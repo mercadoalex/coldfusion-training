@@ -1,0 +1,55 @@
+kind: playground
+name: cf-alex-edcdf975
+base: flexbox
+title: Hungry Minds — ColdFusion 2025 Foundations
+description: |-
+    ColdFusion 2025 Developer Edition + Lucee 7 on Ubuntu 24.04.
+    Course 1: Foundations (Modules 1-4).
+    Course content by Alejandro Mercado / Hungry Minds.
+categories:
+    - linux
+playground:
+    networks:
+        - name: local
+          subnet: 172.16.0.0/24
+    machines:
+        - name: cf-server
+          users:
+            - name: root
+            - name: laborant
+              default: true
+          drives:
+            - mount: /
+              source: oci://ghcr.io/mercadoalex/cf-training:dev
+          network:
+            interfaces:
+                - network: local
+          resources:
+            cpuCount: 2
+            ramSize: 2Gi
+    tabs:
+        - id: terminal-cf-server
+          kind: terminal
+          name: Terminal
+          machine: cf-server
+        - id: ide-cf-server
+          kind: ide
+          name: IDE
+          machine: cf-server
+        - id: http-cf-8500
+          kind: http-port
+          name: ColdFusion 2025
+          machine: cf-server
+          number: 8500
+        - id: http-cf-8888
+          kind: http-port
+          name: Lucee Dev Server
+          machine: cf-server
+          number: 8888
+    accessControl:
+        canList:
+            - owner
+        canRead:
+            - owner
+        canStart:
+            - owner

@@ -1,0 +1,14 @@
+# CF installer binary (900 MB — never commit)
+downloads/
+downloads/*.bin
+downloads/*.exe
+downloads/*.zip
+
+# Docker build artifacts
+rootfs/examiner
+rootfs/examinerctl
+
+# Local build outputs
+*.log
+*.bak
+.DS_Store

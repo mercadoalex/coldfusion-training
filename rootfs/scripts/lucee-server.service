@@ -1,0 +1,35 @@
+[Unit]
+Description=CommandBox / Lucee Development Server
+Documentation=https://commandbox.ortusbooks.com/
+After=network-online.target syslog.target
+Wants=network-online.target
+# Lucee dev server is optional — CF is the primary server
+# It runs on port 8888 so it does not conflict with CF on 8500
+
+[Service]
+Type=simple
+User=laborant
+Group=laborant
+Environment="HOME=/home/laborant"
+Environment="JAVA_HOME=/opt/coldfusion2025/jre"
+Environment="BOX_HOME=/opt/commandbox"
+Environment="COMMANDBOX_HOME=/opt/commandbox"
+Environment="PATH=/opt/coldfusion2025/jre/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+WorkingDirectory=/home/laborant/app
+
+# Use the absolute path to box (/usr/local/bin/box installed via Ortus APT repo)
+ExecStart=/usr/local/bin/box server start --console
+ExecStop=/usr/local/bin/box server stop
+
+TimeoutStartSec=120
+TimeoutStopSec=30
+
+Restart=on-failure
+RestartSec=15
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=lucee-server
+
+[Install]
+WantedBy=multi-user.target
