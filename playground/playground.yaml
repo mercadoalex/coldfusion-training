@@ -13,7 +13,7 @@ playground:
         - name: local
           subnet: 172.16.0.0/24
     machines:
-        - name: cf-server
+        - name: dev-machine
           users:
             - name: root
             - name: laborant
@@ -28,23 +28,23 @@ playground:
             cpuCount: 2
             ramSize: 2Gi
     tabs:
-        - id: terminal-cf-server
+        - id: terminal-dev-machine
           kind: terminal
           name: Terminal
-          machine: cf-server
-        - id: ide-cf-server
+          machine: dev-machine
+        - id: ide-dev-machine
           kind: ide
           name: IDE
-          machine: cf-server
+          machine: dev-machine
         - id: http-cf-8500
           kind: http-port
           name: ColdFusion 2025
-          machine: cf-server
+          machine: dev-machine
           number: 8500
         - id: http-cf-8888
           kind: http-port
           name: Lucee Dev Server
-          machine: cf-server
+          machine: dev-machine
           number: 8888
     accessControl:
         canList:
