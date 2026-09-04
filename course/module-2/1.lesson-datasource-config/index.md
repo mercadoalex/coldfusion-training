@@ -19,7 +19,6 @@ tagz:
 - coldfusion
 - datasource
 - h2
-- mysql
 
 playground:
   name: cf-alex-edcdf975
@@ -67,23 +66,38 @@ tasks:
 
 | Name | Type | Purpose |
 |---|---|---|
-| `training_db` | H2 (embedded) | All lab exercises — pre-seeded with Help Desk schema |
+| `training_db` | H2 embedded | All lab exercises — pre-seeded with Help Desk schema |
+
+The `training_db` datasource is pre-configured and ready on first boot. It contains
+a **Help Desk schema** with realistic sample data:
+
+| Table | Rows | Contents |
+|---|---|---|
+| `hd_departments` | 4 | IT, Dev, HR, Finance |
+| `hd_users` | 6 | Admin, agents, end users |
+| `hd_tickets` | 10 | Mixed status, priority, category |
+| `hd_comments` | 9 | Thread replies and internal notes |
+
+Run the seed script to verify or re-seed: `http://localhost:8500/seed-db.cfm`
+
+View the data: `http://localhost:8500/db-test.cfm`
 
 ## Verify via CFML
 
 ```cfml
 <cfquery name="test" datasource="training_db">
-  SELECT 1 AS alive
+  SELECT COUNT(*) AS total FROM hd_tickets
 </cfquery>
 <cfoutput>
-  Connected: #test.alive eq 1 ? "yes" : "no"#
+  Tickets in training_db: #test.total#
 </cfoutput>
 ```
 
 ## Configure in CF Admin
 
+The datasource is pre-configured — no manual setup needed. To inspect it:
+
 1. Browse to `http://localhost:8500/CFIDE/administrator`
-2. Go to **Data & Services → Data Sources**
-3. Add new H2 datasource named `training_db`
-4. JDBC URL: `jdbc:h2:/opt/coldfusion2025/cfusion/db/training`
-5. Click **Submit** then **Verify**
+2. Login with password: `admin`
+3. Go to **Data & Services → Data Sources**
+4. Click **Verify** next to `training_db`
