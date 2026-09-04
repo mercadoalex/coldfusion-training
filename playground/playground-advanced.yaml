@@ -85,6 +85,15 @@ playground:
           name: ColdFusion (prod)
           machine: cf-prod
           number: 8500
+        - id: terminal-ollama
+          kind: terminal
+          name: Terminal (ollama)
+          machine: ollama
+        - id: http-ollama
+          kind: http-port
+          name: Ollama API
+          machine: ollama
+          number: 11434
 
     accessControl:
         canList:

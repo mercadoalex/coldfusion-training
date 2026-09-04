@@ -14,6 +14,11 @@ LATEST_TAG    := $(REGISTRY)/$(IMAGE_NAME):latest
 FUNDAMENTALS_TAG := $(REGISTRY)/$(IMAGE_NAME):fundamentals
 ADVANCED_TAG     := $(REGISTRY)/$(IMAGE_NAME):advanced
 
+# Ollama node image — separate image, separate registry path
+OLLAMA_IMAGE     ?= cf-ollama
+OLLAMA_TAG       := $(REGISTRY)/$(OLLAMA_IMAGE):latest
+OLLAMA_MODEL     ?= phi3:mini
+
 # ColdFusion installer ZIP (place in downloads/ — exact filename from Adobe)
 CF_INSTALLER  ?= $(CUR_DIR)/downloads/ColdFusion_2025_WWEJ_linux64.zip
 
@@ -30,7 +35,8 @@ LUCEE_VERSION     ?= 7.0.4.34
 
 # ── Phony targets ─────────────────────────────────────────────────────────────
 .PHONY: all build push tag-latest run shell clean help \
-        check-installer check-docker check-registry downloads
+        check-installer check-docker check-registry downloads \
+        build-ollama push-ollama
 
 all: build
 
@@ -84,6 +90,25 @@ tag-advanced: check-registry
 	docker tag $(REGISTRY)/$(IMAGE_NAME):dev $(ADVANCED_TAG)
 	docker push $(ADVANCED_TAG)
 	@echo "\033[0;32mTagged as advanced: $(ADVANCED_TAG)\033[0m"
+
+## build-ollama: Build the Ollama AI node image (pulls phi3:mini at build time — needs internet)
+build-ollama: check-docker
+	@echo "\033[0;32mBuilding $(OLLAMA_TAG)...\033[0m"
+	@echo "\033[0;33mNOTE: phi3:mini (~2.3 GB) will be downloaded during build.\033[0m"
+	docker build \
+		--progress plain \
+		--platform linux/amd64 \
+		--build-arg OLLAMA_MODEL="$(OLLAMA_MODEL)" \
+		-t $(OLLAMA_TAG) \
+		-f $(CUR_DIR)/rootfs/Dockerfile.ollama \
+		$(CUR_DIR)
+	@echo "\033[0;32mBuild complete: $(OLLAMA_TAG)\033[0m"
+
+## push-ollama: Build and push the Ollama AI node image to the registry
+push-ollama: build-ollama check-registry
+	@echo "\033[0;32mPushing $(OLLAMA_TAG)...\033[0m"
+	docker push $(OLLAMA_TAG)
+	@echo "\033[0;32mDone: $(OLLAMA_TAG)\033[0m"
 
 # ── Local testing ─────────────────────────────────────────────────────────────
 ## run: Run the image locally as a container (for quick smoke-testing)
