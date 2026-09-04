@@ -120,8 +120,5 @@
       <a class="btn btn-secondary" href="/db-test.cfm">DB Test</a>
     </div>
   </div>
-  <div style="text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #334155;color:#475569;font-size:.75rem">
-    © <cfoutput>#year(now())#</cfoutput> Hungry Minds · Course content by Alejandro Mercado · Powered by Adobe ColdFusion 2025
-  </div>
 </body>
 </html>
