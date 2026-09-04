@@ -29,12 +29,12 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/students.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/tickets.cfm)
       if [ "${STATUS}" != "200" ]; then
-        echo "students.cfm not found or returning error (got ${STATUS})"
+        echo "tickets.cfm not found or returning error (got ${STATUS})"
         exit 1
       fi
-      echo "students.cfm is accessible"
+      echo "tickets.cfm is accessible"
 
   verify_queryparam_used:
     machine: dev-machine
@@ -42,9 +42,9 @@ tasks:
     needs:
       - verify_query_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/students.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/tickets.cfm"
       if ! grep -qi "cfqueryparam\|queryParam" "${FILE}" 2>/dev/null; then
-        echo "cfqueryparam not found in students.cfm — SQL injection risk"
+        echo "cfqueryparam not found in tickets.cfm — SQL injection risk"
         exit 1
       fi
       echo "cfqueryparam is used — safe SQL"
@@ -55,9 +55,9 @@ tasks:
     needs:
       - verify_queryparam_used
     run: |
-      BODY=$(curl -s http://localhost:8500/students.cfm)
-      if ! echo "${BODY}" | grep -qi "student\|name\|id"; then
-        echo "students.cfm does not display query results"
+      BODY=$(curl -s http://localhost:8500/tickets.cfm)
+      if ! echo "${BODY}" | grep -qi "ticket\|title\|id"; then
+        echo "tickets.cfm does not display query results"
         exit 1
       fi
       echo "Query results are displayed correctly"
@@ -66,14 +66,15 @@ tasks:
 ## SELECT
 
 ```cfml
-<cfquery name="students" datasource="training_db">
-  SELECT id, name, email
-  FROM students
-  ORDER BY name
+<cfquery name="tickets" datasource="training_db">
+  SELECT t.id, t.title, t.status, t.priority, u.name AS submitter
+  FROM   hd_tickets t
+  JOIN   hd_users   u ON u.id = t.user_id
+  ORDER  BY t.created_at DESC
 </cfquery>
 
-<cfoutput query="students">
-  #id# — #name# — #email#<br>
+<cfoutput query="tickets">
+  ##tickets.id## — #encodeForHTML(title)# [#status# / #priority#]<br>
 </cfoutput>
 ```
 
@@ -81,10 +82,14 @@ tasks:
 
 ```cfml
 <cfquery datasource="training_db">
-  INSERT INTO students (name, email)
+  INSERT INTO hd_tickets (title, description, status, priority, user_id, created_at)
   VALUES (
-    <cfqueryparam value="#form.name#" cfsqltype="cf_sql_varchar">,
-    <cfqueryparam value="#form.email#" cfsqltype="cf_sql_varchar">
+    <cfqueryparam value="#form.title#"       cfsqltype="cf_sql_varchar">,
+    <cfqueryparam value="#form.description#" cfsqltype="cf_sql_varchar">,
+    'open',
+    <cfqueryparam value="#form.priority#"    cfsqltype="cf_sql_varchar">,
+    <cfqueryparam value="#session.userId#"   cfsqltype="cf_sql_integer">,
+    <cfqueryparam value="#now()#"            cfsqltype="cf_sql_timestamp">
   )
 </cfquery>
 ```

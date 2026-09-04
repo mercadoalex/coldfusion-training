@@ -86,11 +86,19 @@ box install testbox
 ```cfml
 component extends="testbox.system.BaseSpec" {
   function run() {
-    describe("StudentService", function() {
-      it("should return all students", function() {
-        var svc = new StudentService();
+    describe("TicketService", function() {
+      it("should return all tickets as an array", function() {
+        var svc = new TicketService();
         var result = svc.getAll();
-        expect(result.recordCount).toBeGTE(0);
+        expect(result).toBeArray();
+        expect(arrayLen(result)).toBeGTE(0);
+      });
+
+      it("should return a single ticket by id", function() {
+        var svc = new TicketService();
+        var ticket = svc.getById(1);
+        expect(ticket).toBeStruct();
+        expect(ticket).toHaveKey("title");
       });
     });
   }

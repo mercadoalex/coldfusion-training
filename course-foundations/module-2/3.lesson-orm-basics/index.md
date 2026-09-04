@@ -79,11 +79,13 @@ component {
 ## Define an entity
 
 ```cfml
-// Student.cfc
-component persistent="true" table="students" {
-  property name="id"    fieldtype="id" generator="native";
-  property name="name"  ormtype="string";
-  property name="email" ormtype="string";
+// Ticket.cfc
+component persistent="true" table="hd_tickets" {
+  property name="id"          fieldtype="id" generator="native";
+  property name="title"       ormtype="string";
+  property name="description" ormtype="string";
+  property name="status"      ormtype="string";
+  property name="priority"    ormtype="string";
 }
 ```
 
@@ -92,20 +94,22 @@ component persistent="true" table="students" {
 ```cfml
 <cfscript>
   // CREATE
-  s = new Student();
-  s.setName("Alex");
-  s.setEmail("alex@example.com");
-  entitySave(s);
+  t = new Ticket();
+  t.setTitle("Keyboard not working");
+  t.setDescription("Keys are unresponsive on laptop");
+  t.setStatus("open");
+  t.setPriority("medium");
+  entitySave(t);
 
-  // READ
-  students = entityLoad("Student");
+  // READ all open tickets
+  tickets = entityLoad("Ticket", {status: "open"});
 
   // UPDATE
-  s = entityLoadByPK("Student", 1);
-  s.setName("Alex Updated");
-  entitySave(s);
+  t = entityLoadByPK("Ticket", 1);
+  t.setStatus("closed");
+  entitySave(t);
 
   // DELETE
-  entityDelete(s);
+  entityDelete(t);
 </cfscript>
 ```

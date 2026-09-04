@@ -26,7 +26,7 @@ playground:
 
 ```bash
 # 1 — create project dir
-mkdir /home/student/myapp && cd /home/student/myapp
+mkdir /home/laborant/myapp && cd /home/laborant/myapp
 
 # 2 — create index.cfm
 echo '<cfoutput>Hello from CommandBox + Lucee! #now()#</cfoutput>' > index.cfm

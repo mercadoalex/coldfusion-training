@@ -22,11 +22,11 @@ tagz:
 - automation
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_task_created:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       BODY=$(curl -s http://localhost:8500/schedule_setup.cfm)
@@ -37,7 +37,7 @@ tasks:
       echo "schedule_setup.cfm ran without errors"
 
   verify_cfschedule_used:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_task_created
@@ -50,7 +50,7 @@ tasks:
       echo "cfschedule is used"
 
   verify_task_page_exists:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_cfschedule_used

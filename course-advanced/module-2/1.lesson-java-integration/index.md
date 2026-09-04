@@ -22,11 +22,11 @@ tagz:
 - jvm
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_java_page:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/java_demo.cfm)
@@ -37,7 +37,7 @@ tasks:
       echo "java_demo.cfm is accessible"
 
   verify_createobject_java:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_java_page
@@ -50,7 +50,7 @@ tasks:
       echo "Java object creation found"
 
   verify_java_output:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_createobject_java

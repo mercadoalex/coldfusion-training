@@ -55,9 +55,9 @@ tasks:
     needs:
       - verify_cfinvoke_used
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/StudentService.cfc?wsdl")
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/TicketService.cfc?wsdl")
       if [ "${STATUS}" != "200" ]; then
-        echo "StudentService.cfc WSDL not accessible (got ${STATUS})"
+        echo "TicketService.cfc WSDL not accessible (got ${STATUS})"
         exit 1
       fi
       echo "SOAP WSDL is accessible"
@@ -88,20 +88,21 @@ tasks:
 ## Exposing a CFC as a SOAP web service
 
 ```cfml
-// StudentService.cfc
-component displayname="StudentService" style="document" {
+// TicketService.cfc — expose getById as a remote SOAP method
+component displayname="TicketService" style="document" {
 
-  remote struct function getStudentById(required numeric id)
+  remote struct function getTicketById(required numeric id)
     returntype="struct"
     access="remote"
     output="false"
   {
     var q = queryExecute(
-      "SELECT id, name, email FROM students WHERE id = :id",
+      "SELECT id, title, status, priority FROM hd_tickets WHERE id = :id",
       {id: {value: arguments.id, cfsqltype: "cf_sql_integer"}},
       {datasource: "training_db"}
     );
-    return {id: q.id, name: q.name, email: q.email};
+    if (q.recordCount == 0) { return {error: "not found"}; }
+    return {id: q.id, title: q.title, status: q.status, priority: q.priority};
   }
 
 }
@@ -109,5 +110,5 @@ component displayname="StudentService" style="document" {
 
 Access the WSDL at:
 ```
-http://localhost:8500/StudentService.cfc?wsdl
+http://localhost:8500/TicketService.cfc?wsdl
 ```

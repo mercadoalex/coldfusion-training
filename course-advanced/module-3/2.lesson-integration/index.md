@@ -23,11 +23,11 @@ tagz:
 - ldap
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_cfhttp_page:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/integration_demo.cfm)
@@ -38,7 +38,7 @@ tasks:
       echo "integration_demo.cfm is accessible"
 
   verify_cfhttp_used:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_cfhttp_page
@@ -51,7 +51,7 @@ tasks:
       echo "cfhttp is used"
 
   verify_cfmail_used:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_cfhttp_used

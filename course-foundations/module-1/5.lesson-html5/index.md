@@ -79,26 +79,29 @@ local storage, canvas, geolocation, and web workers.
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CF + HTML5</title>
+  <title>CF + HTML5 — Help Desk</title>
 </head>
 <body>
 <cfscript>
-  students = queryExecute(
-    "SELECT id, name FROM students ORDER BY name",
+  tickets = queryExecute(
+    "SELECT t.id, t.title, t.priority
+     FROM   hd_tickets t
+     WHERE  t.status = 'open'
+     ORDER  BY t.created_at DESC",
     {},
     {datasource: "training_db"}
   );
 </cfscript>
 
-<ul id="student-list">
-  <cfoutput query="students">
-    <li data-id="#id#">#encodeForHTML(name)#</li>
+<ul id="ticket-list">
+  <cfoutput query="tickets">
+    <li data-id="#id#" data-priority="#priority#">#encodeForHTML(title)#</li>
   </cfoutput>
 </ul>
 
 <script>
   // read server data into JS
-  const items = document.querySelectorAll("#student-list li");
+  const items = document.querySelectorAll("#ticket-list li");
   items.forEach(li => {
     li.addEventListener("click", () => {
       localStorage.setItem("lastSelected", li.dataset.id);
@@ -113,12 +116,15 @@ local storage, canvas, geolocation, and web workers.
 
 ```cfml
 <cfscript>
-  data = queryExecute("SELECT id, name FROM students", {}, {datasource:"training_db"});
+  data = queryExecute(
+    "SELECT id, title, priority, status FROM hd_tickets",
+    {}, {datasource: "training_db"}
+  );
   jsonData = serializeJSON(queryToArray(data));
 </cfscript>
 <script>
-  const students = <cfoutput>#jsonData#</cfoutput>;
-  console.log(students);
+  const tickets = <cfoutput>#jsonData#</cfoutput>;
+  console.log(tickets);
 </script>
 ```
 
@@ -128,10 +134,14 @@ local storage, canvas, geolocation, and web workers.
 <!DOCTYPE html>
 <html>
 <body>
-<form method="post" action="save_student.cfm">
-  <input type="text"  name="name"  required minlength="2" maxlength="100">
-  <input type="email" name="email" required>
-  <button type="submit">Save</button>
+<form method="post" action="create_ticket.cfm">
+  <input type="text"   name="title"       required minlength="5" maxlength="255">
+  <textarea            name="description" required></textarea>
+  <select              name="priority">
+    <option>low</option><option selected>medium</option>
+    <option>high</option><option>critical</option>
+  </select>
+  <button type="submit">Submit Ticket</button>
 </form>
 </body>
 </html>

@@ -63,28 +63,36 @@ tasks:
       echo "Chart is powered by dynamic query data"
 ---
 
-## Basic bar chart
+## Basic bar chart — tickets by priority
 
 ```cfml
-<cfquery name="scores" datasource="training_db">
-  SELECT name, score FROM students ORDER BY score DESC
+<cfquery name="byPriority" datasource="training_db">
+  SELECT priority, COUNT(*) AS total
+  FROM   hd_tickets
+  WHERE  status = 'open'
+  GROUP  BY priority
+  ORDER  BY total DESC
 </cfquery>
 
 <cfchart format="png" chartwidth="600" chartheight="400"
-         title="Student Scores" show3d="false">
-  <cfchartseries type="bar" query="scores"
-                 itemcolumn="name" valuecolumn="score"
+         title="Open Tickets by Priority" show3d="false">
+  <cfchartseries type="bar" query="byPriority"
+                 itemcolumn="priority" valuecolumn="total"
                  seriescolor="##4A90D9">
   </cfchartseries>
 </cfchart>
 ```
 
-## Pie chart
+## Pie chart — tickets by status
 
 ```cfml
-<cfchart format="png" chartwidth="500" chartheight="400" title="Score Distribution">
-  <cfchartseries type="pie" query="scores"
-                 itemcolumn="name" valuecolumn="score">
+<cfquery name="byStatus" datasource="training_db">
+  SELECT status, COUNT(*) AS total FROM hd_tickets GROUP BY status
+</cfquery>
+
+<cfchart format="png" chartwidth="500" chartheight="400" title="Tickets by Status">
+  <cfchartseries type="pie" query="byStatus"
+                 itemcolumn="status" valuecolumn="total">
   </cfchartseries>
 </cfchart>
 ```
@@ -93,13 +101,13 @@ tasks:
 
 ```cfml
 <cfchart format="png" name="myChart">
-  <cfchartseries type="line" query="scores"
-                 itemcolumn="name" valuecolumn="score">
+  <cfchartseries type="line" query="byPriority"
+                 itemcolumn="priority" valuecolumn="total">
   </cfchartseries>
 </cfchart>
 
 <cffile action="write"
-        file="#expandPath('/charts/scores.png')#"
+        file="#expandPath('/charts/tickets.png')#"
         output="#myChart#">
 ```
 

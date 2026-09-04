@@ -22,11 +22,11 @@ tagz:
 - configuration
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_admin_accessible:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/CFIDE/administrator/index.cfm)
@@ -37,7 +37,7 @@ tasks:
       echo "CF Admin is accessible (got ${STATUS})"
 
   verify_neo_datasource:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_admin_accessible
@@ -50,7 +50,7 @@ tasks:
       echo "neo-datasource.xml exists"
 
   verify_cf_log:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_neo_datasource

@@ -23,11 +23,11 @@ tagz:
 - best-practices
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_pdf_page:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/pdf_demo.cfm)
@@ -38,7 +38,7 @@ tasks:
       echo "pdf_demo.cfm is accessible"
 
   verify_cfdocument_used:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_pdf_page
@@ -51,7 +51,7 @@ tasks:
       echo "cfdocument/cfpdf is used"
 
   verify_spreadsheet_page:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_cfdocument_used

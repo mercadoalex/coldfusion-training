@@ -22,11 +22,11 @@ tagz:
 - aws
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_docker_running:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       if ! docker info > /dev/null 2>&1; then
@@ -36,7 +36,7 @@ tasks:
       echo "Docker is running"
 
   verify_cf_container:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_docker_running
@@ -48,7 +48,7 @@ tasks:
       echo "ColdFusion/Lucee container is running"
 
   verify_env_config:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_cf_container

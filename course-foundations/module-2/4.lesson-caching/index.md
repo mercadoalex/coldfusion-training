@@ -66,8 +66,11 @@ tasks:
 ## Query caching
 
 ```cfml
-<cfquery name="students" datasource="training_db" cachedwithin="#createTimeSpan(0,0,5,0)#">
-  SELECT id, name FROM students
+<cfquery name="tickets" datasource="training_db" cachedwithin="#createTimeSpan(0,0,5,0)#">
+  SELECT t.id, t.title, t.status, t.priority, u.name AS submitter
+  FROM   hd_tickets t
+  JOIN   hd_users   u ON u.id = t.user_id
+  WHERE  t.status = 'open'
 </cfquery>
 ```
 
@@ -75,10 +78,13 @@ tasks:
 
 ```cfml
 <cfscript>
-  students = cacheGet("allStudents");
-  if (isNull(students)) {
-    students = queryExecute("SELECT * FROM students", {}, {datasource:"training_db"});
-    cachePut("allStudents", students, createTimeSpan(0,0,5,0));
+  tickets = cacheGet("openTickets");
+  if (isNull(tickets)) {
+    tickets = queryExecute(
+      "SELECT id, title, status, priority FROM hd_tickets WHERE status = 'open'",
+      {}, {datasource: "training_db"}
+    );
+    cachePut("openTickets", tickets, createTimeSpan(0,0,5,0));
   }
 </cfscript>
 ```

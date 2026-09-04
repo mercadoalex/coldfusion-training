@@ -22,11 +22,11 @@ tagz:
 - search
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_solr_running:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8983/solr/)
@@ -37,7 +37,7 @@ tasks:
       echo "Solr is running on port 8983"
 
   verify_collection_exists:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_solr_running
@@ -50,7 +50,7 @@ tasks:
       echo "Solr collection exists"
 
   verify_search_page:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_collection_exists

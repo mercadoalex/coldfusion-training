@@ -66,19 +66,26 @@ tasks:
 
 ## HTML5 video element
 
+Store media metadata in a database table and serve files from a known path.
+This example uses the Help Desk `hd_tickets` table to demonstrate query + HTML5 output together.
+
 ```cfml
-<cfquery name="videos" datasource="training_db">
-  SELECT id, title, filename FROM media WHERE type = 'video'
+<cfquery name="tickets" datasource="training_db">
+  SELECT id, title, description FROM hd_tickets
+  WHERE  status = 'open'
+  ORDER  BY created_at DESC
 </cfquery>
 
-<cfoutput query="videos">
-  <section>
+<cfoutput query="tickets">
+  <article>
     <h2>#encodeForHTML(title)#</h2>
+    <p>#encodeForHTML(description)#</p>
+    <!--- Placeholder: replace with real video src when media files are present --->
     <video controls width="640" preload="metadata">
-      <source src="/media/#encodeForHTMLAttribute(filename)#" type="video/mp4">
+      <source src="/media/ticket_#id#.mp4" type="video/mp4">
       Your browser does not support HTML5 video.
     </video>
-  </section>
+  </article>
 </cfoutput>
 ```
 

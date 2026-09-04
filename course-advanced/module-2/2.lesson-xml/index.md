@@ -22,11 +22,11 @@ tagz:
 - xslt
 
 playground:
-  name: cf-alex-edcdf975
+  name: cf-training-advanced
 
 tasks:
   verify_xml_page:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/xml_demo.cfm)
@@ -37,7 +37,7 @@ tasks:
       echo "xml_demo.cfm is accessible"
 
   verify_xml_parse:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_xml_page
@@ -50,7 +50,7 @@ tasks:
       echo "XML functions are used"
 
   verify_xml_output:
-    machine: dev-machine
+    machine: cf-dev
     user: laborant
     needs:
       - verify_xml_parse
