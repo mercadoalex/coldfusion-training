@@ -1,4 +1,5 @@
 ---
+kind: course
 
 title: "ColdFusion 2025: Production & AI"
 description: |
@@ -6,11 +7,9 @@ description: |
   Java integration, and AI-powered applications with Ollama.
   Prerequisites: ColdFusion 2025 Foundations or equivalent experience.
 
-coverImage: __static__/cover.png
+cover: __static__/cover.png
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
-
-playground: cf-training-advanced
 
 ---
 

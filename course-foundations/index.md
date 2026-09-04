@@ -1,4 +1,5 @@
 ---
+kind: course
 
 title: "ColdFusion 2025: Foundations"
 description: |
@@ -6,11 +7,9 @@ description: |
   No local setup required — everything runs in a pre-configured lab environment
   with Adobe ColdFusion 2025 and CommandBox/Lucee 7 ready on first boot.
 
-coverImage: __static__/cover.png
+cover: __static__/cover.png
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
-
-playground: cf-training-foundations
 
 ---
 
