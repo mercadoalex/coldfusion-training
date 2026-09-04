@@ -20,7 +20,7 @@ playground:
               default: true
           drives:
             - mount: /
-              source: oci://ghcr.io/mercadoalex/cf-training:dev
+              source: oci://ghcr.io/mercadoalex/cf-training:fundamentals
           network:
             interfaces:
                 - network: local
