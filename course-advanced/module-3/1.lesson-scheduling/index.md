@@ -22,7 +22,7 @@ tagz:
 - automation
 
 playground:
-  name: cf-training-advanced
+  name: cf-training-advanced-7442b9e0
 
 tasks:
   verify_task_created:

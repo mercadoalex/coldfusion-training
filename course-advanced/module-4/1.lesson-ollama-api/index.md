@@ -24,7 +24,7 @@ tagz:
 - llm
 
 playground:
-  name: cf-training-advanced
+  name: cf-training-advanced-7442b9e0
 
 tasks:
   verify_ollama_running:

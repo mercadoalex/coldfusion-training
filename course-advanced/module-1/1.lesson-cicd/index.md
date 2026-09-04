@@ -24,7 +24,7 @@ tagz:
 - production
 
 playground:
-  name: cf-training-advanced
+  name: cf-training-advanced-7442b9e0
 
 tasks:
   verify_ssh_to_prod:

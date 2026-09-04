@@ -23,7 +23,7 @@ tagz:
 - best-practices
 
 playground:
-  name: cf-training-advanced
+  name: cf-training-advanced-7442b9e0
 
 tasks:
   verify_pdf_page:
