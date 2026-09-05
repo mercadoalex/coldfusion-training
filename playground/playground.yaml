@@ -50,6 +50,6 @@ playground:
         canList:
             - owner
         canRead:
-            - owner
+            - anyone
         canStart:
-            - owner
+            - anyone
