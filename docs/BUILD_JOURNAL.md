@@ -778,3 +778,141 @@ Four tables pre-populated at build time via `seed-db.cfm`:
 
 Access: `http://<vm>:8500/seed-db.cfm` (safe to re-run — skips if data exists)
 View: `http://<vm>:8500/db-test.cfm`
+
+---
+
+## iximiuz Labs Course Content: Critical Schema Rules
+
+**Date discovered:** 2026-09-04 — cost ~5 hours of debugging.
+
+---
+
+### Problem 1: Lesson body content not rendering ("Lesson not found" / blank after frontmatter)
+
+**Symptom:** Clicking "Start Lesson" either showed "Lesson not found" or the lesson opened but rendered nothing below the `tagz:` frontmatter field. Tasks were not visible.
+
+**Root cause:** The iximiuz platform does **not** render content written in the body of `index.md` (after the closing `---`). The lesson body **must** live in a separate `unit-1.md` file.
+
+**The correct lesson structure:**
+
+```
+course-foundations/
+  module-1/
+    0.index.md               ← kind: module  (frontmatter only, no body)
+    1.lesson-introduction/
+      index.md               ← kind: lesson  (frontmatter + tasks only, NO body text)
+      unit-1.md              ← kind: unit    (ALL the readable content goes here)
+```
+
+**`index.md` — frontmatter + tasks only, body must be empty:**
+```yaml
+---
+kind: lesson
+title: Introduction to ColdFusion
+name: introduction-to-coldfusion
+slug: introduction-to-coldfusion
+createdAt: 2026-09-03
+updatedAt: 2026-09-03
+categories:
+- programming
+tagz:
+- coldfusion
+playground:
+  name: cf-alex-edcdf975
+tasks:
+  verify_cf_running:
+    machine: dev-machine
+    user: laborant
+    run: |
+      ...
+---
+```
+← file ends here, nothing after the closing `---`
+
+**`unit-1.md` — all readable content:**
+```yaml
+---
+kind: unit
+title: Introduction to ColdFusion
+name: introduction-to-coldfusion-unit-1
+---
+
+## What is ColdFusion?
+
+All lesson prose, code blocks, tables, and diagrams go here.
+```
+
+---
+
+### Problem 2: Modules showing as empty (`modules: {}`) after push
+
+**Symptom:** `labctl content list` showed `learning: modules: {}` for the course. Lessons pushed fine but the course had no module structure. Clicking any lesson showed "Lesson not found".
+
+**Root cause:** Every `0.index.md` module file was missing the `name:` field. Without it the platform cannot register the module.
+
+**Fix — add `name: module-N` to every `0.index.md`:**
+```yaml
+---
+kind: module
+title: CFML Fundamentals
+name: module-1          # ← THIS IS REQUIRED
+description: |
+  ...
+createdAt: 2026-09-03
+updatedAt: 2026-09-03
+---
+```
+
+---
+
+### Problem 3: `labctl content push` skipping all files silently
+
+**Symptom:** Push output showed `Skipping...` for every file with warning `huh: could not open a new TTY`.
+
+**Root cause:** `labctl` detected files were already on the server and prompted interactively for confirmation. No TTY available so it skipped everything.
+
+**Fix:** Always use `-f` (force) flag when pushing updates:
+```bash
+labctl content push -f course <course-name> -d <dir>
+```
+
+---
+
+### Problem 4: Playground name mismatch
+
+**Symptom:** Lessons referenced a playground that didn't exist, causing "playground not found" errors.
+
+**Root cause:** `playground.yaml` and all lesson `index.md` files had the old playground name (`cf-alex-697a46bc`) instead of the real one (`cf-alex-edcdf975`).
+
+**Fix:** Check the real playground name with:
+```bash
+labctl playground list
+labctl playground manifest <name>
+```
+Then update `playground/playground.yaml` and all lesson files:
+```bash
+find course-foundations course-advanced -name "index.md" | \
+  xargs sed -i '' 's/old-name/new-name/g'
+```
+
+---
+
+### Quick reference: full working push sequence
+
+```bash
+export PATH=$PATH:/Users/alexmarket/.iximiuz/labctl/bin
+
+# Push entire course (force overwrite)
+labctl content push -f course ColdFusion-2025-Foundations-5151cba6 -d course-foundations
+
+# Push a single lesson only
+labctl content push -f course ColdFusion-2025-Foundations-5151cba6 -d course-foundations \
+  --file module-1/1.lesson-introduction/index.md \
+  --file module-1/1.lesson-introduction/unit-1.md
+
+# Verify what the platform actually has
+labctl content pull course ColdFusion-2025-Foundations-5151cba6 -d /tmp/cf-pull
+```
+
+---
+
