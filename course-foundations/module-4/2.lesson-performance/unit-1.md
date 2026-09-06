@@ -98,3 +98,43 @@ curl -s -w "\nHTTP %{http_code} — %{time_total}s\n" -o /dev/null http://localh
 ```
 
 3. Adjust the heap if needed and restart: `sudo systemctl restart cf-server`
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_jvm_config
+---
+#active
+`/opt/coldfusion2025/cfusion/bin/jvm.config` must exist.
+
+#completed
+`jvm.config` found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_heap_set
+---
+#active
+`jvm.config` must contain a `-Xmx` heap setting.
+
+#completed
+JVM heap (`-Xmx`) is configured. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_response_time
+---
+#active
+ColdFusion must respond to a request on port 8500 in under 2000 ms.
+
+#completed
+Response time is within the 2000 ms threshold. ✓
+::

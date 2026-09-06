@@ -98,3 +98,43 @@ http://localhost:8500/TicketService.cfc?wsdl
 curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/TicketService.cfc?wsdl"
 # Should return 200
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_ws_consumer
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm`.
+
+#completed
+`soap_consumer.cfm` exists. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfinvoke_used
+---
+#active
+Use `<cfinvoke>` or `createObject("webservice", ...)` in `soap_consumer.cfm`.
+
+#completed
+Web service invocation found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_exposed_service
+---
+#active
+`TicketService.cfc` must have a `remote` function — verify at `?wsdl`.
+
+#completed
+SOAP WSDL is accessible at `TicketService.cfc?wsdl`. ✓
+::

@@ -86,3 +86,43 @@ curl -s "http://localhost:8500/scopes.cfm?name=TestUser"
 ```
 
 The response should contain **TestUser** and show scope usage for `variables.` somewhere in the output.
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_scopes_page
+---
+#active
+Create `scopes.cfm` — the response must contain the words **variables**, **session**, or **application**.
+
+#completed
+`scopes.cfm` demonstrates variable scopes. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_variables_scope
+---
+#active
+Use the `variables.` prefix explicitly in `scopes.cfm`.
+
+#completed
+The `variables` scope is explicitly used. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_url_scope
+---
+#active
+Visit `scopes.cfm?name=TestUser` — the response must echo back **TestUser** from the URL scope.
+
+#completed
+URL scope is working — `?name=TestUser` is reflected in the output. ✓
+::

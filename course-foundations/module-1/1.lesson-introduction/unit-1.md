@@ -199,3 +199,43 @@ If you see the greeting text (not the raw CFML source), the engine compiled and 
 | **CommandBox** | CLI + embedded server tool for Lucee; analogous to Node's `npm` + `node` |
 | **cfscript** | Block tag (`<cfscript>...</cfscript>`) that enables ECMAScript-style syntax |
 | **Scope** | Named variable namespace (e.g., `variables`, `session`, `application`, `request`) |
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cf_running
+---
+#active
+Waiting for Adobe ColdFusion 2025 to respond on port 8500...
+
+#completed
+ColdFusion 2025 is running on port 8500. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lucee_running
+---
+#active
+Waiting for Lucee / CommandBox to respond on port 8888...
+
+#completed
+Lucee is running on port 8888. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_hello_cfm
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/hello.cfm` that outputs a greeting containing the word **hello**.
+
+#completed
+`hello.cfm` exists and returns a greeting. ✓
+::

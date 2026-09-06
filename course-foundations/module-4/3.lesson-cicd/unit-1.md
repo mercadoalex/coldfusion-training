@@ -132,3 +132,43 @@ docker build -t cfml-app /home/laborant/app/
 # or
 docker build -t cfml-app /opt/coldfusion2025/cfusion/wwwroot/
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_box_json
+---
+#active
+Create `box.json` in the app directory to package the project with CommandBox.
+
+#completed
+`box.json` found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_dockerfile
+---
+#active
+Create a `Dockerfile` in the same directory using the CommandBox base image.
+
+#completed
+`Dockerfile` found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_docker_build
+---
+#active
+Build the Docker image: `docker build -t cfml-app .` — a `cfml` image must appear in `docker images`.
+
+#completed
+Docker image exists. ✓
+::

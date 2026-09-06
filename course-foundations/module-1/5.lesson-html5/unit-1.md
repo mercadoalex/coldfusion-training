@@ -111,3 +111,43 @@ HTML5 provides built-in client-side validation via attributes like `required`, `
 ```bash
 curl -s http://localhost:8500/html5_demo.cfm | grep -i "DOCTYPE"
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_html5_page
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm` — must return HTTP 200.
+
+#completed
+`html5_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_html5_doctype
+---
+#active
+Add `<!DOCTYPE html>` to `html5_demo.cfm`.
+
+#completed
+HTML5 doctype is present. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_dynamic_output
+---
+#active
+Add at least one `<cfoutput>` or `writeOutput()` call to `html5_demo.cfm`.
+
+#completed
+Dynamic CFML output is present in the page. ✓
+::

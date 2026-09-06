@@ -205,3 +205,79 @@ curl -s -X DELETE "http://localhost:8500/api/tickets.cfm?id=1" | python3 -m json
 | Route on verb | `cgi.REQUEST_METHOD` — `"GET"`, `"POST"`, `"DELETE"` |
 | Safe SQL params | `cfqueryparam` / `queryExecute` named bindings |
 | Halt execution | `abort` after writing the response |
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_api_list
+---
+#active
+`GET /api/tickets.cfm` must return HTTP 200.
+
+#completed
+`GET /api/tickets.cfm` → 200 OK. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_json_content_type
+---
+#active
+The response must include `Content-Type: application/json`.
+
+#completed
+`Content-Type: application/json` confirmed. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_json_valid
+---
+#active
+The response body must be valid JSON.
+
+#completed
+Valid JSON response. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_tickets_array
+---
+#active
+The JSON response must contain at least 1 ticket (`total` > 0).
+
+#completed
+Response contains tickets. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_single_ticket
+---
+#active
+`GET /api/tickets.cfm?id=1` must return a ticket object with a `title` field.
+
+#completed
+Single ticket fetch works. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_post_ticket
+---
+#active
+`POST /api/tickets.cfm` with a JSON body must return `{"created": true}`.
+
+#completed
+POST creates a new ticket. ✓
+::

@@ -108,3 +108,43 @@ Other `cfimage` actions: `rotate`, `convert`, `addBorder`, `watermark`, `captcha
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_media_page
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm` — must return HTTP 200.
+
+#completed
+`media_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_html5_video
+---
+#active
+Add a `<video>` or `<audio>` HTML5 element to `media_demo.cfm`.
+
+#completed
+HTML5 media element is present. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_upload_handler
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm` with a `cffile action="upload"` handler.
+
+#completed
+`upload_media.cfm` exists. ✓
+::

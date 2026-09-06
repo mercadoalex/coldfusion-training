@@ -105,3 +105,43 @@ curl -s http://localhost:8888/lucee_info.cfm
 ```bash
 curl -s http://localhost:8888/verify_ds.cfm
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lucee_running
+---
+#active
+Lucee must be running and responding on port 8888.
+
+#completed
+Lucee is running on port 8888. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lucee_version
+---
+#active
+Create `/home/laborant/app/lucee_info.cfm` — the response must contain the word **lucee**.
+
+#completed
+Lucee version info is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lucee_datasource
+---
+#active
+`verify_ds.cfm` must work on the Lucee root (port 8888) without errors.
+
+#completed
+Lucee datasource is configured correctly. ✓
+::

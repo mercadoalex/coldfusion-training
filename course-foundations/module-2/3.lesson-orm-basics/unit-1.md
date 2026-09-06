@@ -122,3 +122,43 @@ Hibernate Query Language is SQL-like but operates on entity names, not table nam
 ```bash
 curl -s http://localhost:8500/orm_test.cfm | grep -vi "error\|exception"
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_orm_enabled
+---
+#active
+Add `this.ormenabled = true` to `Application.cfc`.
+
+#completed
+ORM is enabled in `Application.cfc`. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_entity_exists
+---
+#active
+Create a CFC with `persistent="true"` mapped to `hd_tickets`.
+
+#completed
+At least one persistent ORM entity CFC found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_orm_page
+---
+#active
+Create `orm_test.cfm` that calls `entityLoad` — must return no errors.
+
+#completed
+`orm_test.cfm` runs without errors. ✓
+::

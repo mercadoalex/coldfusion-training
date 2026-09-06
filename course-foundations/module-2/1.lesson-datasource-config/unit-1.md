@@ -82,3 +82,43 @@ component {
 ```bash
 curl -s http://localhost:8500/verify_ds.cfm
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_datasource_page
+---
+#active
+Create `verify_ds.cfm` — the response must contain **success**, **connected**, or **ok**.
+
+#completed
+Datasource connection verified. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_training_db
+---
+#active
+Reference the `training_db` datasource in `verify_ds.cfm`.
+
+#completed
+`training_db` datasource is referenced. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_no_error
+---
+#active
+`verify_ds.cfm` must not output any **error** or **exception** text.
+
+#completed
+No errors on the datasource verification page. ✓
+::

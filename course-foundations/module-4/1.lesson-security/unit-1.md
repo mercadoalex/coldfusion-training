@@ -112,3 +112,43 @@ curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
 2. Confirm `cfqueryparam` is used in the existing `tickets.cfm` (from the SQL lesson).
 3. Add the security headers to `Application.cfc`.
 4. Verify the admin is inaccessible from outside (the task uses `curl` to check the HTTP status).
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_admin_restricted
+---
+#active
+The CF Admin at `/CFIDE/administrator/index.cfm` must return a non-200 response.
+
+#completed
+CF Admin is restricted. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_no_xss
+---
+#active
+Create `input_demo.cfm` — passing `?name=<script>alert(1)</script>` must NOT output the raw script tag.
+
+#completed
+Input is properly HTML-encoded — no XSS. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_queryparam_sql
+---
+#active
+Use `cfqueryparam` at least once somewhere in the web root.
+
+#completed
+`cfqueryparam` is used — SQL injection protection in place. ✓
+::

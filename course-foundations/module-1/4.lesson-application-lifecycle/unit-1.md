@@ -111,3 +111,43 @@ curl -s http://localhost:8500/index.cfm
 curl -s http://localhost:8500/debug_app.cfm
 # or check with cfdump: <cfdump var="#application#">
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_application_cfc_exists
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/Application.cfc`.
+
+#completed
+`Application.cfc` exists in the web root. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_onapplicationstart
+---
+#active
+Add an `onApplicationStart()` method to `Application.cfc`.
+
+#completed
+`onApplicationStart` is defined. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_app_name
+---
+#active
+Set `this.name` to a non-empty string in `Application.cfc`.
+
+#completed
+Application name (`this.name`) is configured. ✓
+::

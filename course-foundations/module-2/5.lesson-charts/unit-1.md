@@ -104,3 +104,43 @@ Then serve it with a normal `<img>` tag: `<img src="/charts/tickets.png">`.
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm
 # Should return 200
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_chart_page
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm` — must return HTTP 200.
+
+#completed
+`chart_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfchart_used
+---
+#active
+Add a `<cfchart>` tag to `chart_demo.cfm`.
+
+#completed
+`cfchart` is used. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_chart_data
+---
+#active
+Power the chart with a `cfquery` or `queryExecute` call against `training_db`.
+
+#completed
+Chart is powered by live query data. ✓
+::

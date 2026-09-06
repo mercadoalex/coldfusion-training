@@ -113,3 +113,43 @@ This is useful for real-time dashboard updates triggered by background jobs or s
 ```bash
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/ws_demo.cfm
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_ws_page
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/ws_demo.cfm` — must return HTTP 200.
+
+#completed
+`ws_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_ws_handler
+---
+#active
+Create `WSHandler.cfc` with `onWSMessage`, `wsPublish`, or `wsGetAllChannels`.
+
+#completed
+WebSocket handler CFC found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_ws_js_client
+---
+#active
+Add `new WebSocket(...)` JavaScript client code to `ws_demo.cfm`.
+
+#completed
+JavaScript WebSocket client is present. ✓
+::

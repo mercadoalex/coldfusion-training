@@ -122,3 +122,43 @@ Debugging output appears at the bottom of every rendered CF page, showing SQL qu
 curl -s "http://localhost:8500/testbox/system/runners/TextRunner.cfm?directory=tests" \
   | grep -i "failures\|errors\|tests"
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_testbox_installed
+---
+#active
+Install TestBox: `box install testbox`
+
+#completed
+TestBox is installed. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_test_exists
+---
+#active
+Create at least one TestBox spec or test CFC (filename containing `Test` or `Spec`).
+
+#completed
+TestBox test/spec file found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_tests_pass
+---
+#active
+Run the TestBox suite — all tests must pass with zero failures and zero errors.
+
+#completed
+TestBox tests pass. ✓
+::

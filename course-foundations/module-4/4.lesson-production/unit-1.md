@@ -115,3 +115,43 @@ curl -s http://localhost:8500/health.cfm | python3 -m json.tool
 curl -s http://localhost:8500/health.cfm \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])"
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_health_endpoint
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/health.cfm` — must return valid JSON.
+
+#completed
+`health.cfm` returns valid JSON. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_health_status
+---
+#active
+The JSON response must contain a `status` field set to `"ok"` or `"degraded"`.
+
+#completed
+Health status is `ok` or `degraded`. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_health_http_code
+---
+#active
+`health.cfm` must return HTTP 200 (healthy) or HTTP 503 (degraded).
+
+#completed
+Health endpoint returns the correct HTTP status code. ✓
+::

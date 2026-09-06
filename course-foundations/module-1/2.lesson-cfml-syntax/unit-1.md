@@ -98,3 +98,43 @@ ColdFusion also supports `for...in` over arrays and structs, and `while` loops. 
 curl -s http://localhost:8500/syntax_tag.cfm
 curl -s http://localhost:8500/syntax_script.cfm
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_tag_syntax
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` using `<cfset>` and `<cfoutput>` — the response must contain the word **tag**.
+
+#completed
+`syntax_tag.cfm` returns tag-syntax output. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_script_syntax
+---
+#active
+Create `syntax_script.cfm` using `<cfscript>` and `writeOutput()` — the response must contain the word **script**.
+
+#completed
+`syntax_script.cfm` returns script-syntax output. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfif
+---
+#active
+Add an `if` or `<cfif>` conditional to `syntax_script.cfm`.
+
+#completed
+Conditional logic is present in `syntax_script.cfm`. ✓
+::

@@ -107,3 +107,43 @@ cacheRemoveAll();
 curl -s http://localhost:8500/cache_demo.cfm
 curl -s http://localhost:8500/cache_demo.cfm
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cache_page
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm` — must return HTTP 200.
+
+#completed
+`cache_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cache_used
+---
+#active
+Use `cfcache`, `cacheGet`/`cachePut`, or `cachedwithin` in `cache_demo.cfm`.
+
+#completed
+Caching directive is present. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cache_no_error
+---
+#active
+`cache_demo.cfm` must return cleanly on a second request with no errors.
+
+#completed
+Cache demo returns clean on repeated requests. ✓
+::

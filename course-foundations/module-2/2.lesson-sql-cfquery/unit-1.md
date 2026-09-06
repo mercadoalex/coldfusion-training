@@ -104,3 +104,43 @@ In cfscript, use the function form instead of the tag:
 ```bash
 curl -s http://localhost:8500/tickets.cfm | grep -i "ticket\|title\|id"
 ```
+
+---
+
+## Hands-on checks
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_query_page
+---
+#active
+Create `/opt/coldfusion2025/cfusion/wwwroot/tickets.cfm` — must return HTTP 200.
+
+#completed
+`tickets.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_queryparam_used
+---
+#active
+Use `<cfqueryparam>` or named bindings in `queryExecute` in `tickets.cfm`.
+
+#completed
+`cfqueryparam` is used — safe parameterised SQL. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_select_results
+---
+#active
+`tickets.cfm` must display ticket data (ID, title, or similar).
+
+#completed
+Query results are displayed correctly. ✓
+::
