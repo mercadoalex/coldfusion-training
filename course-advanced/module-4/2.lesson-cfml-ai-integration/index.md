@@ -10,8 +10,8 @@ description: |
 name: cfml-ai-integration
 slug: cfml-ai-integration
 
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
+createdAt: "2026-09-03"
+updatedAt: "2026-09-03"
 
 categories:
 - programming
@@ -323,3 +323,4 @@ Always wrap AI calls in `<cftry>` — the model node may be busy or restarting:
 | Reusable AI layer | `OllamaService.cfc` with `generate()` and `chat()` methods |
 | Timeout | `<cfhttp timeout="120">` for slow first-load |
 | Error handling | `<cftry>`/`<cfcatch type="OllamaService.Error">` |
+

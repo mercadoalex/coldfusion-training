@@ -10,8 +10,8 @@ description: |
 name: intro-ollama-local-llms
 slug: intro-ollama-local-llms
 
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
+createdAt: "2026-09-03"
+updatedAt: "2026-09-03"
 
 categories:
 - programming
@@ -214,3 +214,4 @@ This is the URL you will use in ColdFusion: `http://ollama:11434`.
 | Chat | `POST /api/chat` with `messages` array |
 | URL from cf-dev | `http://ollama:11434` |
 | No auth needed | Local network, no API key required |
+

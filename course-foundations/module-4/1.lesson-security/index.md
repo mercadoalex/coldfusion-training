@@ -64,26 +64,3 @@ tasks:
       fi
       echo "cfqueryparam is used in ${COUNT} location(s)"
 ---
-
-## Secure CF Admin (nginx)
-
-```nginx
-location /CFIDE/administrator {
-  allow 127.0.0.1;
-  deny all;
-}
-```
-
-## Prevent XSS — encode all output
-
-```cfml
-<cfoutput>#encodeForHTML(url.name)#</cfoutput>
-```
-
-## Security headers
-
-```cfml
-<cfheader name="Content-Security-Policy" value="default-src 'self'">
-<cfheader name="X-Frame-Options" value="DENY">
-<cfheader name="X-Content-Type-Options" value="nosniff">
-```

@@ -10,8 +10,8 @@ description: |
 name: cf-admin-api-cfconfig-automation
 slug: cf-admin-api-cfconfig-automation
 
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
+createdAt: "2026-09-03"
+updatedAt: "2026-09-03"
 
 categories:
 - programming
@@ -227,3 +227,4 @@ curl -sf http://cf-prod:8500/index.cfm && echo "cf-prod back online"
 | CFConfig file | `.CFConfig.json` — JSON representation of CF server state |
 | Apply CFConfig | `box cfconfig import to=... toFormat=adobe2025` |
 | Export CFConfig | `box cfconfig export to=... from=...` |
+

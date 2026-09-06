@@ -11,8 +11,8 @@ description: |
 name: ai-helpdesk
 slug: ai-helpdesk
 
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
+createdAt: "2026-09-03"
+updatedAt: "2026-09-03"
 
 categories:
 - programming
@@ -285,3 +285,4 @@ if (triage.suggested_priority != q.priority) {
 | Clean JSON from LLM | Strip code fences with `reReplace()`, check `isJSON()`, provide fallback |
 | Temperature control | `svc.chat(messages, 0.5)` — lower for factual summaries |
 | DB + AI together | Standard `queryExecute` for data, `OllamaService.cfc` for AI |
+

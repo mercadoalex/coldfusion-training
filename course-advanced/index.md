@@ -1,15 +1,25 @@
 ---
 kind: course
 
-title: "ColdFusion 2025: Production & AI"
-description: |
-  Advanced ColdFusion 2025 training covering DevOps, CI/CD, cloud deployment,
-  Java integration, and AI-powered applications with Ollama.
-  Prerequisites: ColdFusion 2025 Foundations or equivalent experience.
+title: |-
+  ColdFusion 2025: Production & AI
 
-cover: __static__/cover.png
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
+description: |-
+  Advanced ColdFusion 2025 training covering DevOps, CI/CD, cloud deployment, Java integration, and AI-powered applications with Ollama. Prerequisites: ColdFusion 2025 Foundations or equivalent experience.
+
+categories:
+- programming
+
+tagz:
+- coldfusion
+- cfml
+- ai
+- ollama
+
+createdAt: "2026-09-03"
+updatedAt: "2026-09-03"
+
+# cover: __static__/cover.png
 
 ---
 
@@ -42,3 +52,4 @@ This course uses a multi-VM environment:
 - Completion of **ColdFusion 2025: Foundations** or equivalent
 - Basic understanding of REST APIs and databases
 - Familiarity with command-line tools
+

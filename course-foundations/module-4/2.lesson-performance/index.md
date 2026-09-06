@@ -65,24 +65,3 @@ tasks:
       fi
       echo "Response time is ${MS}ms — within acceptable range"
 ---
-
-## JVM heap settings
-
-```bash
-# /opt/coldfusion2025/cfusion/bin/jvm.config
-java.args=-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
-```
-
-## Connection pool tuning
-
-1. CF Admin → **Data & Services → Data Sources → training_db → Advanced Settings**
-2. **Max Connections**: `50`
-3. **Connection Timeout**: `120`
-4. **Max Wait Time**: `5000` ms
-
-## Enable GZIP (nginx)
-
-```nginx
-gzip on;
-gzip_types text/html application/json application/javascript text/css;
-```

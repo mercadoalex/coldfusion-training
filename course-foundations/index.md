@@ -2,15 +2,22 @@
 kind: course
 
 title: "ColdFusion 2025: Foundations"
-description: |
-  Hands-on ColdFusion 2025 training from CFML basics to REST APIs and security.
-  No local setup required — everything runs in a pre-configured lab environment
-  with Adobe ColdFusion 2025 and CommandBox/Lucee 7 ready on first boot.
 
-cover: __static__/cover.png
+description: |-
+  Hands-on ColdFusion 2025 training from CFML basics to REST APIs and security. No local setup required — everything runs in a pre-configured lab environment with Adobe ColdFusion 2025 and CommandBox/Lucee 7 ready on first boot.
+
+categories:
+- programming
+
+tagz:
+- coldfusion
+- cfml
+- lucee
+
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
 
+cover: __static__/cover.png
 ---
 
 ## What you'll learn
@@ -41,3 +48,5 @@ Every lesson runs in a live browser-based environment — no installation needed
 - Basic HTML knowledge
 - Familiarity with any programming language (variables, loops, conditions)
 - No ColdFusion experience required
+
+

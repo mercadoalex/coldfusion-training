@@ -10,8 +10,8 @@ description: |
 name: multi-vm-deployment-cf-prod
 slug: multi-vm-deployment-cf-prod
 
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
+createdAt: "2026-09-03"
+updatedAt: "2026-09-03"
 
 categories:
 - programming
@@ -80,6 +80,10 @@ tasks:
       echo "Deployment marker present on cf-prod ✓"
 ---
 
+![Multi-VM deployment architecture — cf-dev and cf-prod VMs on the same private network, with an rsync SSH arrow from cf-dev to cf-prod and a browser verifying the production URL](__static__/multi-vm-deployment-architecture.png)
+
+> **Image note:** Replace with a Gemini-generated network diagram: cf-dev VM (left) with a blue SSH/rsync arrow pointing to cf-prod VM (right), both on the same internal network, with a browser icon above cf-prod confirming the deployed app.
+
 ## Overview
 
 Your environment has two ColdFusion VMs on the same private network:
@@ -95,6 +99,10 @@ write on `cf-dev` → test → push to `cf-prod` via `rsync` over SSH.
 ---
 
 ## 1. Set up SSH key-based access
+
+![SSH key setup terminal — showing ssh-keygen generating ed25519 key pair, ssh-copy-id copying to cf-prod, and "SSH works" confirmation](__static__/ssh-key-setup.png)
+
+> **Image note:** Replace with a screenshot of the lab terminal (cf-dev tab) showing the ssh-keygen and ssh-copy-id commands completing, followed by "SSH works" output.
 
 Run this once on **cf-dev**:
 
@@ -112,6 +120,10 @@ ssh laborant@cf-prod "echo SSH works"
 ---
 
 ## 2. Write a deployment script
+
+![deploy.sh in VS Code — the bash deployment script open in the code editor with the rsync and ssh commands highlighted](__static__/deploy-script-vscode.png)
+
+> **Image note:** Replace with a screenshot of deploy.sh open in VS Code showing the rsync command block and SSH marker write highlighted.
 
 Create `/home/laborant/deploy.sh` on **cf-dev**:
 
@@ -148,6 +160,10 @@ chmod +x ~/deploy.sh
 
 ## 3. Verify the deployment
 
+![Deployment verification terminal — showing "cat deploy_marker.txt" on cf-prod returning a timestamp, and curl cf-prod:8500 returning an HTML response](__static__/deployment-verification.png)
+
+> **Image note:** Replace with a screenshot of the cf-prod terminal tab showing the deploy_marker.txt timestamp and the curl verification succeeding.
+
 From **cf-dev**:
 
 ```bash
@@ -169,6 +185,10 @@ cat /opt/coldfusion2025/cfusion/wwwroot/deploy_marker.txt
 ---
 
 ## 4. Blue/green variant
+
+![Blue/green deployment diagram — two wwwroot directories (wwwroot-blue and wwwroot-green) with a symlink arrow pointing from wwwroot to the active slot, being atomically swapped](__static__/blue-green-deployment.png)
+
+> **Image note:** Replace with a Gemini-generated diagram showing wwwroot-blue and wwwroot-green directories, a symlink pointing to the active one, and an arrow showing the atomic swap operation.
 
 For zero-downtime, maintain two wwwroot directories and swap a symlink:
 
@@ -197,3 +217,4 @@ ssh laborant@cf-prod \
 | Verify deployment | `curl -sf http://cf-prod:8500/` |
 | Zero-downtime swap | symlink blue/green swap |
 | Deployment marker | write a `deploy_marker.txt` with timestamp |
+

@@ -1,0 +1,84 @@
+---
+kind: unit
+
+title: Datasource Configuration
+
+name: datasource-configuration-unit-1
+---
+
+## Datasources in the lab
+
+The `training_db` datasource is pre-configured in CF Admin on first boot. It is an embedded H2 database pre-seeded with a **Help Desk schema**.
+
+| Name | Type | Purpose |
+|---|---|---|
+| `training_db` | H2 embedded | All lab exercises |
+
+### Help Desk schema
+
+| Table | Rows | Contents |
+|---|---|---|
+| `hd_departments` | 4 | IT, Dev, HR, Finance |
+| `hd_users` | 6 | Admin, agents, end users |
+| `hd_tickets` | 10 | Mixed status, priority, category |
+| `hd_comments` | 9 | Thread replies and internal notes |
+
+Useful URLs in your environment:
+
+```
+http://localhost:8500/seed-db.cfm   ← re-seed the schema
+http://localhost:8500/db-test.cfm   ← view raw table data
+```
+
+---
+
+## Verify via CFML
+
+```cfml
+<cfquery name="test" datasource="training_db">
+  SELECT COUNT(*) AS total FROM hd_tickets
+</cfquery>
+<cfoutput>
+  Tickets in training_db: #test.total#
+</cfoutput>
+```
+
+Create this as `verify_ds.cfm` in the web root. The page must output something containing **success**, **connected**, or **ok** for the lesson task to pass.
+
+---
+
+## Configure in CF Admin
+
+The datasource is already set up — no manual steps needed. To inspect it:
+
+1. Browse to `http://localhost:8500/CFIDE/administrator`
+2. Log in with password: `admin`
+3. Go to **Data & Services → Data Sources**
+4. Click **Verify** next to `training_db`
+
+You should see a green checkmark and "OK" status.
+
+---
+
+## What is a datasource?
+
+A ColdFusion datasource is a **named JDBC connection pool**. Pages and components reference it by name — not by connection string. The pool is configured once (in CF Admin or `Application.cfc`) and shared across all requests.
+
+```cfml
+// Inline datasource definition in Application.cfc (alternative to CF Admin)
+component {
+  this.datasource = "training_db";  // sets the default for all cfquery calls
+}
+```
+
+---
+
+## Exercises
+
+1. Create `/opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm`.
+2. Query `hd_tickets` and output a confirmation containing the word **ok** or **connected**.
+3. Verify:
+
+```bash
+curl -s http://localhost:8500/verify_ds.cfm
+```

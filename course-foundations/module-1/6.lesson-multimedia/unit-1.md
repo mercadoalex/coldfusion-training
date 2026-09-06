@@ -1,0 +1,110 @@
+---
+kind: unit
+
+title: Multimedia Content Integration
+
+name: multimedia-content-integration-unit-1
+---
+
+## HTML5 video element
+
+Store media metadata in a database table and serve files from a known path.
+This example uses the Help Desk `hd_tickets` table to demonstrate query + HTML5 output together.
+
+```cfml
+<cfquery name="tickets" datasource="training_db">
+  SELECT id, title, description FROM hd_tickets
+  WHERE  status = 'open'
+  ORDER  BY created_at DESC
+</cfquery>
+
+<cfoutput query="tickets">
+  <article>
+    <h2>#encodeForHTML(title)#</h2>
+    <p>#encodeForHTML(description)#</p>
+    <!--- Placeholder: replace with real video src when media files are present --->
+    <video controls width="640" preload="metadata">
+      <source src="/media/ticket_#id#.mp4" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+  </article>
+</cfoutput>
+```
+
+---
+
+## File upload with cffile
+
+`cffile action="upload"` handles multipart form submissions:
+
+```cfml
+<cfscript>
+  if (structKeyExists(form, "mediaFile")) {
+    allowedTypes = "video/mp4,video/webm,audio/mpeg,audio/ogg";
+    cffile(
+      action      = "upload",
+      filefield   = "mediaFile",
+      destination = expandPath("/uploads/media/"),
+      accept      = allowedTypes,
+      nameconflict = "makeunique"
+    );
+    writeOutput("Uploaded: " & cffile.serverFile);
+  }
+</cfscript>
+
+<form method="post" enctype="multipart/form-data">
+  <input type="file" name="mediaFile" accept="video/*,audio/*">
+  <button type="submit">Upload</button>
+</form>
+```
+
+Key `cffile` properties after upload:
+
+| Property | Value |
+|---|---|
+| `cffile.serverFile` | Filename on disk (after conflict resolution) |
+| `cffile.serverDirectory` | Destination directory |
+| `cffile.fileSize` | Size in bytes |
+| `cffile.contentType` | MIME type reported by the browser |
+
+---
+
+## Image manipulation with cfimage
+
+ColdFusion ships with a built-in image manipulation library:
+
+```cfml
+<cfscript>
+  cfimage(
+    action    = "resize",
+    source    = "/uploads/original.jpg",
+    dest      = "/uploads/thumb.jpg",
+    width     = "200",
+    height    = "200",
+    overwrite = true
+  );
+</cfscript>
+```
+
+Other `cfimage` actions: `rotate`, `convert`, `addBorder`, `watermark`, `captcha`.
+
+---
+
+## Security considerations
+
+- Always validate file extensions **and** MIME type server-side — never trust the browser.
+- Store uploaded files outside the web root if they should not be directly accessible.
+- Use `nameconflict="makeunique"` to prevent filename collisions.
+
+---
+
+## Exercises
+
+1. Create `/opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm` with an HTML5 `<video>` or `<audio>` element.
+2. Create `/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm` with a `cffile` upload handler.
+3. Verify:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm
+```
