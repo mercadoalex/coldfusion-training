@@ -24,6 +24,7 @@ cover: __static__/cover.png
 
 - Write CFML in both tag-based and script syntax
 - Work with variables, scopes, arrays, structs and queries
+- Build object-oriented applications with CFCs — properties, methods, inheritance
 - Build the Application.cfc lifecycle framework
 - Query databases with cfquery and prevent SQL injection
 - Use ColdFusion ORM with Hibernate
