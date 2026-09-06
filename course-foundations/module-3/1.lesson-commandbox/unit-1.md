@@ -8,6 +8,15 @@ name: commandbox-cli-server-management-unit-1
 
 ## What is CommandBox?
 
+::image-box
+---
+:src: __static__/commandbox-ecosystem-overview-v1.png
+:alt: Diagram showing CommandBox at the centre of three connected roles — on the left "Package Manager" with an arrow to ForgeBox logo and label "install cbvalidation, testbox, coldbox from forgebox.io"; on the right "Server Manager" with an arrow to Lucee and Adobe CF engine logos and label "box server start"; below "CLI & REPL" with a terminal icon and label "box run-script, box testbox run" — all three arrows meet at the central CommandBox logo
+:max-width: 860px
+---
+_CommandBox is package manager + embedded server + CLI in one tool — the `npm` + `node` of the CFML world._
+::
+
 CommandBox is the **package manager, CLI, and embedded server** for the CFML ecosystem. Think of it as `npm` + `node` for ColdFusion. It manages Lucee server instances, installs ForgeBox packages, and runs TestBox test suites — all from the terminal.
 
 In your lab environment, `box` is already on the PATH and Lucee is running on port **8888** via a systemd service.
@@ -57,6 +66,16 @@ When `server.json` exists, running `box server start` picks up all settings auto
 ---
 
 ## box.json — project metadata
+
+::image-box
+---
+:src: __static__/commandbox-server-json-anatomy-v1.png
+:alt: Annotated JSON snippet showing a server.json file — the "name" field is labelled "human-readable server label", "web.http.port" is labelled "port to listen on", "app.cfengine" is labelled "engine + version pin (e.g. lucee@7.0.4.34)", and "app.webroot" is labelled "path to serve files from" — each label is connected to its JSON key by a coloured callout line
+:max-width: 860px
+---
+_`server.json` pins the engine version and port so any developer or CI environment starts identical servers._
+::
+
 
 `box.json` is the package descriptor (like `package.json` for Node):
 
@@ -168,4 +187,17 @@ Create `/home/laborant/app/box.json` to initialise the CommandBox project.
 
 #completed
 `box.json` found — CommandBox project is initialised. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.commandbox-server-1b054ad4
+---
 ::

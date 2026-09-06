@@ -8,6 +8,15 @@ name: lucee-server-configuration-unit-1
 
 ## Lucee vs Adobe ColdFusion 2025
 
+::image-box
+---
+:src: __static__/lucee-vs-adobe-cf-comparison-v1.png
+:alt: Two-column comparison card — left column has the Lucee logo and lists: Open source (LGPL), admin at /lucee/admin/, JSON-based .CFConfig.json config, fast cold start (~5–10 s), PDF via extension; right column has the Adobe ColdFusion 2025 logo and lists: Commercial license, admin at /CFIDE/administrator/, XML neo-*.xml config, moderate cold start (~30 s), native PDF via cfdocument — both columns share a row for "same CFML language core" highlighted in green at the top
+:max-width: 860px
+---
+_Lucee and Adobe CF share the same CFML language core — the differences are in licensing, admin tooling, and some built-in features._
+::
+
 Both engines execute the same CFML language core but differ in licensing, configuration format, and some built-in capabilities.
 
 | Feature | Lucee 7 | Adobe CF 2025 |
@@ -50,6 +59,16 @@ Access via the Lucee tab: `http://localhost:8888/lucee_info.cfm`
 ---
 
 ## CFConfig — JSON-based configuration
+
+::image-box
+---
+:src: __static__/cfconfig-json-workflow-v1.png
+:alt: Three-step workflow diagram — step 1 "Author .CFConfig.json" shows a code editor with the JSON datasources configuration; step 2 "Commit to git" shows a git commit icon labelled "version-controlled server config"; step 3 "box cfconfig import" shows the CommandBox CLI command applying the config to a running Lucee server, producing a green "Datasource 'training_db' created" confirmation message
+:max-width: 860px
+---
+_CFConfig makes server configuration reproducible — commit `.CFConfig.json` to git and import it on every environment._
+::
+
 
 CommandBox ships with the `cfconfig` module for managing Lucee settings as JSON. This enables reproducible, version-controlled server configuration.
 
@@ -144,4 +163,17 @@ Lucee version info is accessible. ✓
 
 #completed
 Lucee datasource is configured correctly. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.lucee-d67efe00
+---
 ::

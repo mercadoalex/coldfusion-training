@@ -8,6 +8,15 @@ name: orm-basics-hibernate-unit-1
 
 ## What is ColdFusion ORM?
 
+::image-box
+---
+:src: __static__/orm-entity-to-table-mapping-v1.png
+:alt: Two-column mapping diagram — on the left a Ticket.cfc component box shows property declarations with persistent="true", property name="id" fieldtype="id", property name="title" ormtype="string", and property name="status" ormtype="string"; on the right a database table box shows the corresponding hd_tickets table with columns id (PK), title (VARCHAR), status (VARCHAR) — a bidirectional arrow labelled "Hibernate ORM" bridges the two sides
+:max-width: 860px
+---
+_ColdFusion ORM maps persistent CFC properties directly to database columns via Hibernate — no SQL DDL required._
+::
+
 ColdFusion ships with **Hibernate** as its built-in ORM layer. Mark a CFC as `persistent="true"` and ColdFusion automatically maps it to a database table, generates the schema, and provides CRUD functions.
 
 ---
@@ -103,6 +112,16 @@ Hibernate Query Language is SQL-like but operates on entity names, not table nam
 
 ## When to use ORM vs cfquery
 
+::image-box
+---
+:src: __static__/orm-vs-cfquery-decision-v1.png
+:alt: Decision flowchart — starting from "Do you need a query?" with two branches: left branch "Simple CRUD on one entity" points to "Use ORM (entityLoad / entitySave)" green box; right branch "Complex JOIN, report, or aggregate" points to "Use cfquery / queryExecute" blue box — a note at the bottom says "Both can be mixed within the same application"
+:max-width: 760px
+---
+_Use ORM for domain-model CRUD, `cfquery` for reporting and complex JOINs — they coexist naturally._
+::
+
+
 | Scenario | Recommendation |
 |---|---|
 | Simple CRUD on one table | ORM — less boilerplate |
@@ -161,4 +180,17 @@ Create `orm_test.cfm` that calls `entityLoad` — must return no errors.
 
 #completed
 `orm_test.cfm` runs without errors. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.orm-entity-eadcb3b1
+---
 ::

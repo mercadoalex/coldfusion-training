@@ -10,6 +10,15 @@ name: html5-advanced-coldfusion-unit-1
 
 ColdFusion renders server-side content that feeds into HTML5 features like local storage, canvas, geolocation, and web workers. The pattern is always the same: CFML runs on the server, produces HTML/JSON, and the browser's HTML5 APIs consume it.
 
+::image-box
+---
+:src: __static__/cfml-server-browser-data-flow-v1.png
+:alt: Data-flow diagram showing the server-browser boundary — on the left the ColdFusion server box contains CFML code and a database cylinder; a rightward arrow labelled "HTTP response (HTML + embedded JSON)" crosses the boundary; on the right a browser box shows the DOM tree and JavaScript code consuming the data with HTML5 APIs (localStorage.setItem, fetch(), canvas.getContext) — illustrating that CFML runs only on the server, never in the browser
+:max-width: 860px
+---
+_ColdFusion generates the HTML and embeds JSON; all HTML5 API calls execute entirely in the browser._
+::
+
 ---
 
 ## Basic HTML5 page with dynamic CFML
@@ -57,6 +66,16 @@ Notice `encodeForHTML()` — always encode untrusted data before rendering it in
 ---
 
 ## Passing CFML data to JavaScript
+
+::image-box
+---
+:src: __static__/cfml-serializejson-to-js-v1.png
+:alt: Split-view diagram showing CFML on the left with a queryExecute() call and serializeJSON() producing a JSON string, and on the right the rendered HTML source with a JavaScript const tickets = [...] variable containing the serialised data — an arrow spans the middle labelled "serializeJSON() bridges the server/client boundary"
+:max-width: 860px
+---
+_`serializeJSON()` is the standard bridge — converts any CF variable to a JSON literal you can embed directly in a `<script>` block._
+::
+
 
 Inject server-side data as a JSON literal into a JavaScript variable:
 
@@ -150,4 +169,17 @@ Add at least one `<cfoutput>` or `writeOutput()` call to `html5_demo.cfm`.
 
 #completed
 Dynamic CFML output is present in the page. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.html5-page-12951dc7
+---
 ::

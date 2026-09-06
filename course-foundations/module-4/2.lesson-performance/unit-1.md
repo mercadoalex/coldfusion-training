@@ -8,6 +8,15 @@ name: performance-tuning-jvm-unit-1
 
 ## JVM heap settings
 
+::image-box
+---
+:src: __static__/jvm-heap-configuration-v1.png
+:alt: Annotated jvm.config file snippet — the line "java.args=-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200" has four callout labels: -Xms512m labelled "Initial heap (minimum)", -Xmx1024m labelled "Maximum heap", -XX:+UseG1GC labelled "Garbage First GC (low latency)", -XX:MaxGCPauseMillis=200 labelled "Target GC pause ≤ 200 ms" — each label is a blue arrow pointing to its flag
+:max-width: 860px
+---
+_`jvm.config` is the single file that controls all JVM tuning for Adobe ColdFusion — restart required after any change._
+::
+
 ColdFusion runs on the JVM. The heap size directly controls how much memory CF can use before triggering garbage collection pauses.
 
 Edit `/opt/coldfusion2025/cfusion/bin/jvm.config`:
@@ -45,6 +54,15 @@ In high-traffic environments, undersized pools cause requests to queue waiting f
 ---
 
 ## Template cache
+
+::image-box
+---
+:src: __static__/cf-template-cache-warm-cold-v1.png
+:alt: Two-path diagram for template execution — left path labelled "Cold request (first hit)" shows browser request → CFML file on disk → CFML compiler → Java bytecode → JVM execution → response, with a side arrow "bytecode cached"; right path labelled "Warm request (cached)" shows browser request → bytecode cache → JVM execution → response, skipping the compiler entirely — warm path is highlighted in green with "⚡ faster" annotation
+:max-width: 860px
+---
+_ColdFusion's template cache eliminates recompilation on repeated requests — the JVM runs bytecode, not source._
+::
 
 ColdFusion compiles `.cfm`/`.cfc` files to Java bytecode on first request and caches the bytecode. Once warm, repeated requests run from cache with no recompilation.
 
@@ -137,4 +155,17 @@ ColdFusion must respond to a request on port 8500 in under 2000 ms.
 
 #completed
 Response time is within the 2000 ms threshold. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.performance-1d8238b5
+---
 ::

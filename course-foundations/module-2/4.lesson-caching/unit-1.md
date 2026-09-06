@@ -8,6 +8,15 @@ name: caching-strategies-coldfusion-unit-1
 
 ## Why cache?
 
+::image-box
+---
+:src: __static__/cf-cache-hit-miss-flow-v1.png
+:alt: Flowchart showing two parallel paths for a page request — the "Cache Miss" path (red) goes: Request → cacheGet returns null → run cfquery → cachePut with TTL → render response; the "Cache Hit" path (green) goes: Request → cacheGet returns data → render response (skipping the database entirely) — the two paths merge at "render response" at the bottom
+:max-width: 760px
+---
+_Cache hit/miss pattern: on a miss the engine queries the DB and warms the cache; on a hit it skips the DB entirely._
+::
+
 ColdFusion applications often spend most of their time waiting for database queries. Caching stores computed results so that subsequent requests skip the work entirely.
 
 ---
@@ -87,6 +96,16 @@ Cache the return value of a CFC function for a period:
 
 ## Invalidating cache
 
+::image-box
+---
+:src: __static__/cf-caching-tiers-overview-v1.png
+:alt: Layered diagram showing four caching tiers stacked vertically from fastest (top) to slowest (bottom) — tier 1 "Page cache (cfcache)" at the top, tier 2 "Function-level cache (cachedWithin attribute)", tier 3 "Application cache (cacheGet/cachePut via ehcache)", tier 4 "Query cache (cachedwithin on cfquery)" — each tier shows its scope label and a typical TTL example
+:max-width: 760px
+---
+_ColdFusion's four caching tiers — use the highest applicable tier to maximise cache hit rate._
+::
+
+
 ```cfml
 // Remove a specific key
 cacheRemove("openTickets");
@@ -146,4 +165,17 @@ Caching directive is present. ✓
 
 #completed
 Cache demo returns clean on repeated requests. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.caching-34aeb17a
+---
 ::

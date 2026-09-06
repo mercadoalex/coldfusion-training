@@ -8,6 +8,15 @@ name: cicd-cfml-applications-unit-1
 
 ## The CI/CD pipeline
 
+::image-box
+---
+:src: __static__/cfml-cicd-pipeline-v1.png
+:alt: Linear pipeline diagram showing five stages connected by rightward arrows — stage 1 "Git push" (dev laptop icon), stage 2 "GitHub Actions triggered" (GitHub logo), stage 3 "box install + box testbox run" (CommandBox logo, green checkmark), stage 4 "docker build -t cfml-app" (Docker whale logo), stage 5 "docker run deployed" (server rack icon) — a red X on stage 3 shows that failing tests stop the pipeline and no image is built
+:max-width: 900px
+---
+_The CFML CI/CD pipeline: tests gate the build — a failing TestBox run stops the Docker image from being created._
+::
+
 The goal: push code → tests run automatically → a Docker image is built → the image is deployed. No manual SSH required.
 
 ```
@@ -22,6 +31,16 @@ Git push
 ---
 
 ## 1. Dockerfile
+
+::image-box
+---
+:src: __static__/commandbox-dockerfile-anatomy-v1.png
+:alt: Annotated Dockerfile showing four lines — FROM ortussolutions/commandbox:latest labelled "Official CommandBox base image (includes Java + Lucee)"; COPY . /app and WORKDIR /app labelled "Copy project files"; RUN box install --production labelled "Install ForgeBox dependencies (no dev packages)"; EXPOSE 8888 and CMD box server start --console labelled "Expose port and start server in foreground" — each label is a callout to its line
+:max-width: 760px
+---
+_The CommandBox Dockerfile is minimal — the base image handles the runtime, you just copy code and install packages._
+::
+
 
 Use the official CommandBox image as the base:
 
@@ -171,4 +190,17 @@ Build the Docker image: `docker build -t cfml-app .` — a `cfml` image must app
 
 #completed
 Docker image exists. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.cicd-pipeline-0e673e58
+---
 ::

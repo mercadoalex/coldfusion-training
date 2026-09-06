@@ -8,6 +8,15 @@ name: sql-cfquery-queryparam-unit-1
 
 ## SELECT
 
+::image-box
+---
+:src: __static__/cfquery-object-structure-v1.png
+:alt: Diagram showing a cfquery tag on the left producing a "Query Object" on the right — the query object box contains labelled fields: recordCount (integer), columnList (comma-separated string), and a grid showing rows with columns id, title, status, priority matching the SELECT columns; arrows from cfoutput query="tickets" and cfloop query="tickets" below show the two ways to iterate the object
+:max-width: 860px
+---
+_A `cfquery` returns a Query object — iterate it with `cfoutput query=` or `cfloop query=`._
+::
+
 ```cfml
 <cfquery name="tickets" datasource="training_db">
   SELECT t.id, t.title, t.status, t.priority, u.name AS submitter
@@ -46,6 +55,15 @@ Always bind parameters with `<cfqueryparam>` — never concatenate user input di
 ---
 
 ## Why cfqueryparam?
+
+::image-box
+---
+:src: __static__/cfqueryparam-sql-injection-v1.png
+:alt: Split comparison diagram showing two code boxes stacked vertically — top box labelled "Without cfqueryparam (UNSAFE)" shows WHERE id = #url.id# with a red banner showing the injection payload 1 OR 1=1; DROP TABLE hd_tickets; bottom box labelled "With cfqueryparam (SAFE)" shows the same clause using cfqueryparam with cfsqltype="cf_sql_integer" and an green banner saying "Bind parameter — injection blocked, query plan cached"
+:max-width: 860px
+---
+_`cfqueryparam` is the single most important SQL security practice in CFML — never interpolate user input directly._
+::
 
 Without it — **dangerous** (SQL injection risk):
 
@@ -143,4 +161,17 @@ Use `<cfqueryparam>` or named bindings in `queryExecute` in `tickets.cfm`.
 
 #completed
 Query results are displayed correctly. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.sql-query-90f5ae15
+---
 ::

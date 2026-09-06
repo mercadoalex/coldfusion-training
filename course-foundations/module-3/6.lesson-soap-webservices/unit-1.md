@@ -8,6 +8,15 @@ name: soap-web-services-integration-unit-1
 
 ## What is SOAP?
 
+::image-box
+---
+:src: __static__/soap-wsdl-envelope-flow-v1.png
+:alt: SOAP request/response flow diagram — on the left a "CF Client" box calls createObject("webservice", WSDL URL); an arrow labelled "HTTP POST (XML SOAP Envelope)" crosses to a "Remote SOAP Service" box on the right; the envelope shows XML with Envelope, Header, and Body elements; the response arrow carries a SOAP response envelope back; below the diagram a WSDL document icon is labelled "describes available operations and data types"
+:max-width: 860px
+---
+_SOAP wraps every call in an XML envelope — ColdFusion handles the serialisation automatically via `createObject("webservice", wsdlUrl)`._
+::
+
 SOAP (Simple Object Access Protocol) is an XML-based messaging protocol for calling remote services over HTTP. The service contract is described in a **WSDL** (Web Services Description Language) document that lists available operations and their data types.
 
 While REST APIs dominate new development, many enterprise systems (banking, government, ERP) still expose SOAP endpoints.
@@ -79,6 +88,16 @@ http://localhost:8500/TicketService.cfc?wsdl
 
 ## SOAP vs REST comparison
 
+::image-box
+---
+:src: __static__/soap-vs-rest-comparison-v1.png
+:alt: Two-column visual comparison card — left column "SOAP" has XML badge and lists: strict WSDL contract, XML over HTTP, SOAP Fault for errors, mature enterprise tooling, high verbosity; right column "REST" has JSON badge and lists: optional OpenAPI contract, any format over HTTP, HTTP status codes for errors, lightweight web/mobile tooling, low verbosity — shared row at top labelled "both run over HTTP"
+:max-width: 860px
+---
+_SOAP and REST both use HTTP — the key differences are contract strictness, payload format, and ecosystem maturity._
+::
+
+
 | Aspect | SOAP | REST |
 |---|---|---|
 | Protocol | XML over HTTP | Any format over HTTP |
@@ -137,4 +156,17 @@ Web service invocation found. ✓
 
 #completed
 SOAP WSDL is accessible at `TicketService.cfc?wsdl`. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.soap-webservices-013fbc6a
+---
 ::

@@ -8,6 +8,15 @@ name: multimedia-content-integration-unit-1
 
 ## HTML5 video element
 
+::image-box
+---
+:src: __static__/cffile-upload-flow-v1.png
+:alt: Three-step upload flow diagram — step 1 "Browser" shows a multipart/form-data POST request with a file field highlighted; step 2 "ColdFusion cffile" shows the cffile tag parsing the upload, validating MIME type against the allowed list, and resolving name conflicts; step 3 "Disk" shows the final file written to /uploads/media/ with the serverFile, serverDirectory, and fileSize properties labelled on the output arrow
+:max-width: 860px
+---
+_`cffile action="upload"` handles the entire multipart pipeline — parsing, validation, name-conflict resolution, and disk write._
+::
+
 Store media metadata in a database table and serve files from a known path.
 This example uses the Help Desk `hd_tickets` table to demonstrate query + HTML5 output together.
 
@@ -70,6 +79,16 @@ Key `cffile` properties after upload:
 ---
 
 ## Image manipulation with cfimage
+
+::image-box
+---
+:src: __static__/cfimage-operations-overview-v1.png
+:alt: Grid of six labelled boxes showing cfimage actions — resize (thumbnail icon), rotate (circular arrow with degree label), convert (two file extension labels jpg↔png), addBorder (image with thick border), watermark (semi-transparent text overlaid on a photo), and captcha (distorted text challenge image) — each box has the action name in bold and a one-line description below
+:max-width: 860px
+---
+_`cfimage` actions reference — resize, rotate, convert, addBorder, watermark, and captcha all ship in the core runtime._
+::
+
 
 ColdFusion ships with a built-in image manipulation library:
 
@@ -147,4 +166,17 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm` with a `cffile act
 
 #completed
 `upload_media.cfm` exists. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.multimedia-04988437
+---
 ::

@@ -8,6 +8,15 @@ name: datasource-configuration-unit-1
 
 ## Datasources in the lab
 
+::image-box
+---
+:src: __static__/cf-datasource-pool-diagram-v1.png
+:alt: Architecture diagram showing the ColdFusion datasource pool — three concurrent browser requests on the left send cfquery calls into a central "Connection Pool (training_db)" box that contains 5 JDBC connection slots, which all point to a single database cylinder on the right labelled "H2 / MySQL / PostgreSQL" — the pool is labelled with "CF Admin or Application.cfc" above it to show where it is configured
+:max-width: 860px
+---
+_A datasource is a named JDBC connection pool — pages reference it by name, the engine manages the connections._
+::
+
 The `training_db` datasource is pre-configured in CF Admin on first boot. It is an embedded H2 database pre-seeded with a **Help Desk schema**.
 
 | Name | Type | Purpose |
@@ -61,6 +70,15 @@ You should see a green checkmark and "OK" status.
 ---
 
 ## What is a datasource?
+
+::image-box
+---
+:src: __static__/cf-admin-datasource-screen-v1.png
+:alt: Screenshot mock-up of the ColdFusion Administrator Data Sources page — a table with columns Name, Driver, Status, and Actions; one row shows "training_db" with driver "H2 Database Engine", status shown as a green checkmark "OK", and action buttons Verify and Edit — styled to match the flat CF Admin UI with a dark sidebar on the left listing menu items
+:max-width: 860px
+---
+_CF Admin's Data Sources panel — click Verify to confirm the pool is healthy without writing any CFML._
+::
 
 A ColdFusion datasource is a **named JDBC connection pool**. Pages and components reference it by name — not by connection string. The pool is configured once (in CF Admin or `Application.cfc`) and shared across all requests.
 
@@ -121,4 +139,17 @@ Reference the `training_db` datasource in `verify_ds.cfm`.
 
 #completed
 No errors on the datasource verification page. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.datasource-verify-ee68f4ff
+---
 ::

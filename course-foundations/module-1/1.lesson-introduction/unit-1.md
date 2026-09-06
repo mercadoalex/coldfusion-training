@@ -159,11 +159,33 @@ _Adobe ColdFusion 2025 (port 8500) and Lucee 7 (port 8888) — both run in your 
 - **Enterprise Adobe shops** use CF for support contracts, CF Admin policies, and built-in PDF/Office features.
 - **This course** uses both: Adobe ColdFusion 2025 on port **8500** is the primary engine; Lucee 7 on port **8888** lets you verify cross-engine compatibility.
 
+::hint-box
+---
+:summary: Why are two servers running in this lab?
+---
+
+Running both engines side by side reflects the real-world CFML ecosystem — Adobe CF and Lucee coexist in many organisations, and knowing both makes you a stronger developer.
+
+For this course you don't need to master the differences right now. **The one thing to remember: all exercises run on Adobe ColdFusion 2025 at port `8500`.** Lucee is there on port `8888` if you want to explore it on your own, but it won't affect your task completions.
+
+--
+
+::
+
 ---
 
 ## Your lab environment
 
 Your lab microVM is pre-configured with both engines running:
+
+::image-box
+---
+:src: __static__/platform-lab-screenshot-v1.png
+:alt: Screenshot of the iximiuz Labs platform showing the ColdFusion 2025 course lab — the top navigation shows course breadcrumbs, the main area is split into a left panel with the lesson content and task checklist, and a right panel showing the live lab environment with a Terminal tab open running ColdFusion on port 8500 and a ColdFusion tab showing the CF Admin login page
+:max-width: 960px
+---
+_The iximiuz Labs interface: lesson content and task checklist on the left, live lab environment on the right._
+::
 
 ::image-box
 ---
@@ -181,6 +203,35 @@ _Your lab microVM boots with CF 2025 (8500), Lucee 7 (8888), and VS Code all rea
 | VS Code (code-server) | IDE tab | Opens the webroot of ColdFusion 2025 |
 
 > **Tip:** Files you create in VS Code land directly in the CF 2025 webroot. Open a Terminal inside VS Code to also write to the Lucee webroot.
+
+::image-box
+---
+:src: __static__/cf-admin-open-new-tab-v1.png
+:alt: Screenshot showing the right-click context menu on the CF Admin button inside the ColdFusion lab tab — the menu is open with "Open Link in New Tab" highlighted, demonstrating how to open the CF Admin console in a full browser window
+:max-width: 860px
+---
+_Right-click the CF Admin button → "Open Link in New Tab" to get a full-screen view._
+::
+
+::hint-box
+---
+:summary: Want the CF Admin or ColdFusion tab to fill your whole screen?
+---
+
+Right-click any lab tab (ColdFusion, Lucee, IDE) and choose **"Open Link in New Tab"**. The lab environment opens in a full browser tab with no course sidebar — ideal when you need more room to work in the CF Admin console or browse your app.
+
+--
+
+::
+
+::image-box
+---
+:src: __static__/cf-admin-fullscreen-login-v1.png
+:alt: The Adobe ColdFusion Administrator login screen displayed in a full browser window with no course sidebar — a centered login form with a password field and a "Login" button on a dark background
+:max-width: 960px
+---
+_CF Admin in full-screen — enter password `admin` to log in._
+::
 
 ---
 
@@ -269,4 +320,17 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/hello.cfm` that outputs a greeting c
 
 #completed
 `hello.cfm` exists and returns a greeting. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.hello-cfml-89727a2b
+---
 ::

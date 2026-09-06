@@ -8,6 +8,15 @@ name: building-rest-apis-cfml-unit-1
 
 ## Overview
 
+::image-box
+---
+:src: __static__/rest-api-request-response-cycle-v1.png
+:alt: HTTP request-response cycle diagram for a CFML REST API — client on the left sends "GET /api/tickets.cfm" with an Accept: application/json header; the ColdFusion server in the middle shows cfheader setting Content-Type, queryExecute fetching from training_db, and serializeJSON serialising the result; the response arrow on the right carries a JSON payload {total:10, tickets:[...]} back to the client
+:max-width: 860px
+---
+_CFML REST endpoints are plain `.cfm` files — set the Content-Type header, run a query, and write serialised JSON._
+::
+
 Your environment has a live Help Desk database (`training_db`) with four tables:
 `hd_departments`, `hd_users`, `hd_tickets`, and `hd_comments`. A fully working
 REST endpoint is already deployed at `/api/tickets.cfm`.
@@ -136,6 +145,16 @@ curl -s -X POST http://localhost:8500/api/tickets.cfm \
 ---
 
 ## 4. Routing on HTTP method
+
+::image-box
+---
+:src: __static__/cfml-http-method-routing-v1.png
+:alt: Decision tree showing cgi.REQUEST_METHOD at the root — three branches lead to GET (returns ticket list or single ticket), POST (creates new ticket, returns 201 Created), and DELETE (closes ticket, returns 200 OK) — a fourth branch labelled "anything else" leads to a 405 Method Not Allowed response — each leaf shows the HTTP status code and a short description
+:max-width: 760px
+---
+_Route on `cgi.REQUEST_METHOD` to implement GET/POST/DELETE in a single `.cfm` file._
+::
+
 
 ColdFusion exposes the request method via `cgi.REQUEST_METHOD`:
 
@@ -280,4 +299,17 @@ Single ticket fetch works. ✓
 
 #completed
 POST creates a new ticket. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.student-api-ba26f06c
+---
 ::

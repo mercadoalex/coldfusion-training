@@ -8,6 +8,15 @@ name: real-time-websockets-unit-1
 
 ## How ColdFusion WebSockets work
 
+::image-box
+---
+:src: __static__/cf-websocket-architecture-v1.png
+:alt: Architecture diagram showing the ColdFusion WebSocket flow — on the left a browser box contains JavaScript with new WebSocket("ws://localhost:8500/cfusion/WS/chat") and ws.onmessage handler; a bidirectional WebSocket upgrade arrow crosses to the right where an "Adobe ColdFusion 2025" server box contains Application.cfc with this.wschannels registration and WSHandler.cfc with onWSMessage calling wsPublish; a small "chat" channel bubble sits between them
+:max-width: 860px
+---
+_ColdFusion's built-in WebSocket server: register channels in `Application.cfc`, implement a handler CFC, connect from the browser._
+::
+
 ColdFusion 2025 ships with a built-in WebSocket server running on the same port as the HTTP server. Clients connect via JavaScript's `WebSocket` API; the server-side handler is a CFC with lifecycle methods.
 
 ---
@@ -94,6 +103,16 @@ This is useful for real-time dashboard updates triggered by background jobs or s
 
 ## Common use cases
 
+::image-box
+---
+:src: __static__/websocket-use-cases-grid-v1.png
+:alt: Four-cell grid of WebSocket use cases — top-left "Live Chat" with a speech bubble icon and label "wsPublish broadcasts to all subscribers"; top-right "Notifications" with a bell icon and label "server pushes events to connected users"; bottom-left "Live Dashboard" with a gauge icon and label "backend pushes metric updates every N seconds"; bottom-right "Collaborative Editing" with a pencil icon and label "per-document channels with targeted routing" — each cell has a coloured left border
+:max-width: 860px
+---
+_Four common WebSocket patterns — all supported natively with ColdFusion's built-in WS server and `wsPublish`._
+::
+
+
 | Use case | Channel | Pattern |
 |---|---|---|
 | Live chat | `chat` | Broadcast every message to all subscribers |
@@ -152,4 +171,17 @@ Add `new WebSocket(...)` JavaScript client code to `ws_demo.cfm`.
 
 #completed
 JavaScript WebSocket client is present. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.websockets-32531628
+---
 ::

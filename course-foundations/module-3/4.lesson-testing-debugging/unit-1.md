@@ -8,6 +8,15 @@ name: testing-debugging-cfml-unit-1
 
 ## Debugging with cfdump
 
+::image-box
+---
+:src: __static__/cfdump-output-example-v1.png
+:alt: Example cfdump HTML output — a colour-coded nested table labelled "Student data" at the top; outer row shows type "struct" with key "name" (value "Alex", type string) and key "scores" (type array); the array expands to show three numeric cells: 95, 87, 72 — styled with the classic ColdFusion blue header bar and alternating white/grey rows
+:max-width: 640px
+---
+_`cfdump` renders any CF variable as a colour-coded interactive table — the fastest debugging tool in CFML._
+::
+
 `<cfdump>` renders any ColdFusion variable as a colour-coded HTML table — the fastest way to inspect data during development.
 
 ```cfml
@@ -45,6 +54,16 @@ tail -f /opt/coldfusion2025/cfusion/logs/myapp.log
 ---
 
 ## Install TestBox
+
+::image-box
+---
+:src: __static__/testbox-bdd-spec-structure-v1.png
+:alt: Annotated CFML code snippet of a TestBox BDD spec — the component extends="testbox.system.BaseSpec" line is labelled "extends BaseSpec"; the describe("TicketService", ...) block is labelled "test suite"; the it("should return all tickets", ...) block is labelled "individual test case"; the expect(result).toBeArray() line is labelled "assertion / matcher" — each label is connected to its code line by a coloured callout arrow
+:max-width: 860px
+---
+_TestBox BDD structure: `describe` groups related tests, `it` describes a single behaviour, `expect` asserts the outcome._
+::
+
 
 TestBox is the CFML BDD/TDD testing framework. Install it via CommandBox:
 
@@ -161,4 +180,17 @@ Run the TestBox suite — all tests must pass with zero failures and zero errors
 
 #completed
 TestBox tests pass. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.testing-d1e51a86
+---
 ::

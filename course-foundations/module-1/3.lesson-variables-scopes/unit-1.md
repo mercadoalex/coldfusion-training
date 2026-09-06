@@ -20,6 +20,15 @@ ColdFusion is dynamically typed. Variables are created on assignment and their t
 | Struct | `{name: "Alex", age: 30}` |
 | Query | result of `cfquery` / `queryExecute()` |
 
+::image-box
+---
+:src: __static__/cfml-data-types-overview-v1.png
+:alt: Six labelled boxes arranged in a 2×3 grid on a white background — String (orange border, example "Hello World"), Numeric (blue, example 42 and 3.14), Boolean (green, example true/false/yes/no), Array (purple, bracket notation [1,2,3]), Struct (teal, curly-brace notation {key: value}), and Query (grey, table icon with rows and columns) — each box shows the type name and a short CFML literal example
+:max-width: 860px
+---
+_CFML's six core data types — dynamically inferred at runtime, no explicit type declarations needed._
+::
+
 ---
 
 ## Variable scopes
@@ -37,6 +46,15 @@ ColdFusion organises variables into named scopes. Every scope has a different li
 | `server` | `server.` | Server lifetime | Rarely written; read CF/Lucee version |
 
 The `variables` scope is the default when you omit a prefix. Always prefix `session.*` and `application.*` explicitly.
+
+::image-box
+---
+:src: __static__/cfml-scope-lifetimes-v1.png
+:alt: Horizontal bar chart showing CFML scope lifetimes from shortest to longest — from top: url/form/request (single request, narrow bar), variables (single request, same width), local/arguments (function call duration, shortest), session (user session lifetime, medium bar), application (application lifetime, long bar), server (server process lifetime, longest bar) — bars are colour-coded from short (red) to long (green)
+:max-width: 860px
+---
+_Scope lifetimes compared — request-scoped variables are cheapest; application-scoped variables persist for the life of the process._
+::
 
 ---
 
@@ -61,6 +79,15 @@ The `variables` scope is the default when you omit a prefix. Always prefix `sess
 ---
 
 ## Scope resolution order
+
+::image-box
+---
+:src: __static__/cfml-scope-resolution-order-v1.png
+:alt: Numbered vertical flowchart showing ColdFusion's unqualified variable lookup order — step 1: local (inside CFC function), step 2: arguments, step 3: thread, step 4: query (inside cfloop query), step 5: variables, step 6: cgi/file/url/form/cookie/client — each step is a rounded rectangle, connected by downward arrows, with a "found → stop" branch on the right side of each box
+:max-width: 640px
+---
+_When you omit a scope prefix, CF walks this resolution chain top-to-bottom — always prefix to be explicit._
+::
 
 When you write just `name` without a prefix, ColdFusion checks scopes in this order:
 
@@ -125,4 +152,17 @@ Visit `scopes.cfm?name=TestUser` — the response must echo back **TestUser** fr
 
 #completed
 URL scope is working — `?name=TestUser` is reflected in the output. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.scope-inspector-3260417b
+---
 ::

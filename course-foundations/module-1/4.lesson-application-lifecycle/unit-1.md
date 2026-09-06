@@ -12,6 +12,15 @@ name: application-cfc-lifecycle-unit-1
 
 It replaces the older `Application.cfm` approach and gives you a clean OO structure.
 
+::image-box
+---
+:src: __static__/application-cfc-request-lifecycle-v1.png
+:alt: Vertical swimlane diagram with two lanes — left lane "First request" shows boxes for onApplicationStart then onSessionStart then onRequestStart then page execution then onRequestEnd; right lane "Subsequent requests" shows only onRequestStart then page execution then onRequestEnd — dashed arrows show onSessionEnd firing when the session timer expires, and onApplicationEnd firing when the server shuts down
+:max-width: 860px
+---
+_Application.cfc lifecycle: first-request path (left) triggers all startup hooks; subsequent requests skip them._
+::
+
 ---
 
 ## Minimal Application.cfc
@@ -57,6 +66,15 @@ Each request triggers a predictable sequence of method calls:
 | 5 | `onRequestEnd` | After every page request |
 | 6 | `onSessionEnd` | When a session times out |
 | 7 | `onApplicationEnd` | When the application shuts down |
+
+::image-box
+---
+:src: __static__/application-cfc-this-settings-v1.png
+:alt: Two-column reference card showing the most important Application.cfc this.* settings — left column shows the setting name (this.name, this.sessionManagement, this.sessionTimeout, this.datasource, this.ormenabled, this.secureJSON) and right column shows a short description and example value for each, laid out as a clean flat table with alternating row shading
+:max-width: 860px
+---
+_Key `this.*` settings in Application.cfc — configure once, effective for every request in the application._
+::
 
 ---
 
@@ -150,4 +168,17 @@ Set `this.name` to a non-empty string in `Application.cfc`.
 
 #completed
 Application name (`this.name`) is configured. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.application-lifecycle-a2a4b96b
+---
 ::

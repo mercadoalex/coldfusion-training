@@ -8,6 +8,15 @@ name: production-readiness-monitoring-unit-1
 
 ## Health check endpoint
 
+::image-box
+---
+:src: __static__/cf-health-endpoint-flow-v1.png
+:alt: Flowchart for the health.cfm endpoint — starting box "GET /health.cfm"; two branches: left "try queryExecute('SELECT 1')" succeeds → status='ok', HTTP 200 → JSON {"status":"ok","timestamp":"..."}; right "catch (any e)" fires → status='degraded', HTTP 503 → JSON {"status":"degraded","timestamp":"..."} — both branches end at "write JSON response" box labelled "Content-Type: application/json"
+:max-width: 760px
+---
+_health.cfm tests the DB on every request and returns 200/503 — used by load balancers and container probes._
+::
+
 Every production ColdFusion application should expose a `/health.cfm` endpoint that:
 1. Tests the database connection
 2. Returns JSON with a `status` field (`"ok"` or `"degraded"`)
@@ -78,6 +87,16 @@ Browse to `http://localhost:8500/CFIDE/administrator` and go to **Server Monitor
 ---
 
 ## Readiness vs liveness probes
+
+::image-box
+---
+:src: __static__/blue-green-deployment-v1.png
+:alt: Blue/green deployment diagram showing five numbered steps — 1. Build new image tagged :green; 2. Start :green container alongside running :blue container; 3. Run health checks on :green (GET /health.cfm → 200); 4. Switch load balancer from :blue to :green; 5. Drain and stop :blue — a load balancer rectangle sits between two server boxes (:blue on the left fading out, :green on the right becoming active) with a traffic arrow switching from blue to green
+:max-width: 860px
+---
+_Blue/green deployment: run both versions simultaneously, flip traffic only after health checks pass, then retire the old version._
+::
+
 
 In container environments (Docker, Kubernetes):
 
@@ -154,4 +173,17 @@ Health status is `ok` or `degraded`. ✓
 
 #completed
 Health endpoint returns the correct HTTP status code. ✓
+::
+
+
+---
+
+## Challenge
+
+Put your skills to the test — complete the hands-on challenge for this lesson.
+
+::card
+---
+:challenge: challenges.health-endpoint-f082760a
+---
 ::
