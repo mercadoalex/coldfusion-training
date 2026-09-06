@@ -17,8 +17,8 @@ categories:
 
 tagz:
 - coldfusion
-- security
 - xss
+- hardening
 
 playground:
   name: cf-alex-edcdf975
