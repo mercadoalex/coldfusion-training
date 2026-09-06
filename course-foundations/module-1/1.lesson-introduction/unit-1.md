@@ -15,9 +15,29 @@ The platform has two layers:
 - **CFML** — the language itself: a hybrid of HTML-like tags (`<cfquery>`, `<cfloop>`) and a modern ECMAScript-style scripting block (`<cfscript>`).
 - **The CFML engine** — the Java-based runtime that compiles `.cfm`/`.cfc` files to bytecode and executes them inside a servlet container (historically JRun, today Apache Tomcat).
 
+::image-box
+---
+:src: __static__/cfml-tag-vs-script-overview.png
+:alt: Side-by-side comparison of CFML tag syntax on the left (cfset and cfoutput tags with hash-delimited variable interpolation) and cfscript syntax on the right (ECMAScript-style statements with writeOutput), showing both are valid CFML
+:max-width: 860px
+---
+_CFML offers two syntaxes that compile to identical bytecode — tags (left) and cfscript (right)._
+::
+
 ---
 
 ## A brief history of CFML
+
+The story of ColdFusion starts in 1995, long before Ruby on Rails or Node.js, with a small startup called **Allaire Corporation**.
+
+::image-box
+---
+:src: __static__/allaire-corporation-logo.png
+:alt: The Allaire Corporation logo — a stylised blue flame above the word "allaire" in lowercase, as used on ColdFusion 1.0 through 4.5 packaging in the late 1990s
+:max-width: 320px
+---
+_Allaire Corporation, founded in 1995 — the original home of ColdFusion and HomeSite._
+::
 
 | Year | Milestone |
 |------|-----------|
@@ -30,6 +50,15 @@ The platform has two layers:
 | 2021 | ColdFusion 2021 introduces `cfThread` improvements and PDF services overhaul |
 | 2023 | ColdFusion 2023 ships with JVM 21 baseline and enhanced security headers |
 | 2025 | **ColdFusion 2025** — current release; Lucee **7.0.x** in parallel |
+
+::image-box
+---
+:src: __static__/coldfusion-version-timeline.png
+:alt: A horizontal timeline from 1995 to 2025 showing ColdFusion version milestones — CF 1.0 (Allaire), CF 5 (Macromedia acquisition), CF MX (rewrite on JRun/J2EE), CF 8 through CF 2023 (Adobe), and Lucee forking from Railo in 2012 as a parallel open-source track
+:max-width: 900px
+---
+_Thirty years of CFML: from Allaire's 1995 launch through three corporate owners to today's Adobe CF 2025 and the parallel open-source Lucee track._
+::
 
 CFML was one of the web's original "batteries included" platforms. While other stacks require composing separate libraries for database access, file I/O, and HTTP clients, ColdFusion ships all of that in the core runtime. This philosophy still defines it today.
 
@@ -83,30 +112,14 @@ ColdFusion pages are compiled to Java bytecode on first request and cached. Subs
 
 ## How ColdFusion's architecture works
 
-```
-Browser / API client
-        │  HTTP
-        ▼
-  Apache / IIS / Nginx          ← optional reverse proxy
-        │  AJP or mod_cfml
-        ▼
-  Apache Tomcat (servlet container)
-        │
-        ▼
-  CFML Engine (ColdFusion 2025 or Lucee)
-  ┌─────────────────────────────────────────┐
-  │  Request lifecycle                      │
-  │  1. Parse .cfm / .cfc                   │
-  │  2. Compile → Java bytecode (cached)    │
-  │  3. Execute in sandbox                  │
-  │  4. Datasource pool  ──► JDBC ──► DB    │
-  │  5. Cache tier (ehcache / Redis)        │
-  │  6. Write response buffer               │
-  └─────────────────────────────────────────┘
-        │
-        ▼
-  HTML / JSON / binary response
-```
+::image-box
+---
+:src: __static__/coldfusion-request-architecture.png
+:alt: ColdFusion request architecture diagram — browser sends an HTTP request to an optional Nginx reverse proxy, which forwards via AJP or mod_cfml to Apache Tomcat, which hands off to the CFML engine; the engine parses and compiles the .cfm file to Java bytecode on first request (cached on subsequent requests), executes it, accesses the datasource connection pool via JDBC to reach the database, optionally checks the ehcache tier, writes to the response buffer, and returns HTML or JSON to the browser
+:max-width: 900px
+---
+_The ColdFusion request pipeline: browser → (optional) reverse proxy → Tomcat → CFML engine → JDBC datasource pool → response._
+::
 
 Key architectural points:
 
@@ -120,6 +133,15 @@ Key architectural points:
 ## Adobe ColdFusion vs. Lucee
 
 Both engines execute the same CFML language core, but they differ in licensing, extension model, and some built-in capabilities.
+
+::image-box
+---
+:src: __static__/adobe-cf-vs-lucee-logos.png
+:alt: The Adobe ColdFusion 2025 logo on the left (stylised red lightning bolt on a dark background with the text "Adobe ColdFusion") and the Lucee logo on the right (bold teal "Lucee" wordmark), placed side by side to represent the two main CFML engines used in this course
+:max-width: 560px
+---
+_Adobe ColdFusion 2025 (port 8500) and Lucee 7 (port 8888) — both run in your lab environment._
+::
 
 | Feature | Adobe ColdFusion 2025 | Lucee 7 |
 |---|---|---|
@@ -142,6 +164,15 @@ Both engines execute the same CFML language core, but they differ in licensing, 
 ## Your lab environment
 
 Your lab microVM is pre-configured with both engines running:
+
+::image-box
+---
+:src: __static__/lab-environment-diagram.png
+:alt: Lab environment diagram showing three services running on a single microVM — Adobe ColdFusion 2025 on port 8500 with its wwwroot at /opt/coldfusion2025/cfusion/wwwroot/, CommandBox plus Lucee 7 on port 8888 with its app root at /home/laborant/app/, and VS Code code-server accessible via the IDE browser tab pointing at the CF 2025 webroot; all three are pre-started on boot with no configuration required
+:max-width: 860px
+---
+_Your lab microVM boots with CF 2025 (8500), Lucee 7 (8888), and VS Code all ready — no installation needed._
+::
 
 | Service | Port | Web root |
 |---|---|---|
