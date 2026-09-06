@@ -17,7 +17,7 @@ The platform has two layers:
 
 ::image-box
 ---
-:src: __static__/cfml-tag-vs-script-overview.png
+:src: __static__/cfml-tag-vs-script-overview-v1.png
 :alt: Side-by-side comparison of CFML tag syntax on the left (cfset and cfoutput tags with hash-delimited variable interpolation) and cfscript syntax on the right (ECMAScript-style statements with writeOutput), showing both are valid CFML
 :max-width: 860px
 ---
@@ -32,7 +32,7 @@ The story of ColdFusion starts in 1995, long before Ruby on Rails or Node.js, wi
 
 ::image-box
 ---
-:src: __static__/allaire-corporation-logo.png
+:src: __static__/allaire-corporation-logo-v1.png
 :alt: The Allaire Corporation logo — a stylised blue flame above the word "allaire" in lowercase, as used on ColdFusion 1.0 through 4.5 packaging in the late 1990s
 :max-width: 320px
 ---
@@ -53,7 +53,7 @@ _Allaire Corporation, founded in 1995 — the original home of ColdFusion and Ho
 
 ::image-box
 ---
-:src: __static__/coldfusion-version-timeline.png
+:src: __static__/coldfusion-version-timeline-v1.png
 :alt: A horizontal timeline from 1995 to 2025 showing ColdFusion version milestones — CF 1.0 (Allaire), CF 5 (Macromedia acquisition), CF MX (rewrite on JRun/J2EE), CF 8 through CF 2023 (Adobe), and Lucee forking from Railo in 2012 as a parallel open-source track
 :max-width: 900px
 ---
@@ -114,7 +114,7 @@ ColdFusion pages are compiled to Java bytecode on first request and cached. Subs
 
 ::image-box
 ---
-:src: __static__/coldfusion-request-architecture.png
+:src: __static__/coldfusion-request-architecture-v1.png
 :alt: ColdFusion request architecture diagram — browser sends an HTTP request to an optional Nginx reverse proxy, which forwards via AJP or mod_cfml to Apache Tomcat, which hands off to the CFML engine; the engine parses and compiles the .cfm file to Java bytecode on first request (cached on subsequent requests), executes it, accesses the datasource connection pool via JDBC to reach the database, optionally checks the ehcache tier, writes to the response buffer, and returns HTML or JSON to the browser
 :max-width: 900px
 ---
@@ -136,7 +136,7 @@ Both engines execute the same CFML language core, but they differ in licensing, 
 
 ::image-box
 ---
-:src: __static__/adobe-cf-vs-lucee-logos.png
+:src: __static__/adobe-cf-vs-lucee-logos-v1.png
 :alt: The Adobe ColdFusion 2025 logo on the left (stylised red lightning bolt on a dark background with the text "Adobe ColdFusion") and the Lucee logo on the right (bold teal "Lucee" wordmark), placed side by side to represent the two main CFML engines used in this course
 :max-width: 560px
 ---
@@ -167,7 +167,7 @@ Your lab microVM is pre-configured with both engines running:
 
 ::image-box
 ---
-:src: __static__/lab-environment-diagram.png
+:src: __static__/lab-environment-diagram-v1.png
 :alt: Lab environment diagram showing three services running on a single microVM — Adobe ColdFusion 2025 on port 8500 with its wwwroot at /opt/coldfusion2025/cfusion/wwwroot/, CommandBox plus Lucee 7 on port 8888 with its app root at /home/laborant/app/, and VS Code code-server accessible via the IDE browser tab pointing at the CF 2025 webroot; all three are pre-started on boot with no configuration required
 :max-width: 860px
 ---
