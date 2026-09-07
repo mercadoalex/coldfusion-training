@@ -916,3 +916,8 @@ labctl content pull course ColdFusion-2025-Foundations-5151cba6 -d /tmp/cf-pull
 
 ---
 
+### Budget Exceeded
+Oh no! It looks like you've gone over your budget allowance of 350 Bobcoins. You can manage your subscription to update your plan and continue.
+
+---
+
