@@ -13,5 +13,5 @@ rootfs/examinerctl
 *.bak
 .DS_Store
 
-#documentation just for me
+# documentation just for me
 docs/

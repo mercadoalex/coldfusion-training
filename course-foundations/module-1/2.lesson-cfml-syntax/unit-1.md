@@ -272,9 +272,9 @@ Conditional logic is present in `syntax_script.cfm`. ✓
 
 ---
 
-## Challenge
+---
 
-Put your skills to the test — complete the hands-on challenge for this lesson.
+Put your skills to the test by completing the hands-on challenge for this lesson.
 
 ::card
 ---

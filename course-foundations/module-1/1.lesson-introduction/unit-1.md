@@ -331,6 +331,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.hello-cfml-89727a2b
+:challenge: challenges.foundations.hello-cfml-89727a2b
 ---
 ::
