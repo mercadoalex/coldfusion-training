@@ -36,6 +36,7 @@ updatedAt: "2026-09-03"
 - Implement full-text search with Apache Solr
 - Generate PDFs, Excel files and ZIP archives
 - Build AI-powered features using ColdFusion's native AI tags and Ollama
+- **Build structured MVC applications with ColdBox** — handlers, WireBox DI, resource routing, and TestBox integration
 
 ## Lab environment
 
