@@ -1,14 +1,34 @@
 ---
 kind: unit
 
-title: HTML5 and Advanced ColdFusion Features
+title: HTML5 & the Modern Browser Platform
 
 name: html5-advanced-coldfusion-unit-1
 ---
 
 ## HTML5 + ColdFusion
 
-ColdFusion renders server-side content that feeds into HTML5 features like local storage, canvas, geolocation, and web workers. The pattern is always the same: CFML runs on the server, produces HTML/JSON, and the browser's HTML5 APIs consume it.
+HTML5 is not a dated technology — it is the **current living standard** for the web, maintained continuously by WHATWG. Every browser ships HTML5. There is no HTML6. When you write `<!DOCTYPE html>` today you are writing HTML5, and the platform keeps gaining capabilities (Web Components, View Transitions, Container Queries, WASM) without ever changing that doctype.
+
+ColdFusion's role is always **server-side**: it queries databases, processes business logic, and renders HTML or JSON. The browser's HTML5 APIs — localStorage, canvas, geolocation, WebSockets, fetch — consume that output. CFML never runs in the browser.
+
+::hint-box
+---
+:summary: What actually evolved since "HTML5 launched"?
+---
+
+The term "HTML5" entered common use around 2010 when browsers started shipping canvas, video, and localStorage. What has changed since then is not the standard itself but the richness of the platform built on top of it:
+
+| Era | New capabilities |
+|---|---|
+| 2010–2014 | `<canvas>`, `<video>`, `<audio>`, localStorage, geolocation, WebSockets |
+| 2015–2018 | ES6 modules, Fetch API, Service Workers, CSS Grid |
+| 2019–2022 | Web Components, CSS custom properties, Intersection Observer |
+| 2023–today | View Transitions API, Container Queries, CSS `@layer`, WASM threads |
+
+All of this runs on the same `<!DOCTYPE html>` foundation. When this course says "HTML5", it means the full modern browser platform — not just the 2010 feature set.
+
+::
 
 ::image-box
 ---
@@ -65,15 +85,68 @@ Notice `encodeForHTML()` — always encode untrusted data before rendering it in
 
 ---
 
-## Passing CFML data to JavaScript
+## Two patterns for sending CFML data to JavaScript
+
+There are two established approaches for getting server-side data into browser JavaScript. Which one you use depends on your architecture.
+
+::hint-box
+---
+:summary: Embedded JSON (SSR) vs fetch — when to use each?
+---
+
+**Pattern 1 — Embedded JSON (Server-Side Rendering):**
+The server renders the full page including the data baked in as a JavaScript variable. No second HTTP request needed.
+
+```cfml
+<cfscript>
+  jsonData = serializeJSON(queryToArray(queryExecute(
+    "SELECT id, title, status FROM hd_tickets", {}, {datasource:"training_db"}
+  )));
+</cfscript>
+<script>
+  const tickets = <cfoutput>#jsonData#</cfoutput>;
+  renderTable(tickets);
+</script>
+```
+
+✓ Fewer round-trips — data is available instantly on page load
+✓ Better for SEO — content is in the initial HTML
+✓ Simpler — no CORS headers, no loading states needed
+✗ Page must fully reload to refresh data
+
+---
+
+**Pattern 2 — fetch() API (Client-Side Data Fetching):**
+The page loads first, then JavaScript calls a CF JSON endpoint asynchronously.
+
+```javascript
+async function loadTickets() {
+  const res  = await fetch('/api/tickets.cfm');
+  const data = await res.json();
+  renderTable(data.tickets);
+}
+loadTickets();
+```
+
+✓ Page stays interactive — data refreshes without full reload
+✓ Works perfectly with React, Vue, Angular frontends
+✓ Supports real-time updates (poll or WebSocket)
+✗ Requires CORS headers on the CF endpoint
+✗ Needs loading/error states in the UI
+
+**The practical rule:** use embedded JSON for simple server-rendered pages; use `fetch()` when building a SPA or when data needs to refresh without a page reload.
+
+::
+
+## Passing CFML data to JavaScript (embedded JSON)
 
 ::image-box
 ---
 :src: __static__/cfml-serializejson-to-js-v1.png
-:alt: Split-view diagram showing CFML on the left with a queryExecute() call and serializeJSON() producing a JSON string, and on the right the rendered HTML source with a JavaScript const tickets = [...] variable containing the serialised data — an arrow spans the middle labelled "serializeJSON() bridges the server/client boundary"
+:alt: Side-by-side comparison of two data patterns — left panel "Embedded JSON (SSR)" shows CFML serializeJSON() output baked into a script tag as a const variable, labelled "one request, data ready on load"; right panel "fetch() pattern" shows a browser fetch call to /api/tickets.cfm returning JSON asynchronously, labelled "second request, works with React/Vue"
 :max-width: 860px
 ---
-_`serializeJSON()` is the standard bridge — converts any CF variable to a JSON literal you can embed directly in a `<script>` block._
+_Two patterns for sending CF data to the browser — embedded JSON (SSR) for simple pages, `fetch()` for SPAs and dynamic updates._
 ::
 
 
