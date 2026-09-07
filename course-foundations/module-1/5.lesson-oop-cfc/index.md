@@ -2,14 +2,24 @@
 kind: lesson
 
 title: Object-Oriented Programming with CFCs
-
 description: |
   Learn how ColdFusion Components (CFCs) bring full OOP to CFML —
   classes, properties, methods, access modifiers, inheritance, and the
   constructor pattern. Build a reusable TicketService CFC from scratch.
 
+name: oop-coldfusion-components
+slug: oop-coldfusion-components
+
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
+
+categories:
+- programming
+
+tagz:
+- coldfusion
+- cfml
+- oop
 
 playground:
   name: cf-alex-edcdf975

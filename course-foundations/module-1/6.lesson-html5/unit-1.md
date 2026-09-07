@@ -170,6 +170,50 @@ Inject server-side data as a JSON literal into a JavaScript variable:
 
 ---
 
+::hint-box
+---
+:summary: What is CORS and why does fetch() need it?
+---
+
+**CORS — Cross-Origin Resource Sharing** is a browser security mechanism that controls which domains are allowed to read responses from a server. It was introduced as a W3C standard in **2014** (implemented in all major browsers by 2015) to replace the older, less flexible JSONP workaround.
+
+**The Same-Origin Policy (the problem CORS solves):**
+Browsers enforce a rule called the Same-Origin Policy — a page at `https://app.example.com` cannot read responses from `https://api.other.com` unless the server explicitly permits it. This prevents malicious scripts on one site from silently reading data from another (e.g. your bank).
+
+**How CORS works:**
+When JavaScript calls `fetch('https://api.other.com/data')`, the browser automatically adds an `Origin` header. The server must respond with `Access-Control-Allow-Origin` — if it doesn't, the browser blocks the response (the request still happens on the server, but JavaScript never sees the result).
+
+**In ColdFusion you add CORS headers in two places:**
+
+```cfml
+<!--- Option 1: per-endpoint in your .cfm file --->
+<cfheader name="Access-Control-Allow-Origin" value="*">
+<cfheader name="Access-Control-Allow-Methods" value="GET, POST, DELETE, OPTIONS">
+<cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization">
+```
+
+```cfml
+<!--- Option 2: globally in Application.cfc onRequestStart — preferred --->
+public boolean function onRequestStart(string targetPage) {
+  cfheader(name="Access-Control-Allow-Origin",  value="https://your-frontend.com");
+  cfheader(name="Access-Control-Allow-Methods", value="GET, POST, DELETE, OPTIONS");
+  cfheader(name="Access-Control-Allow-Headers", value="Content-Type, Authorization");
+  if (cgi.REQUEST_METHOD == "OPTIONS") { abort; }  // handle preflight
+  return true;
+}
+```
+
+**`*` vs specific origin:**
+- `Access-Control-Allow-Origin: *` — allows any domain (fine for public APIs, dangerous for authenticated APIs)
+- `Access-Control-Allow-Origin: https://app.example.com` — allows only your specific frontend (correct for authenticated APIs)
+
+**Why embedded JSON doesn't need CORS:**
+When you use `serializeJSON()` to bake data into the page, the browser sees it as part of the same HTML document — no cross-origin request is made, so no CORS header is needed.
+
+**The practical rule:** if your CF endpoint is called by `fetch()` from a different domain (or a different port on the same domain), add CORS headers. If CF renders the page and data together, CORS is irrelevant.
+
+::
+
 ## HTML5 Form validation + CFML processing
 
 HTML5 provides built-in client-side validation via attributes like `required`, `minlength`, `type="email"`. ColdFusion handles the server-side processing when the form submits.

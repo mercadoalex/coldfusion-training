@@ -77,6 +77,32 @@ component displayname="TicketService" hint="Manages help desk tickets" {
 }
 ```
 
+::hint-box
+---
+:summary: Constructor naming across languages — how does CF compare?
+---
+
+The constructor is named differently across languages. Here's the full picture:
+
+| Language | Constructor name | Must match class? |
+|---|---|---|
+| **Java** | Same as class name | ✅ Yes — `public TicketService() {}` |
+| **C#** | Same as class name | ✅ Yes — `public TicketService() {}` |
+| **C++** | Same as class name | ✅ Yes |
+| **PHP** | `__construct()` | ❌ No — always `__construct` |
+| **Python** | `__init__()` | ❌ No — always `__init__` |
+| **Ruby** | `initialize()` | ❌ No — always `initialize` |
+| **JavaScript** | `constructor()` (in classes) | ❌ No — always `constructor` |
+| **ColdFusion** | `init()` | ❌ No — always `init` |
+
+**The ColdFusion rule:** the constructor is always `init()` regardless of the class (file) name. The filename `TicketService.cfc` must match what you pass to `new TicketService()` — but the method inside is always called `init`.
+
+The return type `public TicketService function init()` is just documentation — it tells CF and your IDE what type is returned, but it does not enforce the name. You can also write `public any function init()` and it works identically.
+
+**`init()` is also optional** — if your CFC has no `init()` method, `new TicketService()` still works and simply returns an uninitialised instance.
+
+::
+
 ---
 
 ## Access modifiers
@@ -286,6 +312,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.scope-inspector-3260417b
+:challenge: challenges.oop-cfc-ticketservice-f91c875e
 ---
 ::
