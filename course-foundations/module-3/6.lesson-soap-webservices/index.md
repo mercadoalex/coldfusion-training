@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "SOAP WSDL is accessible"
+
+
+challenges:
+  soap_webservices_8f4e8ae9: {}
 ---

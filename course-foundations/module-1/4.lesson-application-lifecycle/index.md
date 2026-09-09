@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "Application name is configured"
+
+
+challenges:
+  application_lifecycle_84261e98: {}
 ---

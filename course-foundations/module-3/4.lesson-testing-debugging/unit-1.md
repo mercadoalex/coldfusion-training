@@ -191,6 +191,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.testing-8f70b2b0
+:challenge: challenges.testing_8f70b2b0
 ---
 ::

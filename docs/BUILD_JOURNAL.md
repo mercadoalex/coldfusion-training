@@ -916,6 +916,63 @@ labctl content pull course ColdFusion-2025-Foundations-5151cba6 -d /tmp/cf-pull
 
 ---
 
+### Challenge slugs (platform-assigned hashes)
+
+| Directory | Platform slug |
+|---|---|
+| application-lifecycle | `application-lifecycle-84261e98` |
+| caching | `caching-10837ff1` |
+| cfml-syntax | `cfml-syntax-0b4b2335` |
+| charts | `charts-0e333dfe` |
+| cicd-pipeline | `cicd-pipeline-6f98584e` |
+| commandbox-server | `commandbox-server-9bac5899` |
+| datasource-verify | `datasource-verify-be971bb2` |
+| health-endpoint | `health-endpoint-a895d35e` |
+| hello-cfml | `hello-cfml-9cc7ac40` |
+| html5-page | `html5-page-5ef19f87` |
+| lucee | `lucee-5db89516` |
+| multimedia | `multimedia-c7c70611` |
+| oop-cfc | `oop-cfc-88277abe` |
+| orm-entity | `orm-entity-4c08a96a` |
+| performance | `performance-9b4234b3` |
+| scope-inspector | `scope-inspector-5e09720b` |
+| security | `security-c2586cd1` |
+| soap-webservices | `soap-webservices-8f4e8ae9` |
+| sql-query | `sql-query-9af1b639` |
+| student-api | `student-api-7309bb97` |
+| testing | `testing-8f70b2b0` |
+| websockets | `websockets-6e5e8d19` |
+
+### Tutorial slugs (platform-assigned hashes)
+
+| Directory | Platform slug |
+|---|---|
+| application-cfc | `application-cfc-7ff3dd6a` |
+| building-json-api | `building-json-api-a164dcdd` |
+| caching | `caching-6e1de2c6` |
+| cf-admin-walkthrough | `cf-admin-walkthrough-32331eea` |
+| cfml-forms | `cfml-forms-7cb92987` |
+| cfml-hello-world | `cfml-hello-world-e1f5ffe6` |
+| cfml-syntax-tags-script | `cfml-syntax-tags-script-8030387a` |
+| charts | `charts-f5aac72d` |
+| cicd-docker | `cicd-docker-894766b4` |
+| commandbox-quick-start | `commandbox-quick-start-f662a678` |
+| html5-cfml | `html5-cfml-1b6822c7` |
+| jvm-performance | `jvm-performance-a3fe404e` |
+| lucee-vs-adobe | `lucee-vs-adobe-8d09f288` |
+| multimedia-upload | `multimedia-upload-77a00540` |
+| orm-entity | `orm-entity-4af23db8` |
+| production-health | `production-health-bc319635` |
+| querying-h2-database | `querying-h2-database-d42dc6fc` |
+| security | `security-6bd5e168` |
+| soap-webservices | `soap-webservices-e2862a3d` |
+| sql-cfqueryparam | `sql-cfqueryparam-402def62` |
+| testing-debugging | `testing-debugging-bb188957` |
+| variables-scopes | `variables-scopes-c0eb022e` |
+| websockets | `websockets-22418e02` |
+
+---
+
 ### Budget Exceeded
 Oh no! It looks like you've gone over your budget allowance of 350 Bobcoins. You can manage your subscription to update your plan and continue.
 

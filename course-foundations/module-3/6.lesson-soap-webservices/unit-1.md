@@ -167,6 +167,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.soap-webservices-8f4e8ae9
+:challenge: challenges.soap_webservices_8f4e8ae9
 ---
 ::

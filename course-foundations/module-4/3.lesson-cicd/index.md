@@ -62,4 +62,8 @@ tasks:
         exit 1
       fi
       echo "cfml Docker image exists"
+
+
+challenges:
+  cicd_pipeline_6f98584e: {}
 ---

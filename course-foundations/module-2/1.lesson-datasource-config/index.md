@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "No errors on datasource verification page"
+
+
+challenges:
+  datasource_verify_be971bb2: {}
 ---

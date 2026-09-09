@@ -201,6 +201,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.cicd-pipeline-6f98584e
+:challenge: challenges.cicd_pipeline_6f98584e
 ---
 ::

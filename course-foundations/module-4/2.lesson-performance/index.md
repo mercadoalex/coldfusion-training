@@ -64,4 +64,8 @@ tasks:
         exit 1
       fi
       echo "Response time is ${MS}ms — within acceptable range"
+
+
+challenges:
+  performance_9b4234b3: {}
 ---

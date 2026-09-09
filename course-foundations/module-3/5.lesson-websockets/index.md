@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "JavaScript WebSocket client is present"
+
+
+challenges:
+  websockets_6e5e8d19: {}
 ---

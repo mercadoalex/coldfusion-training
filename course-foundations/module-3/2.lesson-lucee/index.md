@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "Lucee datasource is configured correctly"
+
+
+challenges:
+  lucee_5db89516: {}
 ---

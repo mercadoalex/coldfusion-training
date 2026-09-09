@@ -64,4 +64,8 @@ tasks:
         fi
       fi
       echo "Dynamic CFML output is present"
+
+
+challenges:
+  html5_page_5ef19f87: {}
 ---

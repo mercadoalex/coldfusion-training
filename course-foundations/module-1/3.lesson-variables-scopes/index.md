@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "URL scope is working correctly"
+
+
+challenges:
+  scope_inspector_5e09720b: {}
 ---

@@ -312,6 +312,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.oop-cfc-88277abe
+:challenge: challenges.oop_cfc_88277abe
 ---
 ::

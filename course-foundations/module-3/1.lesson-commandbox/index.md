@@ -58,4 +58,8 @@ tasks:
         exit 1
       fi
       echo "box.json found — CommandBox project is initialized"
+
+
+challenges:
+  commandbox_server_9bac5899: {}
 ---

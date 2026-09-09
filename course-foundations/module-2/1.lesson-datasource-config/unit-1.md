@@ -150,6 +150,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.datasource-verify-be971bb2
+:challenge: challenges.datasource_verify_be971bb2
 ---
 ::

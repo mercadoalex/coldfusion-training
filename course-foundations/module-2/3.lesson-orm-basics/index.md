@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "ORM test page runs without errors"
+
+
+challenges:
+  orm_entity_4c08a96a: {}
 ---

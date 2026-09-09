@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "Conditional logic found in syntax_script.cfm"
+
+
+challenges:
+  cfml_syntax_0b4b2335: {}
 ---

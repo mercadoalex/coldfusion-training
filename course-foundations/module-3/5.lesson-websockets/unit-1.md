@@ -182,6 +182,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.websockets-6e5e8d19
+:challenge: challenges.websockets_6e5e8d19
 ---
 ::

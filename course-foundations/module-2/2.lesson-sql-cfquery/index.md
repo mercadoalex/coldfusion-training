@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "Query results are displayed correctly"
+
+
+challenges:
+  sql_query_9af1b639: {}
 ---

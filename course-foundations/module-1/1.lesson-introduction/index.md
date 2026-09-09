@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "hello.cfm is working correctly"
+
+
+challenges:
+  hello_cfml_9cc7ac40: {}
 ---

@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "Function found in CFC"
+
+
+challenges:
+  oop_cfc_88277abe: {}
 ---

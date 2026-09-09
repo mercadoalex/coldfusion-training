@@ -62,4 +62,8 @@ tasks:
         exit 1
       fi
       echo "Upload handler exists"
+
+
+challenges:
+  multimedia_c7c70611: {}
 ---

@@ -63,4 +63,8 @@ tasks:
         exit 1
       fi
       echo "cfqueryparam is used in ${COUNT} location(s)"
+
+
+challenges:
+  security_c2586cd1: {}
 ---

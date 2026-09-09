@@ -104,4 +104,8 @@ tasks:
         exit 1
       fi
       echo "POST ticket created ✓"
+
+
+challenges:
+  student_api_7309bb97: {}
 ---

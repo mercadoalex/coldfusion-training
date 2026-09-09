@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "Chart is powered by dynamic query data"
+
+
+challenges:
+  charts_0e333dfe: {}
 ---

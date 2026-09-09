@@ -61,4 +61,8 @@ tasks:
         exit 1
       fi
       echo "Cache demo page returns clean on repeated requests"
+
+
+challenges:
+  caching_10837ff1: {}
 ---

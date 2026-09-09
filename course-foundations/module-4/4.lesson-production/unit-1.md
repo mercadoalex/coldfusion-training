@@ -184,6 +184,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.health-endpoint-a895d35e
+:challenge: challenges.health_endpoint_a895d35e
 ---
 ::

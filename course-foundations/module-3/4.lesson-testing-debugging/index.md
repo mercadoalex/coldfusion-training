@@ -60,4 +60,8 @@ tasks:
         exit 1
       fi
       echo "TestBox tests pass"
+
+
+challenges:
+  testing_8f70b2b0: {}
 ---

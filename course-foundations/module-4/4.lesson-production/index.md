@@ -62,4 +62,8 @@ tasks:
         exit 1
       fi
       echo "Health endpoint returns correct HTTP status ${HTTP_CODE}"
+
+
+challenges:
+  health_endpoint_a895d35e: {}
 ---
