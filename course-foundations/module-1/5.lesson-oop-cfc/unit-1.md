@@ -312,6 +312,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.oop-cfc-ticketservice-f91c875e
+:challenge: challenges.oop-cfc-88277abe
 ---
 ::

@@ -179,6 +179,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.application-lifecycle-a2a4b96b
+:challenge: challenges.application-lifecycle-84261e98
 ---
 ::

@@ -198,6 +198,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.commandbox-server-1b054ad4
+:challenge: challenges.commandbox-server-9bac5899
 ---
 ::

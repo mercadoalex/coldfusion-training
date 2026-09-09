@@ -310,6 +310,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.student-api-ba26f06c
+:challenge: challenges.student-api-7309bb97
 ---
 ::

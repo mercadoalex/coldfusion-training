@@ -173,6 +173,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.charts-f5fda49c
+:challenge: challenges.charts-0e333dfe
 ---
 ::

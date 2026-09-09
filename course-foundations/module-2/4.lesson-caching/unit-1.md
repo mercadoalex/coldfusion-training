@@ -176,6 +176,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.caching-34aeb17a
+:challenge: challenges.caching-10837ff1
 ---
 ::

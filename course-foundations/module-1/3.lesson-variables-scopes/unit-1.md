@@ -163,6 +163,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.scope-inspector-3260417b
+:challenge: challenges.scope-inspector-5e09720b
 ---
 ::

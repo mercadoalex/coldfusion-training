@@ -172,6 +172,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.sql-query-90f5ae15
+:challenge: challenges.sql-query-9af1b639
 ---
 ::

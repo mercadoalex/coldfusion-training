@@ -278,6 +278,6 @@ Put your skills to the test by completing the hands-on challenge for this lesson
 
 ::card
 ---
-:challenge: challenges.cfml-syntax-18c13331
+:challenge: challenges.cfml-syntax-0b4b2335
 ---
 ::

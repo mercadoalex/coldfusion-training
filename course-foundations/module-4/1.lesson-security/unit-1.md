@@ -180,6 +180,6 @@ Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---
-:challenge: challenges.security-7d969f68
+:challenge: challenges.security-c2586cd1
 ---
 ::
