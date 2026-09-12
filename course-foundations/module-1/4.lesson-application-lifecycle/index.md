@@ -61,14 +61,12 @@ tasks:
       fi
       echo "Application name is configured"
 
-
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_app_name
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  application_lifecycle_84261e98: {}
 
 ---
