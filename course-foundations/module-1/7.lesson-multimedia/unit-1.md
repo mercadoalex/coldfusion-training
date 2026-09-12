@@ -512,7 +512,19 @@ The current code in this lesson already uses `imageInfo()`. If you see this erro
 
 ---
 
-When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
+When all the checks above are green, this lesson is complete. Your progress is saved automatically.
+
+---
+
+🎉 **Congratulations — you have reached the end of Unit 1!**
+
+You have covered a lot of ground: CFML syntax, variables and scopes, the application lifecycle, object-oriented programming with CFCs, HTML5 integration, and multimedia handling. That is a solid foundation.
+
+To reinforce everything you have learned, **your next step is the Unit 1 Challenge**. The challenge brings together concepts from across all seven lessons into a single hands-on task. Feel free to review any lesson, re-read the hint boxes, or consult external sources — that is not cheating, that is how real developers work.
+
+Take your time, trust the process, and keep up the hard work. You've got this. 💪
+
+---
 
 ::simple-task
 ---
@@ -520,8 +532,8 @@ When all the checks above are green, this lesson is complete. Your progress is s
 :name: verify_lesson_complete
 ---
 #active
-All done? Hit **Check** to mark this lesson complete and unlock the next one.
+All done? Hit **Check** to mark this lesson complete and unlock the Unit 1 Challenge.
 
 #completed
-Lesson complete. On to the next one!
+Lesson complete — on to the Unit 1 Challenge!
 ::
