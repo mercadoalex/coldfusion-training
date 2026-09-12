@@ -231,9 +231,18 @@ Navigate to `/status.cfm` in the browser tab. This page reads directly from the 
 _`/status.cfm` — a zero-dependency live view of your running CF engine and `Application.cfc` state._
 ::
 
-**2 — CF Admin → Logging & Profiling → Log Files**
+**2 — CF Admin → Debugging & Logging → Log Files**
 
-Open `application.log` — you should see the line written by `writeLog()` in `onApplicationStart()`, timestamped to when the application first started.
+In CF Admin, go to **Debugging & Logging → Log Files** in the left navigation. Open `application.log` — you should see the line written by `writeLog()` in `onApplicationStart()`, timestamped to when the application first started.
+
+::image-box
+---
+:src: __static__/browser-cf-admin-log-files-v1.png
+:alt: ColdFusion Administrator showing the Debugging & Logging section with Log Files selected — a table lists available log files including application.log, with columns for file name, size, and last modified date, and action buttons to view or download each file
+:max-width: 960px
+---
+_CF Admin → Debugging & Logging → Log Files — open `application.log` to see the entry written by `onApplicationStart()`._
+::
 
 > **Note on Performance Monitoring Toolset:** The PMT button in CF Admin requires a separate PMT Server + Elastic Stack (Elasticsearch + Kibana) that is not running in this lab. See the hint box below for the full explanation. Full PMT setup is covered in a **separate ColdFusion Monitoring & Observability course**.
 
@@ -316,7 +325,7 @@ Elastic Stack
 
 **Why this lab cannot run full PMT:** Elasticsearch alone requires 4–8 GB of heap. This lab VM has 2 GB total RAM — running Elasticsearch here would leave no memory for ColdFusion itself.
 
-**What you can explore in this lab:** navigate to `/status.cfm` to see live engine and application scope data, or use CF Admin → **Logging & Profiling → Log Files** to read what `onApplicationStart` logged. These give you a real window into lifecycle behaviour without the Elastic Stack.
+**What you can explore in this lab:** navigate to `/status.cfm` to see live engine and application scope data, or use CF Admin → **Debugging & Logging → Log Files** to read what `onApplicationStart` logged. These give you a real window into lifecycle behaviour without the Elastic Stack.
 
 > **Full PMT setup — PMT Server installation, Elasticsearch + Logstash + Kibana configuration, CF Admin connection (hostname, port, shared secret), and Kibana dashboard import — is a dedicated operations topic covered in a **separate ColdFusion Monitoring & Observability course**, not this Foundations course or the Advanced Course.**
 
