@@ -275,6 +275,39 @@ vi /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
 
 ---
 
+::hint-box
+---
+:summary: Going further — ColdFusion as a backend for React, Vue, or Angular
+---
+
+Once you are comfortable with `Application.cfc` you may wonder how it fits into a modern frontend stack. The short answer: **React owns the UI, ColdFusion owns the data and business logic, and they meet at a JSON API boundary.**
+
+```
+Browser (React)                    Server (ColdFusion)
+───────────────────                ──────────────────────────────
+Components / State                 Application.cfc (session, auth, CORS)
+     │                                      │
+     │  fetch("/api/tickets")  ────────────►│  TicketService.cfc → cfquery → DB
+     │◄────────────────────────  JSON       │  serializeJSON(result)
+     │
+  renders UI
+```
+
+`Application.cfc` becomes your API gateway — handling CORS headers, JWT token validation, and authentication before any endpoint runs. React never touches the database; ColdFusion never touches the DOM.
+
+| Concern | Owner |
+|---|---|
+| Routes / UI components | React |
+| Business rules & validation | ColdFusion CFC |
+| Database access | ColdFusion (`cfquery` / ORM) |
+| Auth / sessions / CORS | ColdFusion `Application.cfc` |
+
+> **This topic is outside the scope of this Foundations course.** It is covered in depth — including JWT auth, CORS configuration, REST endpoint design, and ColdBox MVC — in the **ColdFusion Advanced Course**.
+
+::
+
+---
+
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
