@@ -37,7 +37,7 @@ cat > syntax_tag.cfm << 'EOF'
 EOF
 ```
 
-Verify the engine executes it:
+To see the rendered output, click the **ColdFusion** tab in your lab (the live browser tab on port 8500) and navigate to `/syntax_tag.cfm` — you should see the text rendered by the engine, not raw CFML source. You can also verify from the Terminal:
 
 ```bash
 curl -s http://localhost:8500/syntax_tag.cfm
@@ -91,6 +91,8 @@ cat > syntax_script.cfm << 'EOF'
 </cfscript>
 EOF
 ```
+
+Open the **ColdFusion** tab and navigate to `/syntax_script.cfm` to see the output rendered in the browser. Or from the Terminal:
 
 ```bash
 curl -s http://localhost:8500/syntax_script.cfm
@@ -199,6 +201,8 @@ cat > /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 EOF
 ```
 
+Reload `/syntax_script.cfm` in the **ColdFusion** tab to see the grade appended to the output. Or from the Terminal:
+
 ```bash
 curl -s http://localhost:8500/syntax_script.cfm
 # Expected: I am using cfscript — script syntax — Grade: B
@@ -260,6 +264,8 @@ cat > /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
 </cfscript>
 EOF
 ```
+
+Open `/syntax_loop.cfm` in the **ColdFusion** tab — the browser will render the `<br>` tags and show the numbers stacked on separate lines. Or from the Terminal:
 
 ```bash
 curl -s http://localhost:8500/syntax_loop.cfm
