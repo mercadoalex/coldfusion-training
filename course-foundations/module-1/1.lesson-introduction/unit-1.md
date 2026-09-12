@@ -320,14 +320,3 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/hello.cfm` that outputs a greeting c
 | **cfscript** | Block tag (`<cfscript>...</cfscript>`) that enables ECMAScript-style syntax |
 | **Scope** | Named variable namespace (e.g., `variables`, `session`, `application`, `request`) |
 
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
-
-::card
----
-:challenge: challenges.hello_cfml_9cc7ac40
----
-::

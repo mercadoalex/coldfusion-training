@@ -88,6 +88,4 @@ tasks:
         fi
       fi
 
-challenges:
-  hello_cfml_9cc7ac40: {}
 ---
