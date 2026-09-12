@@ -191,6 +191,15 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/index.cfm
 # Expected: 200
 ```
 
+::image-box
+---
+:src: __static__/terminal-application-cfc-this-v1.png
+:alt: Terminal window showing the output of grep "this.name" on Application.cfc — a single matching line reads: this.name = "CFTraining"; confirming the application name is set correctly
+:max-width: 860px
+---
+_`grep` confirms `this.name = "CFTraining"` is set in `Application.cfc`._
+::
+
 Open the **ColdFusion 2025** tab (right-click → Open in New Tab) and browse to your lab root — CF Admin login page appearing means the engine is running with your `Application.cfc` active.
 
 ::image-box
