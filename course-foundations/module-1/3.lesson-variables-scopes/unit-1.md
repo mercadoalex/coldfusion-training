@@ -29,7 +29,7 @@ ColdFusion is dynamically typed. Variables are created on assignment and their t
 _CFML's six core data types — dynamically inferred at runtime, no explicit type declarations needed._
 ::
 
-**Activity:** Create `data_types.cfm` to explore all six types. In the Terminal:
+**Activity:** Click the **Terminal** tab in your lab. Once the terminal is open, copy and paste the script below to create `data_types.cfm` and explore all six data types:
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/data_types.cfm << 'EOF'
@@ -116,7 +116,7 @@ The `variables` scope is the default when you omit a prefix. Always prefix `sess
 _Scope lifetimes compared — request-scoped variables are cheapest; application-scoped variables persist for the life of the process._
 ::
 
-**Activity:** Create `scopes.cfm` to demonstrate the `variables` scope explicitly:
+**Activity:** Still in the **Terminal** tab, copy and paste the script below to create `scopes.cfm` and demonstrate the `variables` scope explicitly:
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/scopes.cfm << 'EOF'
