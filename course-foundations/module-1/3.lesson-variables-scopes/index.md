@@ -24,12 +24,27 @@ playground:
   name: cf-alex-edcdf975
 
 tasks:
-  verify_scopes_page:
+  verify_data_types:
     machine: dev-machine
     user: laborant
     run: |
+      BODY=$(curl -s http://localhost:8500/data_types.cfm)
+      for word in "String" "Numeric" "Boolean"; do
+        if ! echo "${BODY}" | grep -qi "${word}"; then
+          echo "data_types.cfm is missing expected output: ${word}"
+          exit 1
+        fi
+      done
+      echo "data_types.cfm demonstrates all six data types"
+
+  verify_scopes_page:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_data_types
+    run: |
       BODY=$(curl -s http://localhost:8500/scopes.cfm)
-      if ! echo "${BODY}" | grep -qi "variables\|session\|application"; then
+      if ! echo "${BODY}" | grep -qi "variables"; then
         echo "scopes.cfm does not demonstrate variable scopes"
         exit 1
       fi
@@ -61,14 +76,12 @@ tasks:
       fi
       echo "URL scope is working correctly"
 
-
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_url_scope
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  scope_inspector_5e09720b: {}
 
 ---

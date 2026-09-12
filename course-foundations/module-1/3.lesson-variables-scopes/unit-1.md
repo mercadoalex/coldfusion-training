@@ -8,17 +8,17 @@ name: variables-data-types-scopes-unit-1
 
 ## Data types
 
-ColdFusion is dynamically typed. Variables are created on assignment and their type is inferred at runtime.
+ColdFusion is dynamically typed. Variables are created on assignment and their type is inferred at runtime — no `int`, `String`, or `var` declarations required.
 
-| Type | Example |
-|---|---|
-| String | `"Hello"` |
-| Numeric | `42`, `3.14` |
-| Boolean | `true`, `false`, `yes`, `no` |
-| Date | `now()`, `"2026-09-03"` |
-| Array | `[1, 2, 3]` |
-| Struct | `{name: "Alex", age: 30}` |
-| Query | result of `cfquery` / `queryExecute()` |
+| Type | Example | Notes |
+|---|---|---|
+| String | `"Hello"` | Immutable; `&` concatenates |
+| Numeric | `42`, `3.14` | Integer and float unified |
+| Boolean | `true`, `false`, `yes`, `no` | `yes`/`no` are aliases |
+| Date | `now()`, `"2026-09-03"` | Rich date/time functions built in |
+| Array | `[1, 2, 3]` | 1-based index |
+| Struct | `{name: "Alex", age: 30}` | Key-value map; keys case-insensitive |
+| Query | result of `cfquery` / `queryExecute()` | Tabular result set |
 
 ::image-box
 ---
@@ -27,6 +27,66 @@ ColdFusion is dynamically typed. Variables are created on assignment and their t
 :max-width: 860px
 ---
 _CFML's six core data types — dynamically inferred at runtime, no explicit type declarations needed._
+::
+
+**Activity:** Create `data_types.cfm` to explore all six types. In the Terminal:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/data_types.cfm << 'EOF'
+<cfscript>
+  // String
+  myString = "Hello ColdFusion";
+  writeOutput("<strong>String:</strong> " & myString & "<br>");
+
+  // Numeric
+  myInt  = 42;
+  myFloat = 3.14;
+  writeOutput("<strong>Numeric:</strong> " & myInt & " / " & myFloat & "<br>");
+
+  // Boolean
+  isActive = true;
+  writeOutput("<strong>Boolean:</strong> " & isActive & "<br>");
+
+  // Date
+  today = now();
+  writeOutput("<strong>Date:</strong> " & dateFormat(today, "yyyy-mm-dd") & "<br>");
+
+  // Array
+  fruits = ["apple", "banana", "cherry"];
+  writeOutput("<strong>Array[1]:</strong> " & fruits[1] & "<br>");
+
+  // Struct
+  person = {name: "Alex", age: 30};
+  writeOutput("<strong>Struct:</strong> " & person.name & " is " & person.age & "<br>");
+</cfscript>
+EOF
+```
+
+Open `/data_types.cfm` in the **ColdFusion 2025** browser tab (right-click → Open Link in New Tab, then change the path). Or from the Terminal:
+
+```bash
+curl -s http://localhost:8500/data_types.cfm
+```
+
+::image-box
+---
+:src: __static__/browser-output-data-types-v1.png
+:alt: Browser window showing the rendered output of data_types.cfm — six lines each prefixed with a bold type label: String showing Hello ColdFusion, Numeric showing 42 / 3.14, Boolean showing true, Date showing the current date in yyyy-mm-dd format, Array[1] showing apple, Struct showing Alex is 30
+:max-width: 860px
+---
+_All six data types rendered — each line shows the type name and its value._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_data_types
+---
+#active
+Create `data_types.cfm` — the response must contain **String**, **Numeric**, and **Boolean**.
+
+#completed
+`data_types.cfm` demonstrates all six data types. ✓
 ::
 
 ---
@@ -56,25 +116,105 @@ The `variables` scope is the default when you omit a prefix. Always prefix `sess
 _Scope lifetimes compared — request-scoped variables are cheapest; application-scoped variables persist for the life of the process._
 ::
 
+**Activity:** Create `scopes.cfm` to demonstrate the `variables` scope explicitly:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/scopes.cfm << 'EOF'
+<cfscript>
+  // variables scope — explicit prefix
+  variables.name    = "Alex";
+  variables.course  = "ColdFusion 2025";
+
+  writeOutput("<strong>variables.name:</strong> "   & variables.name   & "<br>");
+  writeOutput("<strong>variables.course:</strong> " & variables.course & "<br>");
+
+  // url scope — reads ?name= from the query string
+  urlName = url.name ?: "no name passed";
+  writeOutput("<strong>url.name:</strong> " & urlName & "<br>");
+</cfscript>
+EOF
+```
+
+Open `/scopes.cfm` in the browser to confirm the `variables` scope output:
+
+```bash
+curl -s http://localhost:8500/scopes.cfm
+```
+
+::image-box
+---
+:src: __static__/browser-output-scopes-v1.png
+:alt: Browser window showing the rendered output of scopes.cfm — three lines: variables.name showing Alex, variables.course showing ColdFusion 2025, url.name showing no name passed (because no query string was provided)
+:max-width: 860px
+---
+_`scopes.cfm` with no query string — `variables.*` values are set, `url.name` falls back to the default._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_scopes_page
+---
+#active
+Create `scopes.cfm` — the response must contain the word **variables**.
+
+#completed
+`scopes.cfm` demonstrates variable scopes. ✓
+::
+
 ---
 
-## Code example
+Now verify that the `variables.` prefix is used explicitly in the file:
 
-```cfml
-<cfscript>
-  // variables scope (default — page only)
-  variables.name = "Alex";
+::simple-task
+---
+:tasks: tasks
+:name: verify_variables_scope
+---
+#active
+Confirm `scopes.cfm` uses the `variables.` prefix explicitly — the file must contain `variables.`.
 
-  // url scope (query string params)
-  writeOutput(url.name ?: "no name in URL");
+#completed
+The `variables` scope is explicitly prefixed. ✓
+::
 
-  // session scope (per user session)
-  session.userId = 42;
+---
 
-  // application scope (shared across all requests)
-  application.siteName = "CF Training";
-</cfscript>
+## URL scope
+
+Pass a query-string parameter and read it back with `url.name`:
+
+```bash
+curl -s "http://localhost:8500/scopes.cfm?name=TestUser"
+# Expected: url.name: TestUser
 ```
+
+Or in the browser, append `?name=TestUser` to the URL:
+
+```
+https://<your-session-id>.iximiuz.com/scopes.cfm?name=TestUser
+```
+
+::image-box
+---
+:src: __static__/browser-output-scopes-url-v1.png
+:alt: Browser window showing the rendered output of scopes.cfm?name=TestUser — three lines: variables.name showing Alex, variables.course showing ColdFusion 2025, url.name showing TestUser (the value passed in the query string)
+:max-width: 860px
+---
+_With `?name=TestUser` appended, `url.name` resolves to **TestUser** instead of the default._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_url_scope
+---
+#active
+Visit `scopes.cfm?name=TestUser` — the response must echo back **TestUser** from the URL scope.
+
+#completed
+URL scope is working — `?name=TestUser` is reflected in the output. ✓
+::
 
 ---
 
@@ -98,65 +238,44 @@ When you write just `name` without a prefix, ColdFusion checks scopes in this or
 5. `variables`
 6. `cgi`, `file`, `url`, `form`, `cookie`, `client`
 
-Always prefix to be explicit and avoid scope-bleed bugs.
+**Always prefix to be explicit and avoid scope-bleed bugs.** In a large application, an unqualified variable that accidentally resolves from `url` instead of `variables` can cause hard-to-trace security issues.
 
+::hint-box
+---
+:summary: Need to inspect all scope values at once?
 ---
 
-## Exercises
+ColdFusion has a built-in debugging tool — `cfdump`. It renders any variable, struct, array, or scope as a formatted HTML table, perfect for exploring what's actually in scope at runtime.
 
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/scopes.cfm` and output `variables.name` — the response must contain the word **variables**.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_scopes_page
----
-#active
-Create `scopes.cfm` — the response must contain the words **variables**, **session**, or **application**.
-
-#completed
-`scopes.cfm` demonstrates variable scopes. ✓
-::
-
-2. Use the `variables.` prefix explicitly in `scopes.cfm`.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_variables_scope
----
-#active
-Use the `variables.` prefix explicitly in `scopes.cfm`.
-
-#completed
-The `variables` scope is explicitly used. ✓
-::
-
-3. Pass `?name=TestUser` and echo it back from the URL scope.
-
-```bash
-curl -s "http://localhost:8500/scopes.cfm?name=TestUser"
+```cfml
+<cfdump var="#variables#" label="variables scope">
+<cfdump var="#url#"       label="url scope">
+<cfdump var="#session#"   label="session scope">
 ```
 
-The response should contain **TestUser**.
+Add those lines temporarily to any `.cfm` file, reload in the browser, and you get a complete view of every variable in each scope. Remove them before going to production.
 
-::simple-task
----
-:tasks: tasks
-:name: verify_url_scope
----
-#active
-Visit `scopes.cfm?name=TestUser` — the response must echo back **TestUser** from the URL scope.
-
-#completed
-URL scope is working — `?name=TestUser` is reflected in the output. ✓
 ::
 
+::hint-box
+---
+:summary: Need to edit a file? Use vi
 ---
 
-## Challenge
+If you need to tweak `scopes.cfm` without rewriting it from scratch:
 
-Put your skills to the test — complete the hands-on challenge for this lesson.
+```bash
+vi /opt/coldfusion2025/cfusion/wwwroot/scopes.cfm
+```
+
+| Key | What it does |
+|---|---|
+| `i` | Enter insert mode |
+| `Esc` | Back to normal mode |
+| `:wq` + Enter | Save and quit |
+| `:q!` + Enter | Quit without saving |
+
+::
 
 ---
 
@@ -172,10 +291,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.scope_inspector_5e09720b
----
 ::
