@@ -288,6 +288,22 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/index.cfm
 
 ::hint-box
 ---
+:summary: Performance Monitoring Toolset says "pmtagent package is not installed"?
+---
+
+If you see the message **"The pmtagent package is not installed"** when clicking the Performance Monitoring Toolset button, the PMT agent package was not installed in this lab session. Fix it from the Terminal in under a minute:
+
+```bash
+sudo /opt/coldfusion2025/cfusion/bin/cfpm.sh install pmtagent
+sudo systemctl restart coldfusion
+```
+
+Wait about 15 seconds for CF to restart, then reload the CF Admin page and click **Performance Monitoring Toolset** again — it should now open the dashboard.
+
+::
+
+::hint-box
+---
 :summary: Need to edit Application.cfc? Use vi
 ---
 
