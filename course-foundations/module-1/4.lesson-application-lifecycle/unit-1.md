@@ -202,6 +202,8 @@ _`grep` confirms `this.name = "CFTraining"` is set in `Application.cfc`._
 
 Open the **ColdFusion 2025** tab (right-click → Open in New Tab) and browse to your lab root — CF Admin login page appearing means the engine is running with your `Application.cfc` active.
 
+Log in with password `admin`. Once inside, click **Performance Monitoring Toolset** in the left navigation — this opens the live monitoring dashboard where you can see active requests, memory usage, and application scope activity. It confirms your `Application.cfc` is loaded and the application context is running.
+
 ::image-box
 ---
 :src: __static__/browser-cf-admin-app-running-v1.png
