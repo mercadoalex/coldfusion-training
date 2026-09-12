@@ -65,4 +65,10 @@ tasks:
 
 challenges:
   oop_cfc_88277abe: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

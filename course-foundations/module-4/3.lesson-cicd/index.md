@@ -66,4 +66,10 @@ tasks:
 
 challenges:
   cicd_pipeline_6f98584e: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

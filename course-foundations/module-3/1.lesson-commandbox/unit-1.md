@@ -191,6 +191,22 @@ Create `/home/laborant/app/box.json` to initialise the CommandBox project.
 
 Put your skills to the test — complete the hands-on challenge for this lesson.
 
+---
+
+When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lesson_complete
+---
+#active
+All done? Hit **Check** to mark this lesson complete and unlock the next one.
+
+#completed
+Lesson complete. On to the next one!
+::
+
 ::card
 ---
 :challenge: challenges.commandbox_server_9bac5899

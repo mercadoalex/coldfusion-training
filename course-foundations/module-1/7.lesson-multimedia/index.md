@@ -66,4 +66,10 @@ tasks:
 
 challenges:
   multimedia_c7c70611: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

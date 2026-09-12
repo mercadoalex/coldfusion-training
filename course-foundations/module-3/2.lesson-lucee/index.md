@@ -64,4 +64,10 @@ tasks:
 
 challenges:
   lucee_5db89516: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

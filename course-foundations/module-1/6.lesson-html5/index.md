@@ -68,4 +68,10 @@ tasks:
 
 challenges:
   html5_page_5ef19f87: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

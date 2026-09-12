@@ -64,4 +64,10 @@ tasks:
 
 challenges:
   cfml_syntax_0b4b2335: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

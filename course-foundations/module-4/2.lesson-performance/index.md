@@ -68,4 +68,10 @@ tasks:
 
 challenges:
   performance_9b4234b3: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

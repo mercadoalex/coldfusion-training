@@ -306,6 +306,10 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/hello.cfm` that outputs a greeting c
 
 ---
 
+---
+
+When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
+
 ## Key concepts reference
 
 | Term | Meaning |

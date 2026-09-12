@@ -190,6 +190,22 @@ TestBox tests pass. ✓
 
 Put your skills to the test — complete the hands-on challenge for this lesson.
 
+---
+
+When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lesson_complete
+---
+#active
+All done? Hit **Check** to mark this lesson complete and unlock the next one.
+
+#completed
+Lesson complete. On to the next one!
+::
+
 ::card
 ---
 :challenge: challenges.testing_8f70b2b0

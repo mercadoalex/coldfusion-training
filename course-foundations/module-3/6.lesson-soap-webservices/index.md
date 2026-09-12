@@ -65,4 +65,10 @@ tasks:
 
 challenges:
   soap_webservices_8f4e8ae9: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

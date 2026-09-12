@@ -108,4 +108,10 @@ tasks:
 
 challenges:
   student_api_7309bb97: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

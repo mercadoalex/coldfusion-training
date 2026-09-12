@@ -65,4 +65,10 @@ tasks:
 
 challenges:
   caching_10837ff1: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

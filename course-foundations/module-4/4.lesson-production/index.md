@@ -66,4 +66,10 @@ tasks:
 
 challenges:
   health_endpoint_a895d35e: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---

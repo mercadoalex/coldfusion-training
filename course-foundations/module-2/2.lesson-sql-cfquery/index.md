@@ -65,4 +65,10 @@ tasks:
 
 challenges:
   sql_query_9af1b639: {}
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "Lesson complete — well done!"
+
 ---
