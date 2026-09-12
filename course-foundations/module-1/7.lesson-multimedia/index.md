@@ -56,21 +56,42 @@ tasks:
     needs:
       - verify_html5_video
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm"
-      if [ ! -f "${FILE}" ]; then
-        echo "upload_media.cfm not found"
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "upload_media.cfm not found (got ${STATUS})"
         exit 1
       fi
-      echo "Upload handler exists"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm"
+      if ! grep -q "cffile\|action.*upload" "${FILE}" 2>/dev/null; then
+        echo "No cffile upload handler found in upload_media.cfm"
+        exit 1
+      fi
+      echo "Upload handler exists and contains cffile"
 
+  verify_image_thumb:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_upload_handler
+    run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/image_thumb.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "image_thumb.cfm not found (got ${STATUS})"
+        exit 1
+      fi
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/image_thumb.cfm"
+      if ! grep -q "cfimage\|imageNew\|imageWrite" "${FILE}" 2>/dev/null; then
+        echo "No cfimage usage found in image_thumb.cfm"
+        exit 1
+      fi
+      echo "image_thumb.cfm exists and uses cfimage"
 
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_image_thumb
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  multimedia_c7c70611: {}
 
 ---
