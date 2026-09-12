@@ -68,11 +68,33 @@ tasks:
       fi
       echo "$COUNT functions found in GreetingService.cfc"
 
-  verify_lesson_complete:
+  verify_java_cfc:
     machine: dev-machine
     user: laborant
     needs:
       - verify_cfc_method
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/JavaUtilService.cfc"
+      if [ ! -f "${FILE}" ]; then
+        echo "JavaUtilService.cfc not found"
+        exit 1
+      fi
+      BODY=$(curl -s http://localhost:8500/test_java_cfc.cfm)
+      if echo "${BODY}" | grep -qi "error\|exception"; then
+        echo "test_java_cfc.cfm returned an error"
+        exit 1
+      fi
+      if ! echo "${BODY}" | grep -qi "CFML"; then
+        echo "Expected 'CFML' in output — StringBuilder method may not be working"
+        exit 1
+      fi
+      echo "Java called successfully from JavaUtilService CFC"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_java_cfc
     run: |
       echo "Lesson complete — well done!"
 

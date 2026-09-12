@@ -384,6 +384,106 @@ writeOutput(sb.toString());
 
 This is rarely needed for everyday CF work, but the entire Java ecosystem is available when you need it.
 
+---
+
+## Activity 4 — Call Java from inside a CFC
+
+**Activity:** In the **Terminal** tab, create `JavaUtilService.cfc` — a CFC whose methods each call a different Java class from the standard library:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/JavaUtilService.cfc << 'EOF'
+component displayname="JavaUtilService" hint="Demonstrates calling Java from CFML" {
+
+  public JavaUtilService function init() {
+    return this;
+  }
+
+  // 1. java.util.UUID — generate a random unique identifier
+  public string function generateUUID() {
+    return createObject("java", "java.util.UUID")
+           .randomUUID()
+           .toString();
+  }
+
+  // 2. java.lang.StringBuilder — efficient string building
+  public string function buildMessage(required array parts) {
+    var sb = createObject("java", "java.lang.StringBuilder").init();
+    for (var part in arguments.parts) {
+      sb.append(part);
+    }
+    return sb.toString();
+  }
+
+  // 3. java.lang.System — read a JVM system property
+  public string function getJavaVersion() {
+    return createObject("java", "java.lang.System")
+           .getProperty("java.version");
+  }
+
+  // 4. java.util.Collections — sort an array using Java's sort algorithm
+  public array function sortList(required array items) {
+    var javaList = createObject("java", "java.util.ArrayList").init();
+    for (var item in arguments.items) {
+      javaList.add(item);
+    }
+    createObject("java", "java.util.Collections").sort(javaList);
+    var result = [];
+    for (var item in javaList) {
+      arrayAppend(result, item);
+    }
+    return result;
+  }
+
+}
+EOF
+```
+
+Now create `test_java_cfc.cfm` to call all four methods:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_java_cfc.cfm << 'EOF'
+<cfscript>
+  svc = new JavaUtilService();
+
+  writeOutput("<strong>1. UUID:</strong> "          & svc.generateUUID() & "<br>");
+  writeOutput("<strong>2. StringBuilder:</strong> " & svc.buildMessage(["Hello", ", ", "Java", " from ", "CFML!"]) & "<br>");
+  writeOutput("<strong>3. Java version:</strong> "  & svc.getJavaVersion() & "<br>");
+
+  sorted = svc.sortList(["banana", "apple", "cherry", "date"]);
+  writeOutput("<strong>4. Sorted list:</strong> "   & arrayToList(sorted) & "<br>");
+</cfscript>
+EOF
+```
+
+Open `/test_java_cfc.cfm` in the **ColdFusion 2025** browser tab, or from the Terminal:
+
+```bash
+curl -s http://localhost:8500/test_java_cfc.cfm
+```
+
+::image-box
+---
+:src: __static__/browser-java-cfc-output-v1.png
+:alt: Browser window showing the rendered output of test_java_cfc.cfm — four lines: UUID showing a random UUID string, StringBuilder showing Hello, Java from CFML!, Java version showing the JVM version number, and Sorted list showing apple,banana,cherry,date in alphabetical order
+:max-width: 860px
+---
+_All four Java classes called from inside a CFC — UUID, StringBuilder, System properties, and Collections sort._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_java_cfc
+---
+#active
+Create `JavaUtilService.cfc` and `test_java_cfc.cfm` — the response must contain a UUID, the word **CFML**, and the sorted fruit list.
+
+#completed
+Java called successfully from inside a CFC. ✓
+::
+
+---
+
 ::hint-box
 ---
 :summary: CFCs vs .cfm pages — when to use each?
