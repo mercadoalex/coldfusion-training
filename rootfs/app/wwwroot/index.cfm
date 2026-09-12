@@ -12,9 +12,24 @@
       color: #e2e8f0;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: .75rem 1rem;
+      font-size: .75rem;
+      color: #475569;
+      border-top: 1px solid #1e293b;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      background: #0f172a;
+    }
+    footer a { color: #475569; text-decoration: none; }
+    footer a:hover { color: #94a3b8; }
     .card {
       background: #1e293b;
       border: 1px solid #334155;
@@ -120,5 +135,9 @@
       <a class="btn btn-secondary" href="/db-test.cfm">DB Test</a>
     </div>
   </div>
+
+  <footer>
+    &copy; 2026 Hungry Minds &nbsp;&middot;&nbsp; Course content by Alejandro Mercado &nbsp;&middot;&nbsp; Powered by Adobe ColdFusion 2025
+  </footer>
 </body>
 </html>
