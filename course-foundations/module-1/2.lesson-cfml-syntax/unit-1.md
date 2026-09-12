@@ -35,7 +35,26 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm << 'EOF'
 EOF
 ```
 
-To see the rendered output, click the **ColdFusion** tab in your lab (the live browser tab on port 8500) and navigate to `/syntax_tag.cfm` — you should see the text rendered by the engine, not raw CFML source. You can also verify from the Terminal:
+To see the rendered page in the browser:
+
+1. Click the **ColdFusion 2025** tab in your lab — it shows the CF Admin login page inside the lab frame.
+2. **Right-click** that tab button and choose **"Open Link in New Tab"** — this opens the engine's root URL in a real browser window with a full address bar.
+3. In the address bar, replace whatever path is shown with `/syntax_tag.cfm` and press Enter.
+
+::hint-box
+---
+:summary: Why can't I just type the URL directly?
+---
+
+Each lab VM gets a **unique, temporary hostname** that changes every time you start a new session — something like `https://6aa4b837d4c87b4fa0370284-3ec630.node-eu-13e2.iximiuz.com/`. That prefix is yours alone and only valid for the current session, so there is no fixed URL to share or bookmark. The reliable way to get it is to open the ColdFusion tab in a new browser window (right-click → Open Link in New Tab) and read it from the address bar. Then append your filename:
+
+```
+https://<your-session-id>.iximiuz.com/syntax_tag.cfm
+```
+
+::
+
+You can also verify from the Terminal without opening a browser at all:
 
 ```bash
 curl -s http://localhost:8500/syntax_tag.cfm
@@ -88,7 +107,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 EOF
 ```
 
-Open the **ColdFusion** tab and navigate to `/syntax_script.cfm` to see the output rendered in the browser. Or from the Terminal:
+In the browser window you opened earlier, change the path to `/syntax_script.cfm` and reload. Or from the Terminal:
 
 ```bash
 curl -s http://localhost:8500/syntax_script.cfm
@@ -197,7 +216,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 EOF
 ```
 
-Reload `/syntax_script.cfm` in the **ColdFusion** tab to see the grade appended to the output. Or from the Terminal:
+Reload `/syntax_script.cfm` in the browser window to see the grade appended to the output. Or from the Terminal:
 
 ```bash
 curl -s http://localhost:8500/syntax_script.cfm
@@ -261,7 +280,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
 EOF
 ```
 
-Open `/syntax_loop.cfm` in the **ColdFusion** tab — the browser will render the `<br>` tags and show the numbers stacked on separate lines. Or from the Terminal:
+Change the path to `/syntax_loop.cfm` in the browser window — the `<br>` tags render properly so the numbers appear on separate lines. Or from the Terminal:
 
 ```bash
 curl -s http://localhost:8500/syntax_loop.cfm
