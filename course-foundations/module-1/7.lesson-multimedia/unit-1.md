@@ -424,8 +424,10 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/image_thumb.cfm << 'EOF'
       overwrite   = true
     );
 
-    origInfo  = imageGetInfo(imageRead(srcPath));
-    thumbInfo = imageGetInfo(imageRead(thumbPath));
+    origImg   = imageRead(srcPath);
+    thumbImg  = imageRead(thumbPath);
+    origInfo  = imageInfo(origImg);
+    thumbInfo = imageInfo(thumbImg);
   </cfscript>
 
   <div class="images">
