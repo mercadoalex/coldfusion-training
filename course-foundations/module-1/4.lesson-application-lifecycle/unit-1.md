@@ -211,26 +211,31 @@ Open the **ColdFusion 2025** tab (right-click → Open in New Tab) and browse to
 _CF Admin login page — log in with password `admin`._
 ::
 
-Log in with password `admin`. Now verify your `Application.cfc` is active using two built-in CF Admin tools that work without any external infrastructure:
+Log in with password `admin`. Now verify your `Application.cfc` is active in two ways:
 
-**1 — Server Settings → Memory Variables**
+**1 — /status.cfm (fastest)**
 
-Go to **Server Settings → Memory Variables** in the left navigation. Your `CFTraining` application will appear in the application list with its `startTime` value — proof that `onApplicationStart()` ran and wrote to the application scope.
+Navigate to `/status.cfm` in the browser tab. This page reads directly from the running CF engine and shows:
+
+- **this.name** — confirms `Application.cfc` is loaded and `CFTraining` is the app name
+- **onApplicationStart** — shows `fired — <timestamp>` if `onApplicationStart()` ran and set `application.startTime`
+- **JVM memory** — live heap usage
+- **Session management** — confirms sessions are enabled
 
 ::image-box
 ---
 :src: __static__/browser-cf-pmt-dashboard-v1.png
-:alt: ColdFusion Administrator Memory Variables page showing the CFTraining application in the application scope list, with a startTime key visible — confirming that onApplicationStart fired and wrote to the application scope
+:alt: Browser window showing the status.cfm page — a dark-themed status dashboard with three sections: Engine (product name, version, Java version, server time), JVM Memory (used/total/max in MB), and Application Scope showing this.name as CFTraining and onApplicationStart as fired with a timestamp
 :max-width: 960px
 ---
-_Memory Variables in CF Admin — your `CFTraining` app appears here with the `startTime` set by `onApplicationStart()`._
+_`/status.cfm` — a zero-dependency live view of your running CF engine and `Application.cfc` state._
 ::
 
-**2 — Logging & Profiling → Log Files**
+**2 — CF Admin → Logging & Profiling → Log Files**
 
-Go to **Logging & Profiling → Log Files** and open `application.log` — you should see the line written by `writeLog()` in your `onApplicationStart()` method, timestamped to when the application first started.
+Open `application.log` — you should see the line written by `writeLog()` in `onApplicationStart()`, timestamped to when the application first started.
 
-> **Note on Performance Monitoring Toolset:** The PMT button in CF Admin connects to a separate Elastic Stack (Elasticsearch + Kibana) infrastructure that is not running in this lab. It is a powerful tool but requires dedicated infrastructure well beyond a single VM. It is covered in the **ColdFusion Advanced Course**. See the hint box below for the full explanation.
+> **Note on Performance Monitoring Toolset:** The PMT button in CF Admin requires a separate PMT Server + Elastic Stack (Elasticsearch + Kibana) that is not running in this lab. See the hint box below for the full explanation. It is covered in the **ColdFusion Advanced Course**.
 
 ::simple-task
 ---
