@@ -122,22 +122,10 @@ This gives zero-downtime deploys with instant rollback.
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/health.cfm` using the template above.
-2. Verify it returns valid JSON:
 
 ```bash
 curl -s http://localhost:8500/health.cfm | python3 -m json.tool
 ```
-
-3. Confirm the `status` field is `"ok"`:
-
-```bash
-curl -s http://localhost:8500/health.cfm \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])"
-```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -150,6 +138,13 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/health.cfm` — must return valid JS
 #completed
 `health.cfm` returns valid JSON. ✓
 ::
+
+2. Confirm the `status` field is `"ok"`:
+
+```bash
+curl -s http://localhost:8500/health.cfm \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])"
+```
 
 ::simple-task
 ---
@@ -174,7 +169,6 @@ Health status is `ok` or `degraded`. ✓
 #completed
 Health endpoint returns the correct HTTP status code. ✓
 ::
-
 
 ---
 

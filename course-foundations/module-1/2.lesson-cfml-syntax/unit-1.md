@@ -221,17 +221,10 @@ Yes — and growing. Many enterprise teams that have ColdFusion backends are add
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` — output the text **"tag"** using `<cfset>` and `<cfoutput>`.
-2. Create `syntax_script.cfm` — output the text **"script"** using `writeOutput()` inside `<cfscript>`, and add an `if` condition.
-3. Verify:
 
 ```bash
 curl -s http://localhost:8500/syntax_tag.cfm
-curl -s http://localhost:8500/syntax_script.cfm
 ```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -245,6 +238,12 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` using `<cfset>` and 
 `syntax_tag.cfm` returns tag-syntax output. ✓
 ::
 
+2. Create `syntax_script.cfm` — output the text **"script"** using `writeOutput()` inside `<cfscript>`.
+
+```bash
+curl -s http://localhost:8500/syntax_script.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -256,6 +255,8 @@ Create `syntax_script.cfm` using `<cfscript>` and `writeOutput()` — the respon
 #completed
 `syntax_script.cfm` returns script-syntax output. ✓
 ::
+
+3. Add an `if` or `<cfif>` conditional to `syntax_script.cfm`.
 
 ::simple-task
 ---
@@ -269,12 +270,11 @@ Add an `if` or `<cfif>` conditional to `syntax_script.cfm`.
 Conditional logic is present in `syntax_script.cfm`. ✓
 ::
 
-
 ---
 
----
+## Challenge
 
-Put your skills to the test by completing the hands-on challenge for this lesson.
+Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ::card
 ---

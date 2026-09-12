@@ -194,40 +194,12 @@ Large APIs benefit from separating the HTTP layer from the data layer.
 
 ## 6. Try it — curl exercises
 
+Create `/opt/coldfusion2025/cfusion/wwwroot/api/tickets.cfm` and test each endpoint:
+
 ```bash
 # List all tickets
 curl -s http://localhost:8500/api/tickets.cfm | python3 -m json.tool
-
-# Get ticket #2 with its comments
-curl -s "http://localhost:8500/api/tickets.cfm?id=2" | python3 -m json.tool
-
-# Create a new ticket
-curl -s -X POST http://localhost:8500/api/tickets.cfm \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Monitor flickering","description":"Display flickers","priority":"high","user_id":3}' \
-  | python3 -m json.tool
-
-# Close a ticket
-curl -s -X DELETE "http://localhost:8500/api/tickets.cfm?id=1" | python3 -m json.tool
 ```
-
----
-
-## Key takeaways
-
-| Concept | ColdFusion approach |
-|---|---|
-| Set response type | `cfheader(name="Content-Type", value="application/json")` |
-| Serialize data | `serializeJSON(struct_or_array)` |
-| Parse JSON input | `deserializeJSON(toString(getHttpRequestData().content))` |
-| HTTP status codes | `cfheader(statuscode="404", statustext="Not Found")` |
-| Route on verb | `cgi.REQUEST_METHOD` — `"GET"`, `"POST"`, `"DELETE"` |
-| Safe SQL params | `cfqueryparam` / `queryExecute` named bindings |
-| Halt execution | `abort` after writing the response |
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -277,6 +249,11 @@ The JSON response must contain at least 1 ticket (`total` > 0).
 Response contains tickets. ✓
 ::
 
+```bash
+# Get a single ticket
+curl -s "http://localhost:8500/api/tickets.cfm?id=1" | python3 -m json.tool
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -288,6 +265,14 @@ Response contains tickets. ✓
 #completed
 Single ticket fetch works. ✓
 ::
+
+```bash
+# Create a new ticket
+curl -s -X POST http://localhost:8500/api/tickets.cfm \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Monitor flickering","description":"Display flickers","priority":"high","user_id":3}' \
+  | python3 -m json.tool
+```
 
 ::simple-task
 ---
@@ -301,6 +286,19 @@ Single ticket fetch works. ✓
 POST creates a new ticket. ✓
 ::
 
+---
+
+## Key takeaways
+
+| Concept | ColdFusion approach |
+|---|---|
+| Set response type | `cfheader(name="Content-Type", value="application/json")` |
+| Serialize data | `serializeJSON(struct_or_array)` |
+| Parse JSON input | `deserializeJSON(toString(getHttpRequestData().content))` |
+| HTTP status codes | `cfheader(statuscode="404", statustext="Not Found")` |
+| Route on verb | `cgi.REQUEST_METHOD` — `"GET"`, `"POST"`, `"DELETE"` |
+| Safe SQL params | `cfqueryparam` / `queryExecute` named bindings |
+| Halt execution | `abort` after writing the response |
 
 ---
 

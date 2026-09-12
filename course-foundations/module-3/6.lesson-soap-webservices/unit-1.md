@@ -111,16 +111,6 @@ _SOAP and REST both use HTTP — the key differences are contract strictness, pa
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm` that calls a SOAP service using `createObject("webservice", ...)` or `<cfinvoke>`.
-2. Verify that `TicketService.cfc` exposes a remote function and the WSDL is accessible:
-
-```bash
-curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/TicketService.cfc?wsdl"
-# Should return 200
-```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -146,6 +136,13 @@ Use `<cfinvoke>` or `createObject("webservice", ...)` in `soap_consumer.cfm`.
 Web service invocation found. ✓
 ::
 
+2. Add a `remote` function to `TicketService.cfc` and verify the WSDL is accessible:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/TicketService.cfc?wsdl"
+# Should return 200
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -157,7 +154,6 @@ Web service invocation found. ✓
 #completed
 SOAP WSDL is accessible at `TicketService.cfc?wsdl`. ✓
 ::
-
 
 ---
 

@@ -126,26 +126,12 @@ curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
 
 ## Exercises
 
-1. Create `input_demo.cfm` that takes `url.name` and outputs it with `encodeForHTML()`.
-2. Confirm `cfqueryparam` is used in the existing `tickets.cfm` (from the SQL lesson).
-3. Add the security headers to `Application.cfc`.
-4. Verify the admin is inaccessible from outside (the task uses `curl` to check the HTTP status).
+1. Create `input_demo.cfm` that takes `url.name` and outputs it with `encodeForHTML()`:
 
----
-
-## Hands-on checks
-
-::simple-task
----
-:tasks: tasks
-:name: verify_admin_restricted
----
-#active
-The CF Admin at `/CFIDE/administrator/index.cfm` must return a non-200 response.
-
-#completed
-CF Admin is restricted. ✓
-::
+```bash
+curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
+# Should output encoded entity — NOT the raw script tag
+```
 
 ::simple-task
 ---
@@ -159,6 +145,8 @@ Create `input_demo.cfm` — passing `?name=<script>alert(1)</script>` must NOT o
 Input is properly HTML-encoded — no XSS. ✓
 ::
 
+2. Confirm `cfqueryparam` is used in `tickets.cfm`.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -171,6 +159,19 @@ Use `cfqueryparam` at least once somewhere in the web root.
 `cfqueryparam` is used — SQL injection protection in place. ✓
 ::
 
+3. Restrict the CF Admin — the task verifies it returns a non-200 response from outside.
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_admin_restricted
+---
+#active
+The CF Admin at `/CFIDE/administrator/index.cfm` must return a non-200 response.
+
+#completed
+CF Admin is restricted. ✓
+::
 
 ---
 

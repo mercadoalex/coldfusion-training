@@ -114,25 +114,7 @@ public boolean function onRequestStart(string targetPage) {
 
 ## Exercises
 
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/Application.cfc` with:
-   - `this.name` set to any string
-   - an `onApplicationStart` method that writes to the application scope
-2. Verify:
-
-```bash
-curl -s http://localhost:8500/index.cfm
-```
-
-3. Check that `onApplicationStart` fires by inspecting `application.startTime`:
-
-```bash
-curl -s http://localhost:8500/debug_app.cfm
-# or check with cfdump: <cfdump var="#application#">
-```
-
----
-
-## Hands-on checks
+1. Create `/opt/coldfusion2025/cfusion/wwwroot/Application.cfc` with `this.name` set to any string.
 
 ::simple-task
 ---
@@ -146,6 +128,8 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/Application.cfc`.
 `Application.cfc` exists in the web root. ✓
 ::
 
+2. Add an `onApplicationStart()` method that writes to the application scope.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -158,6 +142,12 @@ Add an `onApplicationStart()` method to `Application.cfc`.
 `onApplicationStart` is defined. ✓
 ::
 
+3. Set `this.name` to a non-empty string and verify the app starts:
+
+```bash
+curl -s http://localhost:8500/index.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -169,7 +159,6 @@ Set `this.name` to a non-empty string in `Application.cfc`.
 #completed
 Application name (`this.name`) is configured. ✓
 ::
-
 
 ---
 

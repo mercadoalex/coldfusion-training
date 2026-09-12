@@ -243,30 +243,7 @@ This is rarely needed for everyday CF work, but it means the entire Java ecosyst
 
 ## Exercises
 
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc` with:
-   - An `init()` constructor
-   - A `public` method `getAll()` that queries `hd_tickets`
-   - A `private` helper method
-
-2. Create `test_cfc.cfm` that instantiates it and calls `getAll()`:
-
-```cfml
-<cfscript>
-  svc     = new TicketService();
-  tickets = svc.getAll();
-  writeDump(tickets);
-</cfscript>
-```
-
-3. Verify:
-
-```bash
-curl -s http://localhost:8500/test_cfc.cfm | grep -vi "error\|exception"
-```
-
----
-
-## Hands-on checks
+1. Create `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc` with an `init()` constructor, a `public` method `getAll()`, and a `private` helper method.
 
 ::simple-task
 ---
@@ -291,6 +268,20 @@ The CFC must contain a `component` declaration.
 #completed
 `component` declaration found. ✓
 ::
+
+2. Create `test_cfc.cfm` that instantiates it and calls `getAll()`:
+
+```cfml
+<cfscript>
+  svc     = new TicketService();
+  tickets = svc.getAll();
+  writeDump(tickets);
+</cfscript>
+```
+
+```bash
+curl -s http://localhost:8500/test_cfc.cfm | grep -vi "error\|exception"
+```
 
 ::simple-task
 ---

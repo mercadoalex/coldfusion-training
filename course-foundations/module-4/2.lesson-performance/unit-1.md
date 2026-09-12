@@ -109,18 +109,6 @@ The task checks that the response is under **2000 ms**.
 grep -i "xmx" /opt/coldfusion2025/cfusion/bin/jvm.config
 ```
 
-2. Measure the CF response time:
-
-```bash
-curl -s -w "\nHTTP %{http_code} — %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
-```
-
-3. Adjust the heap if needed and restart: `sudo systemctl restart cf-server`
-
----
-
-## Hands-on checks
-
 ::simple-task
 ---
 :tasks: tasks
@@ -145,6 +133,12 @@ curl -s -w "\nHTTP %{http_code} — %{time_total}s\n" -o /dev/null http://localh
 JVM heap (`-Xmx`) is configured. ✓
 ::
 
+2. Measure the CF response time — it must be under 2000 ms:
+
+```bash
+curl -s -w "\nHTTP %{http_code} — %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -156,7 +150,6 @@ ColdFusion must respond to a request on port 8500 in under 2000 ms.
 #completed
 Response time is within the 2000 ms threshold. ✓
 ::
-
 
 ---
 

@@ -137,22 +137,6 @@ box "server list --running"
 box version
 ```
 
-2. Confirm the Lucee server is running on port 8888:
-
-```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm
-```
-
-3. Check that `box.json` exists at `/home/laborant/app/box.json`:
-
-```bash
-cat /home/laborant/app/box.json
-```
-
----
-
-## Hands-on checks
-
 ::simple-task
 ---
 :tasks: tasks
@@ -164,6 +148,12 @@ Confirm CommandBox is on the PATH: `box version`
 #completed
 CommandBox (`box`) is installed. ✓
 ::
+
+2. Confirm the Lucee server is running on port 8888:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm
+```
 
 ::simple-task
 ---
@@ -177,6 +167,12 @@ The CommandBox Lucee server must be responding on port 8888.
 CommandBox server is running on port 8888. ✓
 ::
 
+3. Create `/home/laborant/app/box.json` to initialise the CommandBox project:
+
+```bash
+cat /home/laborant/app/box.json
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -188,7 +184,6 @@ Create `/home/laborant/app/box.json` to initialise the CommandBox project.
 #completed
 `box.json` found — CommandBox project is initialised. ✓
 ::
-
 
 ---
 

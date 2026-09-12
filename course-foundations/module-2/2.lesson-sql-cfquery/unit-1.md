@@ -116,16 +116,6 @@ In cfscript, use the function form instead of the tag:
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/tickets.cfm` that SELECTs from `hd_tickets` and outputs ticket data.
-2. Make sure you use `cfqueryparam` (or named bindings in `queryExecute`) for any parameterised value.
-3. Verify:
-
-```bash
-curl -s http://localhost:8500/tickets.cfm | grep -i "ticket\|title\|id"
-```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -139,6 +129,8 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/tickets.cfm` — must return HTTP 20
 `tickets.cfm` is accessible. ✓
 ::
 
+2. Use `cfqueryparam` (or named bindings in `queryExecute`) for any parameterised value.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -151,6 +143,12 @@ Use `<cfqueryparam>` or named bindings in `queryExecute` in `tickets.cfm`.
 `cfqueryparam` is used — safe parameterised SQL. ✓
 ::
 
+3. Verify the ticket data is displayed:
+
+```bash
+curl -s http://localhost:8500/tickets.cfm | grep -i "ticket\|title\|id"
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -162,7 +160,6 @@ Use `<cfqueryparam>` or named bindings in `queryExecute` in `tickets.cfm`.
 #completed
 Query results are displayed correctly. ✓
 ::
-
 
 ---
 

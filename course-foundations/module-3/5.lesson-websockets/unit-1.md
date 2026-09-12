@@ -125,17 +125,24 @@ _Four common WebSocket patterns — all supported natively with ColdFusion's bui
 ## Exercises
 
 1. Create `WSHandler.cfc` in the webroot with `onWSMessage`, `onWSOpen`, and `onWSClose`.
-2. Register a `chat` channel in `Application.cfc`.
-3. Create `ws_demo.cfm` with a `new WebSocket(...)` JavaScript client.
-4. Verify:
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_ws_handler
+---
+#active
+Create `WSHandler.cfc` with `onWSMessage`, `wsPublish`, or `wsGetAllChannels`.
+
+#completed
+WebSocket handler CFC found. ✓
+::
+
+2. Register a `chat` channel in `Application.cfc` and create `ws_demo.cfm` with a `new WebSocket(...)` JavaScript client.
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/ws_demo.cfm
 ```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -152,18 +159,6 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/ws_demo.cfm` — must return HTTP 20
 ::simple-task
 ---
 :tasks: tasks
-:name: verify_ws_handler
----
-#active
-Create `WSHandler.cfc` with `onWSMessage`, `wsPublish`, or `wsGetAllChannels`.
-
-#completed
-WebSocket handler CFC found. ✓
-::
-
-::simple-task
----
-:tasks: tasks
 :name: verify_ws_js_client
 ---
 #active
@@ -172,7 +167,6 @@ Add `new WebSocket(...)` JavaScript client code to `ws_demo.cfm`.
 #completed
 JavaScript WebSocket client is present. ✓
 ::
-
 
 ---
 

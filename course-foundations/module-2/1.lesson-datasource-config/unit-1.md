@@ -93,17 +93,7 @@ component {
 
 ## Exercises
 
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm`.
-2. Query `hd_tickets` and output a confirmation containing the word **ok** or **connected**.
-3. Verify:
-
-```bash
-curl -s http://localhost:8500/verify_ds.cfm
-```
-
----
-
-## Hands-on checks
+1. Create `/opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm` — reference the `training_db` datasource.
 
 ::simple-task
 ---
@@ -129,6 +119,12 @@ Reference the `training_db` datasource in `verify_ds.cfm`.
 `training_db` datasource is referenced. ✓
 ::
 
+2. Query `hd_tickets` and output a confirmation containing the word **ok** or **connected**.
+
+```bash
+curl -s http://localhost:8500/verify_ds.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -140,7 +136,6 @@ Reference the `training_db` datasource in `verify_ds.cfm`.
 #completed
 No errors on the datasource verification page. ✓
 ::
-
 
 ---
 

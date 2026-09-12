@@ -113,22 +113,6 @@ box cfconfig import from=.CFConfig.json to=default@lucee5
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm
 ```
 
-2. Create `/home/laborant/app/lucee_info.cfm` and verify it outputs the Lucee version string:
-
-```bash
-curl -s http://localhost:8888/lucee_info.cfm
-```
-
-3. Verify the `training_db` datasource works from Lucee:
-
-```bash
-curl -s http://localhost:8888/verify_ds.cfm
-```
-
----
-
-## Hands-on checks
-
 ::simple-task
 ---
 :tasks: tasks
@@ -140,6 +124,12 @@ Lucee must be running and responding on port 8888.
 #completed
 Lucee is running on port 8888. ✓
 ::
+
+2. Create `/home/laborant/app/lucee_info.cfm` and verify it outputs the Lucee version string:
+
+```bash
+curl -s http://localhost:8888/lucee_info.cfm
+```
 
 ::simple-task
 ---
@@ -153,6 +143,12 @@ Create `/home/laborant/app/lucee_info.cfm` — the response must contain the wor
 Lucee version info is accessible. ✓
 ::
 
+3. Verify the `training_db` datasource works from Lucee:
+
+```bash
+curl -s http://localhost:8888/verify_ds.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -164,7 +160,6 @@ Lucee version info is accessible. ✓
 #completed
 Lucee datasource is configured correctly. ✓
 ::
-
 
 ---
 

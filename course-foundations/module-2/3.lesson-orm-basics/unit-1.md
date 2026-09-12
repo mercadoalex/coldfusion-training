@@ -134,17 +134,6 @@ _Use ORM for domain-model CRUD, `cfquery` for reporting and complex JOINs — th
 ## Exercises
 
 1. Enable ORM in your `Application.cfc` (`this.ormenabled = true`).
-2. Create `Ticket.cfc` with `persistent="true"` mapped to `hd_tickets`.
-3. Create `orm_test.cfm` that loads all open tickets with `entityLoad`.
-4. Verify:
-
-```bash
-curl -s http://localhost:8500/orm_test.cfm | grep -vi "error\|exception"
-```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -158,6 +147,8 @@ Add `this.ormenabled = true` to `Application.cfc`.
 ORM is enabled in `Application.cfc`. ✓
 ::
 
+2. Create `Ticket.cfc` with `persistent="true"` mapped to `hd_tickets`.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -170,6 +161,12 @@ Create a CFC with `persistent="true"` mapped to `hd_tickets`.
 At least one persistent ORM entity CFC found. ✓
 ::
 
+3. Create `orm_test.cfm` that loads all open tickets with `entityLoad` and verify:
+
+```bash
+curl -s http://localhost:8500/orm_test.cfm | grep -vi "error\|exception"
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -181,7 +178,6 @@ Create `orm_test.cfm` that calls `entityLoad` — must return no errors.
 #completed
 `orm_test.cfm` runs without errors. ✓
 ::
-
 
 ---
 

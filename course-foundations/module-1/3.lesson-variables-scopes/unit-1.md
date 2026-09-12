@@ -104,19 +104,7 @@ Always prefix to be explicit and avoid scope-bleed bugs.
 
 ## Exercises
 
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/scopes.cfm`.
-2. Output `variables.name`, a value from `url.name` (passed as query string), and set `session.userId`.
-3. Verify:
-
-```bash
-curl -s "http://localhost:8500/scopes.cfm?name=TestUser"
-```
-
-The response should contain **TestUser** and show scope usage for `variables.` somewhere in the output.
-
----
-
-## Hands-on checks
+1. Create `/opt/coldfusion2025/cfusion/wwwroot/scopes.cfm` and output `variables.name` — the response must contain the word **variables**.
 
 ::simple-task
 ---
@@ -130,6 +118,8 @@ Create `scopes.cfm` — the response must contain the words **variables**, **ses
 `scopes.cfm` demonstrates variable scopes. ✓
 ::
 
+2. Use the `variables.` prefix explicitly in `scopes.cfm`.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -142,6 +132,14 @@ Use the `variables.` prefix explicitly in `scopes.cfm`.
 The `variables` scope is explicitly used. ✓
 ::
 
+3. Pass `?name=TestUser` and echo it back from the URL scope.
+
+```bash
+curl -s "http://localhost:8500/scopes.cfm?name=TestUser"
+```
+
+The response should contain **TestUser**.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -153,7 +151,6 @@ Visit `scopes.cfm?name=TestUser` — the response must echo back **TestUser** fr
 #completed
 URL scope is working — `?name=TestUser` is reflected in the output. ✓
 ::
-
 
 ---
 

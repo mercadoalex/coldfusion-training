@@ -116,17 +116,11 @@ _Available cfchartseries types — choose based on whether you're comparing cate
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm`.
-2. Run a `cfquery` against `hd_tickets` and render a `<cfchart>` from the result.
-3. Verify:
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm
 # Should return 200
 ```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -140,6 +134,8 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm` — must return HTTP
 `chart_demo.cfm` is accessible. ✓
 ::
 
+2. Add a `<cfchart>` tag to `chart_demo.cfm`.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -152,6 +148,8 @@ Add a `<cfchart>` tag to `chart_demo.cfm`.
 `cfchart` is used. ✓
 ::
 
+3. Power the chart with a `cfquery` or `queryExecute` call against `training_db`.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -163,7 +161,6 @@ Power the chart with a `cfquery` or `queryExecute` call against `training_db`.
 #completed
 Chart is powered by live query data. ✓
 ::
-
 
 ---
 

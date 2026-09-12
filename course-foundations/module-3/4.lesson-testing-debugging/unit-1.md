@@ -133,18 +133,11 @@ Debugging output appears at the bottom of every rendered CF page, showing SQL qu
 
 ## Exercises
 
-1. Install TestBox: `box install testbox`
-2. Create `tests/TicketServiceTest.cfc` with at least one `describe`/`it`/`expect` block.
-3. Run tests and verify they pass:
+1. Install TestBox:
 
 ```bash
-curl -s "http://localhost:8500/testbox/system/runners/TextRunner.cfm?directory=tests" \
-  | grep -i "failures\|errors\|tests"
+box install testbox
 ```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -158,6 +151,8 @@ Install TestBox: `box install testbox`
 TestBox is installed. ✓
 ::
 
+2. Create `tests/TicketServiceTest.cfc` with at least one `describe`/`it`/`expect` block.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -170,6 +165,13 @@ Create at least one TestBox spec or test CFC (filename containing `Test` or `Spe
 TestBox test/spec file found. ✓
 ::
 
+3. Run tests and verify they pass:
+
+```bash
+curl -s "http://localhost:8500/testbox/system/runners/TextRunner.cfm?directory=tests" \
+  | grep -i "failures\|errors\|tests"
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -181,7 +183,6 @@ Run the TestBox suite — all tests must pass with zero failures and zero errors
 #completed
 TestBox tests pass. ✓
 ::
-
 
 ---
 

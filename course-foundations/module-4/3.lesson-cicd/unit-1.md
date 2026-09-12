@@ -143,18 +143,6 @@ box cfconfig set datasourceUsername=training_db_user \
 ## Exercises
 
 1. Create `box.json` in `/home/laborant/app/` or `/opt/coldfusion2025/cfusion/wwwroot/`.
-2. Create a `Dockerfile` in the same directory (it doesn't need to build successfully — the task just checks it exists).
-3. Build a Docker image tagged `cfml-app`:
-
-```bash
-docker build -t cfml-app /home/laborant/app/
-# or
-docker build -t cfml-app /opt/coldfusion2025/cfusion/wwwroot/
-```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -168,6 +156,8 @@ Create `box.json` in the app directory to package the project with CommandBox.
 `box.json` found. ✓
 ::
 
+2. Create a `Dockerfile` in the same directory using the CommandBox base image.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -180,6 +170,14 @@ Create a `Dockerfile` in the same directory using the CommandBox base image.
 `Dockerfile` found. ✓
 ::
 
+3. Build a Docker image tagged `cfml-app`:
+
+```bash
+docker build -t cfml-app /home/laborant/app/
+# or
+docker build -t cfml-app /opt/coldfusion2025/cfusion/wwwroot/
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -191,7 +189,6 @@ Build the Docker image: `docker build -t cfml-app .` — a `cfml` image must app
 #completed
 Docker image exists. ✓
 ::
-
 
 ---
 

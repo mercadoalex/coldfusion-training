@@ -119,17 +119,6 @@ cacheRemoveAll();
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`.
-2. Use at least one of: `cfcache`, `cacheGet`/`cachePut`, or `cachedwithin`.
-3. Verify (hit it twice — the second request should serve from cache):
-
-```bash
-curl -s http://localhost:8500/cache_demo.cfm
-curl -s http://localhost:8500/cache_demo.cfm
-```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -143,6 +132,8 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm` — must return HTTP
 `cache_demo.cfm` is accessible. ✓
 ::
 
+2. Use at least one of: `cfcache`, `cacheGet`/`cachePut`, or `cachedwithin`.
+
 ::simple-task
 ---
 :tasks: tasks
@@ -155,6 +146,13 @@ Use `cfcache`, `cacheGet`/`cachePut`, or `cachedwithin` in `cache_demo.cfm`.
 Caching directive is present. ✓
 ::
 
+3. Hit it twice — the second request should serve from cache:
+
+```bash
+curl -s http://localhost:8500/cache_demo.cfm
+curl -s http://localhost:8500/cache_demo.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -166,7 +164,6 @@ Caching directive is present. ✓
 #completed
 Cache demo returns clean on repeated requests. ✓
 ::
-
 
 ---
 

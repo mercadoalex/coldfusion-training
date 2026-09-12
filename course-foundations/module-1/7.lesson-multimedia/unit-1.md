@@ -120,17 +120,10 @@ Other `cfimage` actions: `rotate`, `convert`, `addBorder`, `watermark`, `captcha
 ## Exercises
 
 1. Create `/opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm` with an HTML5 `<video>` or `<audio>` element.
-2. Create `/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm` with a `cffile` upload handler.
-3. Verify:
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm
 ```
-
----
-
-## Hands-on checks
 
 ::simple-task
 ---
@@ -156,6 +149,12 @@ Add a `<video>` or `<audio>` HTML5 element to `media_demo.cfm`.
 HTML5 media element is present. ✓
 ::
 
+2. Create `/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm` with a `cffile` upload handler.
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm
+```
+
 ::simple-task
 ---
 :tasks: tasks
@@ -167,7 +166,6 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm` with a `cffile act
 #completed
 `upload_media.cfm` exists. ✓
 ::
-
 
 ---
 
