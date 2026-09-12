@@ -76,11 +76,26 @@ tasks:
       done
       echo "Loop outputs 1-5 correctly"
 
-  verify_lesson_complete:
+  verify_loop_all:
     machine: dev-machine
     user: laborant
     needs:
       - verify_loop_syntax
+    run: |
+      BODY=$(curl -s http://localhost:8500/syntax_loop_all.cfm)
+      for word in "CFML" "Java" "count"; do
+        if ! echo "${BODY}" | grep -qi "${word}"; then
+          echo "syntax_loop_all.cfm is missing expected output: ${word}"
+          exit 1
+        fi
+      done
+      echo "All loop forms present in syntax_loop_all.cfm"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_loop_all
     run: |
       echo "Lesson complete — well done!"
 

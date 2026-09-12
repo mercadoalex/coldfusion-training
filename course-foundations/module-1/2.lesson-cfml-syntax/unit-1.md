@@ -301,6 +301,108 @@ Create `syntax_loop.cfm` that uses a loop to output numbers 1 through 5 — the 
 
 ---
 
+## All loop forms — putting it together
+
+CFML has four loop constructs you will encounter in real codebases. This exercise writes them all into a single file so you can see how they look side by side.
+
+| Form | Use when |
+|---|---|
+| `for (i = 1; i <= n; i++)` | You need a numeric counter |
+| `for (item in array)` | Iterating every element of an array |
+| `for (key in struct)` | Iterating every key of a struct |
+| `while (condition)` | Repeating until a condition is false |
+
+**Activity:** In the Terminal, create `syntax_loop_all.cfm`:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop_all.cfm << 'EOF'
+<cfscript>
+  // 1. Index loop — numeric counter
+  writeOutput("<strong>Index loop:</strong><br>");
+  for (i = 1; i <= 3; i++) {
+    writeOutput("  step #i#<br>");
+  }
+
+  // 2. For-in loop — array
+  writeOutput("<br><strong>Array loop:</strong><br>");
+  languages = ["CFML", "Java", "JavaScript"];
+  for (lang in languages) {
+    writeOutput("  #lang#<br>");
+  }
+
+  // 3. For-in loop — struct
+  writeOutput("<br><strong>Struct loop:</strong><br>");
+  info = {engine: "ColdFusion", version: "2025", port: "8500"};
+  for (key in info) {
+    writeOutput("  #key# = #info[key]#<br>");
+  }
+
+  // 4. While loop
+  writeOutput("<br><strong>While loop:</strong><br>");
+  count = 1;
+  while (count <= 3) {
+    writeOutput("  count is #count#<br>");
+    count++;
+  }
+</cfscript>
+EOF
+```
+
+Change the path to `/syntax_loop_all.cfm` in your browser window to see all four loop types rendered. Or from the Terminal:
+
+```bash
+curl -s http://localhost:8500/syntax_loop_all.cfm
+```
+
+::hint-box
+---
+:summary: Need to fix a file? Edit it with vi
+---
+
+If a file has a typo or you want to tweak it without rewriting the whole thing, `vi` (or `vim`) is available in the lab Terminal.
+
+**Open the file:**
+```bash
+vi /opt/coldfusion2025/cfusion/wwwroot/syntax_loop_all.cfm
+```
+
+**Basic vi commands:**
+
+| Key | What it does |
+|---|---|
+| `i` | Enter **insert** mode — you can now type and edit |
+| `Esc` | Leave insert mode, go back to **normal** mode |
+| `dd` | Delete the current line (normal mode) |
+| `u` | Undo the last change (normal mode) |
+| `:w` + Enter | **Save** the file (normal mode) |
+| `:q` + Enter | **Quit** vi (normal mode, only if no unsaved changes) |
+| `:wq` + Enter | **Save and quit** in one step |
+| `:q!` + Enter | **Quit without saving** (discard changes) |
+
+**Quickest edit workflow:**
+1. `vi filename.cfm` — open the file
+2. Navigate to the line you want to change (arrow keys work)
+3. Press `i` to enter insert mode
+4. Make your edit
+5. Press `Esc` to return to normal mode
+6. Type `:wq` and press Enter to save and exit
+
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_loop_all
+---
+#active
+Create `syntax_loop_all.cfm` with all four loop types — the response must contain **CFML**, **Java**, and **count**.
+
+#completed
+`syntax_loop_all.cfm` runs all four loop constructs. ✓
+::
+
+---
+
 ::hint-box
 ---
 :summary: Is cfscript similar to JavaScript?
