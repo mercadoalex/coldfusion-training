@@ -212,7 +212,7 @@ if [ -f "${CF_BIN}/cfpm.sh" ]; then
   echo "[CF] Installing optional CF packages via cfpm.sh..."
   chmod +x "${CF_BIN}/cfpm.sh"
   for pkg in document orm mail debugger websocket zip \
-             ai milvus chroma; do
+             pmtagent ai milvus chroma; do
     echo "[CF] Installing package: ${pkg}..."
     bash "${CF_BIN}/cfpm.sh" install "${pkg}" 2>/dev/null || \
       echo "[CF] WARNING: package ${pkg} failed (non-fatal)"
