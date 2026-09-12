@@ -26,17 +26,22 @@ Tags are case-insensitive and must be paired (or self-closed). The hash signs `#
 _Anatomy of a CFML tag: opening tag, optional attributes, hash-delimited interpolation, and closing tag._
 ::
 
-**Activity:** Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` — use `<cfset>` to assign a variable and `<cfoutput>` to print the word **tag**.
+**Activity:** In your lab, click the **Terminal** tab. Navigate to the ColdFusion web root and create `syntax_tag.cfm` using `cat`:
 
-```cfml
+```bash
+cd /opt/coldfusion2025/cfusion/wwwroot
+
+cat > syntax_tag.cfm << 'EOF'
 <cfset message = "I am using tag syntax">
 <cfoutput>#message# — tag</cfoutput>
+EOF
 ```
 
-Verify it works:
+Verify the engine executes it:
 
 ```bash
 curl -s http://localhost:8500/syntax_tag.cfm
+# Expected output: I am using tag syntax — tag
 ```
 
 ::simple-task
@@ -75,16 +80,21 @@ Both syntaxes compile to the same bytecode. You can mix them freely — a common
 _Both syntaxes are compiled by the same CFML engine to identical JVM bytecode._
 ::
 
-**Activity:** Create `syntax_script.cfm` — use `<cfscript>` and `writeOutput()` to print the word **script**.
+**Activity:** Still in the Terminal, create `syntax_script.cfm` in the same directory:
 
-```cfml
+```bash
+cd /opt/coldfusion2025/cfusion/wwwroot
+
+cat > syntax_script.cfm << 'EOF'
 <cfscript>
   writeOutput("I am using cfscript — script syntax");
 </cfscript>
+EOF
 ```
 
 ```bash
 curl -s http://localhost:8500/syntax_script.cfm
+# Expected output: I am using cfscript — script syntax
 ```
 
 ::simple-task
@@ -171,19 +181,27 @@ Tag equivalent:
 _Quick reference: CFML tag syntax (left) vs. cfscript syntax (right) for conditionals and loops._
 ::
 
-**Activity:** Add a conditional to `syntax_script.cfm`. Check a variable against a threshold and output a different message for each branch.
+**Activity:** Update `syntax_script.cfm` to add a conditional. In the Terminal, overwrite the file with this version:
 
-```cfml
+```bash
+cat > /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 <cfscript>
+  writeOutput("I am using cfscript — script syntax");
   score = 85;
   if (score >= 90) {
-    writeOutput("Grade: A");
+    writeOutput(" — Grade: A");
   } else if (score >= 80) {
-    writeOutput("Grade: B");
+    writeOutput(" — Grade: B");
   } else {
-    writeOutput("Grade: C");
+    writeOutput(" — Grade: C");
   }
 </cfscript>
+EOF
+```
+
+```bash
+curl -s http://localhost:8500/syntax_script.cfm
+# Expected: I am using cfscript — script syntax — Grade: B
 ```
 
 ::simple-task
@@ -231,14 +249,16 @@ ColdFusion also supports iterating over arrays and structs:
 </cfscript>
 ```
 
-**Activity:** Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm`. Use a `for` loop (cfscript or `<cfloop>` tag) to output the numbers 1 through 5, one per line.
+**Activity:** In the Terminal, create `syntax_loop.cfm` using a `for` loop to output the numbers 1 through 5:
 
-```cfml
+```bash
+cat > /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
 <cfscript>
   for (i = 1; i <= 5; i++) {
     writeOutput(i & "<br>");
   }
 </cfscript>
+EOF
 ```
 
 ```bash
