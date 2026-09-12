@@ -62,12 +62,13 @@ tasks:
       echo "ORM test page runs without errors"
 
 
-challenges:
-  orm_entity_4c08a96a: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  orm_entity_4c08a96a: {}
 
 ---

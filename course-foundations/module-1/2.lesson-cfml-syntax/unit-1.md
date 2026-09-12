@@ -26,6 +26,31 @@ Tags are case-insensitive and must be paired (or self-closed). The hash signs `#
 _Anatomy of a CFML tag: opening tag, optional attributes, hash-delimited interpolation, and closing tag._
 ::
 
+**Activity:** Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` — use `<cfset>` to assign a variable and `<cfoutput>` to print the word **tag**.
+
+```cfml
+<cfset message = "I am using tag syntax">
+<cfoutput>#message# — tag</cfoutput>
+```
+
+Verify it works:
+
+```bash
+curl -s http://localhost:8500/syntax_tag.cfm
+```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_tag_syntax
+---
+#active
+Create `syntax_tag.cfm` using `<cfset>` and `<cfoutput>` — the response must contain the word **tag**.
+
+#completed
+`syntax_tag.cfm` is working with tag syntax. ✓
+::
+
 ---
 
 ## Script syntax (modern)
@@ -48,6 +73,30 @@ Both syntaxes compile to the same bytecode. You can mix them freely — a common
 :max-width: 800px
 ---
 _Both syntaxes are compiled by the same CFML engine to identical JVM bytecode._
+::
+
+**Activity:** Create `syntax_script.cfm` — use `<cfscript>` and `writeOutput()` to print the word **script**.
+
+```cfml
+<cfscript>
+  writeOutput("I am using cfscript — script syntax");
+</cfscript>
+```
+
+```bash
+curl -s http://localhost:8500/syntax_script.cfm
+```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_script_syntax
+---
+#active
+Create `syntax_script.cfm` using `<cfscript>` and `writeOutput()` — the response must contain the word **script**.
+
+#completed
+`syntax_script.cfm` is working with cfscript syntax. ✓
 ::
 
 ---
@@ -83,17 +132,9 @@ Yes — for two reasons. First, you will encounter tag syntax in legacy codebase
 
 ---
 
-## Conditionals & Loops
+## Conditionals
 
-::image-box
----
-:src: __static__/cfml-loops-conditionals-cheatsheet-v1.png
-:alt: Two-column cheat-sheet showing equivalent tag and script syntax for the three most common CFML control structures — cfif/if-else, cfloop index/for loop, and cfloop list/for-in — with matching colour coding so tag and script versions are visually paired
-:max-width: 900px
----
-_Quick reference: CFML tag syntax (left) vs. cfscript syntax (right) for conditionals and loops._
-::
-
+CFML conditionals work in both syntaxes. The cfscript form mirrors JavaScript; the tag form uses attribute-style operators like `GTE`, `LTE`, `EQ`, `NEQ`.
 
 ```cfml
 <cfscript>
@@ -111,6 +152,7 @@ _Quick reference: CFML tag syntax (left) vs. cfscript syntax (right) for conditi
 Tag equivalent:
 
 ```cfml
+<cfset score = 85>
 <cfif score GTE 90>
   A
 <cfelseif score GTE 80>
@@ -120,9 +162,47 @@ Tag equivalent:
 </cfif>
 ```
 
+::image-box
+---
+:src: __static__/cfml-loops-conditionals-cheatsheet-v1.png
+:alt: Two-column cheat-sheet showing equivalent tag and script syntax for the three most common CFML control structures — cfif/if-else, cfloop index/for loop, and cfloop list/for-in — with matching colour coding so tag and script versions are visually paired
+:max-width: 900px
+---
+_Quick reference: CFML tag syntax (left) vs. cfscript syntax (right) for conditionals and loops._
+::
+
+**Activity:** Add a conditional to `syntax_script.cfm`. Check a variable against a threshold and output a different message for each branch.
+
+```cfml
+<cfscript>
+  score = 85;
+  if (score >= 90) {
+    writeOutput("Grade: A");
+  } else if (score >= 80) {
+    writeOutput("Grade: B");
+  } else {
+    writeOutput("Grade: C");
+  }
+</cfscript>
+```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfif
+---
+#active
+Add an `if` / `else` conditional (or `<cfif>`) to `syntax_script.cfm` — the file must contain the keyword `if` or `cfif`.
+
+#completed
+Conditional logic is present in `syntax_script.cfm`. ✓
+::
+
 ---
 
 ## Loops
+
+ColdFusion supports `for`, `while`, and `for...in` in cfscript, and `<cfloop>` in tag syntax. The most common is the index loop:
 
 ```cfml
 <cfscript>
@@ -132,7 +212,51 @@ Tag equivalent:
 </cfscript>
 ```
 
-ColdFusion also supports `for...in` over arrays and structs, and `while` loops. The tag equivalent is `<cfloop>`.
+Tag equivalent:
+
+```cfml
+<cfloop index="i" from="1" to="5">
+  Item #i#<br>
+</cfloop>
+```
+
+ColdFusion also supports iterating over arrays and structs:
+
+```cfml
+<cfscript>
+  fruits = ["apple", "banana", "cherry"];
+  for (fruit in fruits) {
+    writeOutput("#fruit#<br>");
+  }
+</cfscript>
+```
+
+**Activity:** Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm`. Use a `for` loop (cfscript or `<cfloop>` tag) to output the numbers 1 through 5, one per line.
+
+```cfml
+<cfscript>
+  for (i = 1; i <= 5; i++) {
+    writeOutput(i & "<br>");
+  }
+</cfscript>
+```
+
+```bash
+curl -s http://localhost:8500/syntax_loop.cfm
+# Expected: 1<br>2<br>3<br>4<br>5<br>
+```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_loop_syntax
+---
+#active
+Create `syntax_loop.cfm` that uses a loop to output numbers 1 through 5 — the response must contain **1**, **2**, **3**, **4**, and **5**.
+
+#completed
+`syntax_loop.cfm` loops and outputs numbers 1–5. ✓
+::
 
 ---
 
@@ -143,7 +267,7 @@ ColdFusion also supports `for...in` over arrays and structs, and `while` loops. 
 
 Yes — deliberately so. When Adobe introduced cfscript as the full-language syntax in ColdFusion 9 (2009), they modelled it closely on ECMAScript to lower the learning curve for web developers already familiar with JavaScript.
 
-> **cfscript is NOT ECMAScript.** It runs on the JVM — on the server — never in a browser engine. The resemblance is purely syntactic, adopted to ease the learning curve. You cannot run cfscript in a browser, import ES modules, use `Promise`, `fetch`, or touch the DOM. It is a server-side language that happens to use curly braces and `for` loops.
+> **cfscript is NOT ECMAScript.** It runs on the JVM — on the server — never in a browser engine. The resemblance is purely syntactic. You cannot run cfscript in a browser, import ES modules, use `Promise`, `fetch`, or touch the DOM.
 
 | | cfscript | JavaScript |
 |---|---|---|
@@ -153,21 +277,9 @@ Yes — deliberately so. When Adobe introduced cfscript as the full-language syn
 | **Compiled to** | Java bytecode | V8 bytecode / interpreted |
 | **Standard** | Adobe / Lucee spec | ECMA-262 |
 
-**What feels the same:**
-- Curly-brace blocks `{ }`, `if / else if / else`, `for`, `while`, `do...while`
-- `var` for local variable declaration inside functions
-- Array literals `[1, 2, 3]` and struct/object literals `{key: "value"}`
-- Arrow-style ternary `condition ? a : b`
-- String concatenation with `&` (CF) vs `+` (JS) — the one operator that differs
+**What feels the same:** curly-brace blocks, `if/else`, `for`, `while`, array literals `[1,2,3]`, struct literals `{key: "value"}`, ternary `condition ? a : b`.
 
-**What is different:**
-- **No `this` binding complexity** — CF components (`.cfc`) use `this` for instance scope but it behaves predictably, unlike JS
-- **Hash interpolation** — `"Hello, #name#!"` inside strings is CF-only; JS uses template literals `` `Hello, ${name}!` ``
-- **Semicolons are optional** in cfscript — CF tolerates their absence; JS has ASI rules that can bite you
-- **Typed function signatures** — CF lets you declare `string function getName()` with return types and argument types, closer to TypeScript than plain JS
-- **No async/await** — CF handles concurrency through `cfthread` and scheduled tasks, not promises
-
-**The practical takeaway:** if you know JavaScript, cfscript will feel immediately readable. The mental model — functions, objects, loops, conditionals — is the same. The differences are surface-level and pick up quickly as you go.
+**What is different:** string concatenation uses `&` not `+`, hash interpolation `"Hello, #name#!"` is CF-only, and there is no `async/await` — CF handles concurrency through `cfthread`.
 
 ::
 
@@ -176,11 +288,9 @@ Yes — deliberately so. When Adobe introduced cfscript as the full-language syn
 :summary: How does ColdFusion interact with React, Angular, or Vue?
 ---
 
-This is one of the most common questions from developers coming from a modern JS stack — and the answer is: **very well, and it is increasingly common.**
+**The pattern: ColdFusion as a JSON API backend.**
 
-**The pattern: ColdFusion as a JSON API backend**
-
-ColdFusion handles everything the browser cannot — database queries, authentication, file I/O, email, third-party integrations — and exposes the results as a JSON REST API. The frontend framework (React, Angular, Vue, Svelte, anything) consumes that API over `fetch` or `axios`, exactly as it would with a Node.js or Java backend.
+ColdFusion handles everything the browser cannot — database queries, authentication, file I/O, email, third-party integrations — and exposes the results as a JSON REST API. The frontend framework consumes that API over `fetch` or `axios`, exactly as it would with a Node.js or Java backend.
 
 ```
 React / Vue / Angular        ColdFusion 2025
@@ -190,91 +300,9 @@ fetch("/api/tickets")  →     tickets.cfm queries DB
 renders ticket list          done — CF is invisible
 ```
 
-**Is it common in production?**
-
-Yes — and growing. Many enterprise teams that have ColdFusion backends are adding React or Vue frontends without replacing CF. The typical stack looks like:
-
-| Layer | Technology |
-|---|---|
-| Frontend SPA | React / Vue / Angular |
-| API layer | ColdFusion REST endpoints (`.cfm` or CFC remoting) |
-| Database | MySQL / PostgreSQL / MSSQL via CF datasource |
-| Auth | CF session or JWT tokens validated server-side |
-
-**What ColdFusion brings to this stack:**
-- Mature, battle-tested database connectivity with connection pooling
-- Built-in PDF generation, email, file handling — no extra services needed
-- Single deployment unit — no separate Node API server to manage
-- Existing CF codebase can be gradually modernised by adding a JS frontend without a full rewrite
-
-**What to watch for:**
-- Set `Content-Type: application/json` and CORS headers (`Access-Control-Allow-Origin`) on every CF endpoint the frontend calls
-- Use `cfqueryparam` on every query — the frontend is now a public API surface
-- Return consistent JSON error shapes (`{"error": "message"}`) so the frontend can handle failures gracefully
-
-**The bottom line:** ColdFusion as a headless JSON backend paired with a modern JS framework is a legitimate, production-proven architecture. This course covers exactly that pattern in the REST APIs lesson.
+This is covered in depth in the REST APIs lesson.
 
 ::
-
----
-
-## Exercises
-
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` — output the text **"tag"** using `<cfset>` and `<cfoutput>`.
-
-```bash
-curl -s http://localhost:8500/syntax_tag.cfm
-```
-
-::simple-task
----
-:tasks: tasks
-:name: verify_tag_syntax
----
-#active
-Create `/opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm` using `<cfset>` and `<cfoutput>` — the response must contain the word **tag**.
-
-#completed
-`syntax_tag.cfm` returns tag-syntax output. ✓
-::
-
-2. Create `syntax_script.cfm` — output the text **"script"** using `writeOutput()` inside `<cfscript>`.
-
-```bash
-curl -s http://localhost:8500/syntax_script.cfm
-```
-
-::simple-task
----
-:tasks: tasks
-:name: verify_script_syntax
----
-#active
-Create `syntax_script.cfm` using `<cfscript>` and `writeOutput()` — the response must contain the word **script**.
-
-#completed
-`syntax_script.cfm` returns script-syntax output. ✓
-::
-
-3. Add an `if` or `<cfif>` conditional to `syntax_script.cfm`.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_cfif
----
-#active
-Add an `if` or `<cfif>` conditional to `syntax_script.cfm`.
-
-#completed
-Conditional logic is present in `syntax_script.cfm`. ✓
-::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -290,10 +318,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.cfml_syntax_0b4b2335
----
 ::

@@ -61,12 +61,26 @@ tasks:
       fi
       echo "Conditional logic found in syntax_script.cfm"
 
+  verify_loop_syntax:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_cfif
+    run: |
+      BODY=$(curl -s http://localhost:8500/syntax_loop.cfm)
+      for n in 1 2 3 4 5; do
+        if ! echo "${BODY}" | grep -q "${n}"; then
+          echo "syntax_loop.cfm does not output number ${n}"
+          exit 1
+        fi
+      done
+      echo "Loop outputs 1-5 correctly"
 
-challenges:
-  cfml_syntax_0b4b2335: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_loop_syntax
     run: |
       echo "Lesson complete — well done!"
 

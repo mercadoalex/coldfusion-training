@@ -64,12 +64,13 @@ tasks:
       echo "cfml Docker image exists"
 
 
-challenges:
-  cicd_pipeline_6f98584e: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  cicd_pipeline_6f98584e: {}
 
 ---

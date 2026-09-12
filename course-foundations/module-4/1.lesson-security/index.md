@@ -65,12 +65,13 @@ tasks:
       echo "cfqueryparam is used in ${COUNT} location(s)"
 
 
-challenges:
-  security_c2586cd1: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  security_c2586cd1: {}
 
 ---

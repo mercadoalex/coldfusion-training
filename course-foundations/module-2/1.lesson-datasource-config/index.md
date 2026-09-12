@@ -62,12 +62,13 @@ tasks:
       echo "No errors on datasource verification page"
 
 
-challenges:
-  datasource_verify_be971bb2: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  datasource_verify_be971bb2: {}
 
 ---

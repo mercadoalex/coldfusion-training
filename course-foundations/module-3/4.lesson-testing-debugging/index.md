@@ -62,12 +62,13 @@ tasks:
       echo "TestBox tests pass"
 
 
-challenges:
-  testing_8f70b2b0: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  testing_8f70b2b0: {}
 
 ---

@@ -63,12 +63,13 @@ tasks:
       echo "Function found in CFC"
 
 
-challenges:
-  oop_cfc_88277abe: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  oop_cfc_88277abe: {}
 
 ---

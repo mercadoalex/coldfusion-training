@@ -60,12 +60,13 @@ tasks:
       echo "box.json found — CommandBox project is initialized"
 
 
-challenges:
-  commandbox_server_9bac5899: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  commandbox_server_9bac5899: {}
 
 ---

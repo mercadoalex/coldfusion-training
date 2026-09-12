@@ -63,12 +63,13 @@ tasks:
       echo "JavaScript WebSocket client is present"
 
 
-challenges:
-  websockets_6e5e8d19: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  websockets_6e5e8d19: {}
 
 ---

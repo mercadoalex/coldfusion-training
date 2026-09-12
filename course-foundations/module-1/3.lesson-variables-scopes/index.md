@@ -62,12 +62,13 @@ tasks:
       echo "URL scope is working correctly"
 
 
-challenges:
-  scope_inspector_5e09720b: {}
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
     run: |
       echo "Lesson complete — well done!"
+
+challenges:
+  scope_inspector_5e09720b: {}
 
 ---
