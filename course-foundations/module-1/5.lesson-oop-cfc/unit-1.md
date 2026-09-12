@@ -34,6 +34,63 @@ _Anatomy of a CFC — one file defines the class, its properties, and all its me
 
 ---
 
+## Activity 1 — Create your first CFC
+
+**Activity:** Click the **Terminal** tab in your lab. Copy and paste the script below to create `GreetingService.cfc` — a simple CFC with a constructor, a public method, and a private helper:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc << 'EOF'
+component displayname="GreetingService" hint="Returns greetings" {
+
+  // Constructor
+  public GreetingService function init() {
+    variables.createdAt = now();
+    return this;
+  }
+
+  // Public method
+  public string function greet(required string name) {
+    return _format("Hello, " & arguments.name & "!");
+  }
+
+  // Private helper — not callable from outside
+  private string function _format(required string msg) {
+    return "[" & timeFormat(now(), "HH:mm:ss") & "] " & arguments.msg;
+  }
+
+}
+EOF
+```
+
+Verify the file was created:
+
+```bash
+ls -lh /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc
+```
+
+::image-box
+---
+:src: __static__/terminal-greeting-cfc-created-v1.png
+:alt: Terminal window showing the sudo tee command writing GreetingService.cfc followed by the ls -lh output confirming the file exists in the wwwroot directory with its size and timestamp
+:max-width: 860px
+---
+_Terminal confirming `GreetingService.cfc` was created in the web root._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfc_exists
+---
+#active
+Click the **Terminal** tab and run the `sudo tee` command above to create `GreetingService.cfc` in the web root.
+
+#completed
+CFC file found in the web root. ✓
+::
+
+---
+
 ## CFC anatomy
 
 ```cfml
@@ -88,18 +145,12 @@ The constructor is named differently across languages. Here's the full picture:
 |---|---|---|
 | **Java** | Same as class name | ✅ Yes — `public TicketService() {}` |
 | **C#** | Same as class name | ✅ Yes — `public TicketService() {}` |
-| **C++** | Same as class name | ✅ Yes |
 | **PHP** | `__construct()` | ❌ No — always `__construct` |
 | **Python** | `__init__()` | ❌ No — always `__init__` |
-| **Ruby** | `initialize()` | ❌ No — always `initialize` |
 | **JavaScript** | `constructor()` (in classes) | ❌ No — always `constructor` |
 | **ColdFusion** | `init()` | ❌ No — always `init` |
 
-**The ColdFusion rule:** the constructor is always `init()` regardless of the class (file) name. The filename `TicketService.cfc` must match what you pass to `new TicketService()` — but the method inside is always called `init`.
-
-The return type `public TicketService function init()` is just documentation — it tells CF and your IDE what type is returned, but it does not enforce the name. You can also write `public any function init()` and it works identically.
-
-**`init()` is also optional** — if your CFC has no `init()` method, `new TicketService()` still works and simply returns an uninitialised instance.
+**The ColdFusion rule:** the constructor is always `init()` regardless of the class (file) name. `init()` is also **optional** — if your CFC has no `init()` method, `new GreetingService()` still works and simply returns an uninitialised instance.
 
 ::
 
@@ -118,30 +169,74 @@ The `remote` modifier is unique to ColdFusion — it turns any method into an au
 
 ---
 
+## Activity 2 — Instantiate the CFC and call a method
+
+**Activity:** Still in the **Terminal** tab, copy and paste the script below to create `test_cfc.cfm` — a page that instantiates `GreetingService` and calls its `greet()` method:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_cfc.cfm << 'EOF'
+<cfscript>
+  svc     = new GreetingService();
+  message = svc.greet("ColdFusion Student");
+  writeOutput("<strong>Result:</strong> " & message & "<br>");
+  writeOutput("<strong>CFC type:</strong> " & getMetaData(svc).name & "<br>");
+</cfscript>
+EOF
+```
+
+Open `/test_cfc.cfm` in the **ColdFusion 2025** browser tab (right-click → Open Link in New Tab, change path). Or from the Terminal:
+
+```bash
+curl -s http://localhost:8500/test_cfc.cfm
+# Expected: Result: [HH:mm:ss] Hello, ColdFusion Student!
+```
+
+::image-box
+---
+:src: __static__/browser-test-cfc-output-v1.png
+:alt: Browser window showing the rendered output of test_cfc.cfm — two lines: Result showing the timestamped greeting message, and CFC type showing GreetingService confirming the component was instantiated correctly
+:max-width: 860px
+---
+_`test_cfc.cfm` confirms the CFC was instantiated and the `greet()` method returned a value._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfc_component
+---
+#active
+Create `test_cfc.cfm` and confirm it runs without errors — the CFC must contain a `component` declaration.
+
+#completed
+`component` declaration found and CFC instantiated successfully. ✓
+::
+
+---
+
 ## Instantiation
 
 ```cfml
 // Modern syntax (preferred)
-svc = new TicketService();
+svc = new GreetingService();
 
 // With constructor argument
 svc = new TicketService(datasource="training_db");
 
 // Equivalent older syntax
-svc = createObject("component", "TicketService").init();
+svc = createObject("component", "GreetingService").init();
 
 // Call a method
-tickets = svc.getAll();
-ticket  = svc.getById(3);
+msg = svc.greet("World");
 ```
 
 ::image-box
 ---
 :src: __static__/cfc-instantiation-methods-v1.png
-:alt: Side-by-side comparison showing two equivalent ways to instantiate a CFC — left panel shows "new TicketService()" modern syntax with a green "preferred" badge; right panel shows "createObject('component','TicketService').init()" legacy syntax with a grey "still valid" badge — an equals sign between them shows they produce the same result
+:alt: Side-by-side comparison showing two equivalent ways to instantiate a CFC — left panel shows "new GreetingService()" modern syntax with a green "preferred" badge; right panel shows "createObject('component','GreetingService').init()" legacy syntax with a grey "still valid" badge — an equals sign between them shows they produce the same result
 :max-width: 860px
 ---
-_`new TicketService()` and `createObject("component","TicketService").init()` are identical — prefer the `new` syntax._
+_`new GreetingService()` and `createObject("component","GreetingService").init()` are identical — prefer the `new` syntax._
 ::
 
 ---
@@ -156,20 +251,90 @@ component {
   }
 }
 
-// TicketService.cfc — inherits getTimestamp()
+// GreetingService.cfc — inherits getTimestamp()
 component extends="BaseService" {
-  public array function getAll() {
-    // ... query logic
+  public string function greet(required string name) {
+    return "Hello, " & arguments.name & " — " & getTimestamp();
   }
 }
 
 // Usage
-svc = new TicketService();
-svc.getAll();          // defined in TicketService
-svc.getTimestamp();    // inherited from BaseService
+svc = new GreetingService();
+svc.greet("World");       // defined in GreetingService
+svc.getTimestamp();       // inherited from BaseService
 ```
 
 Use `super.methodName()` to call the parent's version of an overridden method.
+
+---
+
+## Activity 3 — Add a method and verify with cfdump
+
+**Activity:** Update `GreetingService.cfc` to add a `getInfo()` method that returns a struct with instance information, then verify it with `cfdump`:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc << 'EOF'
+component displayname="GreetingService" hint="Returns greetings" {
+
+  public GreetingService function init() {
+    variables.createdAt = now();
+    return this;
+  }
+
+  public string function greet(required string name) {
+    return _format("Hello, " & arguments.name & "!");
+  }
+
+  public struct function getInfo() {
+    return {
+      name:      "GreetingService",
+      createdAt: variables.createdAt,
+      age:       dateDiff("s", variables.createdAt, now()) & " seconds"
+    };
+  }
+
+  private string function _format(required string msg) {
+    return "[" & timeFormat(now(), "HH:mm:ss") & "] " & arguments.msg;
+  }
+
+}
+EOF
+```
+
+Now update `test_cfc.cfm` to dump the info struct:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_cfc.cfm << 'EOF'
+<cfscript>
+  svc = new GreetingService();
+  writeOutput("<strong>Greeting:</strong> " & svc.greet("ColdFusion Student") & "<br><br>");
+</cfscript>
+<cfdump var="#new GreetingService().getInfo()#" label="GreetingService.getInfo()">
+EOF
+```
+
+Reload `/test_cfc.cfm` in the browser — you should see the greeting and a `cfdump` table showing the struct with `name`, `createdAt`, and `age`.
+
+::image-box
+---
+:src: __static__/browser-cfdump-getinfo-v1.png
+:alt: Browser window showing the rendered output of test_cfc.cfm — the greeting message at the top, followed by a cfdump table labelled GreetingService.getInfo() showing three rows: name with value GreetingService, createdAt with a timestamp, and age showing 0 seconds
+:max-width: 860px
+---
+_`cfdump` renders the struct returned by `getInfo()` — a live view of the CFC's instance state._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfc_method
+---
+#active
+Update `GreetingService.cfc` to add a `getInfo()` method — the CFC must define at least two `function` blocks.
+
+#completed
+Multiple functions defined in the CFC. ✓
+::
 
 ---
 
@@ -204,7 +369,7 @@ public array function getAll() {
 
 ## Calling Java from a CFC
 
-Because ColdFusion runs on the JVM, you can instantiate any Java class:
+Because ColdFusion runs on the JVM, you can instantiate any Java class directly from CFML:
 
 ```cfml
 // Use Java's UUID generator
@@ -217,7 +382,7 @@ sb.append(", World!");
 writeOutput(sb.toString());
 ```
 
-This is rarely needed for everyday CF work, but it means the entire Java ecosystem is available when you need it.
+This is rarely needed for everyday CF work, but the entire Java ecosystem is available when you need it.
 
 ::hint-box
 ---
@@ -227,7 +392,6 @@ This is rarely needed for everyday CF work, but it means the entire Java ecosyst
 **Use a `.cfm` page when:**
 - You are rendering an HTTP response (a web page or an API endpoint)
 - The logic is request-specific and not reused elsewhere
-- You are doing a quick prototype or one-off script
 
 **Use a `.cfc` component when:**
 - You are writing reusable business logic (a service, a DAO, a utility)
@@ -239,67 +403,23 @@ This is rarely needed for everyday CF work, but it means the entire Java ecosyst
 
 ::
 
+::hint-box
 ---
-
-## Exercises
-
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc` with an `init()` constructor, a `public` method `getAll()`, and a `private` helper method.
-
-::simple-task
+:summary: Need to edit a CFC? Use vi
 ---
-:tasks: tasks
-:name: verify_cfc_exists
----
-#active
-Create at least one `.cfc` file in `/opt/coldfusion2025/cfusion/wwwroot/`.
-
-#completed
-CFC file found in the web root. ✓
-::
-
-::simple-task
----
-:tasks: tasks
-:name: verify_cfc_component
----
-#active
-The CFC must contain a `component` declaration.
-
-#completed
-`component` declaration found. ✓
-::
-
-2. Create `test_cfc.cfm` that instantiates it and calls `getAll()`:
-
-```cfml
-<cfscript>
-  svc     = new TicketService();
-  tickets = svc.getAll();
-  writeDump(tickets);
-</cfscript>
-```
 
 ```bash
-curl -s http://localhost:8500/test_cfc.cfm | grep -vi "error\|exception"
+vi /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc
 ```
 
-::simple-task
----
-:tasks: tasks
-:name: verify_cfc_method
----
-#active
-The CFC must define at least one `function`.
+| Key | What it does |
+|---|---|
+| `i` | Enter insert mode |
+| `Esc` | Back to normal mode |
+| `:wq` + Enter | Save and quit |
+| `:q!` + Enter | Quit without saving |
 
-#completed
-Function defined in CFC. ✓
 ::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -315,10 +435,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.oop_cfc_88277abe
----
 ::
