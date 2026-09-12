@@ -206,13 +206,15 @@ mkdir -p \
   "${CF_HOME}/${CF_INSTANCE}/db"
 
 # ─── Install optional CF packages ────────────────────────────────────────────
-# Packages for intermediate/advanced training curriculum.
+# Packages used by the Foundations course curriculum.
+# Advanced packages (pmtagent, ai, milvus, chroma) are excluded:
+#   - pmtagent requires an external PMT Server + Elastic Stack (not available in lab VM)
+#   - ai/milvus/chroma require external vector DB infrastructure (Advanced Course only)
 # Each installs independently — one failure won't abort the rest.
 if [ -f "${CF_BIN}/cfpm.sh" ]; then
-  echo "[CF] Installing optional CF packages via cfpm.sh..."
+  echo "[CF] Installing CF packages for Foundations curriculum..."
   chmod +x "${CF_BIN}/cfpm.sh"
-  for pkg in document orm mail debugger websocket zip \
-             pmtagent ai milvus chroma; do
+  for pkg in document orm mail debugger websocket zip; do
     echo "[CF] Installing package: ${pkg}..."
     bash "${CF_BIN}/cfpm.sh" install "${pkg}" 2>/dev/null || \
       echo "[CF] WARNING: package ${pkg} failed (non-fatal)"
