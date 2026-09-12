@@ -202,36 +202,35 @@ _`grep` confirms `this.name = "CFTraining"` is set in `Application.cfc`._
 
 Open the **ColdFusion 2025** tab (right-click → Open in New Tab) and browse to your lab root — CF Admin login page appearing means the engine is running with your `Application.cfc` active.
 
-Log in with password `admin`. Once inside, click **Performance Monitoring Toolset** in the left navigation — this opens the live monitoring dashboard where you can see active requests, memory usage, and application scope activity. It confirms your `Application.cfc` is loaded and the application context is running.
-
 ::image-box
 ---
 :src: __static__/browser-cf-admin-app-running-v1.png
 :alt: Browser window showing the ColdFusion Administrator login page at the lab root URL, confirming the CF engine is running and Application.cfc is active — the dark login form is centered on the page with a password field and Login button
 :max-width: 860px
 ---
-_CF Admin login page — log in with password `admin` to access the Performance Monitoring Toolset._
+_CF Admin login page — log in with password `admin`._
 ::
 
-Inside the Performance Monitoring Toolset, click the **Applications** page in the left sidebar. This page lets you select up to 5 applications and view real-time data for each one:
+Log in with password `admin`. Now verify your `Application.cfc` is active using two built-in CF Admin tools that work without any external infrastructure:
 
-- **Average execution time** — how long requests are taking on average
-- **Health score** — an overall indicator of application performance
-- **Load distribution** — how requests are spread across the server
-- **Error graph** — spikes here correspond to exceptions caught by `onError()`
-- **Active session count** — live count of sessions managed by `onSessionStart()`
-- **Request distribution** — breakdown of request types hitting your endpoints
+**1 — Server Settings → Memory Variables**
 
-Your `CFTraining` application (the `this.name` you just set) should appear in the application selector. This is where `Application.cfc` becomes visible — every metric on this page traces back to the lifecycle methods you defined.
+Go to **Server Settings → Memory Variables** in the left navigation. Your `CFTraining` application will appear in the application list with its `startTime` value — proof that `onApplicationStart()` ran and wrote to the application scope.
 
 ::image-box
 ---
 :src: __static__/browser-cf-pmt-dashboard-v1.png
-:alt: ColdFusion Performance Monitoring Toolset Applications page — the left sidebar shows navigation items including Applications, the main panel shows up to 5 application selectors at the top, and below them six metric panels: average execution time (line graph), health score (gauge), load distribution (bar chart), error graph (line graph with spikes), active session count (numeric counter), and request distribution (pie chart)
+:alt: ColdFusion Administrator Memory Variables page showing the CFTraining application in the application scope list, with a startTime key visible — confirming that onApplicationStart fired and wrote to the application scope
 :max-width: 960px
 ---
-_The Applications page in the Performance Monitoring Toolset — select your `CFTraining` app to see live metrics driven by your `Application.cfc` lifecycle methods._
+_Memory Variables in CF Admin — your `CFTraining` app appears here with the `startTime` set by `onApplicationStart()`._
 ::
+
+**2 — Logging & Profiling → Log Files**
+
+Go to **Logging & Profiling → Log Files** and open `application.log` — you should see the line written by `writeLog()` in your `onApplicationStart()` method, timestamped to when the application first started.
+
+> **Note on Performance Monitoring Toolset:** The PMT button in CF Admin connects to a separate Elastic Stack (Elasticsearch + Kibana) infrastructure that is not running in this lab. It is a powerful tool but requires dedicated infrastructure well beyond a single VM. It is covered in the **ColdFusion Advanced Course**. See the hint box below for the full explanation.
 
 ::simple-task
 ---
@@ -288,17 +287,33 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/index.cfm
 
 ::hint-box
 ---
-:summary: Performance Monitoring Toolset says "pmtagent package is not installed"?
+:summary: What is the Performance Monitoring Toolset really, and why can't I use it fully here?
 ---
 
-If you see the message **"The pmtagent package is not installed"** when clicking the Performance Monitoring Toolset button, the PMT agent package was not installed in this lab session. Fix it from the Terminal in under a minute:
+The CF Admin button labelled **Performance Monitoring Toolset** is more complex than it looks. It is not a simple built-in dashboard — it is a connection point to a **separate, external infrastructure stack**.
 
-```bash
-sudo /opt/coldfusion2025/cfusion/bin/cfpm.sh install pmtagent
-sudo systemctl restart coldfusion
+**The full PMT architecture:**
+
+```
+ColdFusion 2025
+   │  pmtagent (CF package) — ships metrics out via REST
+   ▼
+PMT Server  ← separate Adobe download, runs as its own Java process
+   │  stores and indexes data in ▼
+   ▼
+Elastic Stack
+   ├── Elasticsearch  ← stores all metrics and log data
+   ├── Logstash       ← ingests and transforms the data stream
+   └── Kibana         ← the actual dashboards you interact with
 ```
 
-Wait about 15 seconds for CF to restart, then reload the CF Admin page and click **Performance Monitoring Toolset** again — it should now open the dashboard.
+**What `cfpm.sh install pmtagent` does:** it installs only the **CF-side agent** — the part that collects metrics and sends them out. Without a running PMT Server + Elasticsearch + Kibana on the receiving end, clicking the button in CF Admin will either show a connection error or an empty screen.
+
+**Why this lab cannot run full PMT:** Elasticsearch alone requires 4–8 GB of heap. This lab VM has 2 GB total RAM — running Elasticsearch here would leave no memory for ColdFusion itself.
+
+**What you can explore in this lab:** CF Admin → **Server Settings → Memory Variables** shows live application scope data (your `CFTraining` app and its `startTime` value). CF Admin → **Log Files** shows what `onApplicationStart` logged. These give you a real window into lifecycle behaviour without the Elastic Stack.
+
+> **Full PMT setup — including PMT Server installation, Elasticsearch configuration, Kibana dashboard import, and connecting CF Admin to the stack — is covered in the ColdFusion Advanced Course.**
 
 ::
 
