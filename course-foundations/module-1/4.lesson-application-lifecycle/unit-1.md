@@ -235,7 +235,7 @@ _`/status.cfm` — a zero-dependency live view of your running CF engine and `Ap
 
 Open `application.log` — you should see the line written by `writeLog()` in `onApplicationStart()`, timestamped to when the application first started.
 
-> **Note on Performance Monitoring Toolset:** The PMT button in CF Admin requires a separate PMT Server + Elastic Stack (Elasticsearch + Kibana) that is not running in this lab. See the hint box below for the full explanation. It is covered in the **ColdFusion Advanced Course**.
+> **Note on Performance Monitoring Toolset:** The PMT button in CF Admin requires a separate PMT Server + Elastic Stack (Elasticsearch + Kibana) that is not running in this lab. See the hint box below for the full explanation. Full PMT setup is covered in a **separate ColdFusion Monitoring & Observability course**.
 
 ::simple-task
 ---
@@ -316,9 +316,9 @@ Elastic Stack
 
 **Why this lab cannot run full PMT:** Elasticsearch alone requires 4–8 GB of heap. This lab VM has 2 GB total RAM — running Elasticsearch here would leave no memory for ColdFusion itself.
 
-**What you can explore in this lab:** CF Admin → **Server Settings → Memory Variables** shows live application scope data (your `CFTraining` app and its `startTime` value). CF Admin → **Log Files** shows what `onApplicationStart` logged. These give you a real window into lifecycle behaviour without the Elastic Stack.
+**What you can explore in this lab:** navigate to `/status.cfm` to see live engine and application scope data, or use CF Admin → **Logging & Profiling → Log Files** to read what `onApplicationStart` logged. These give you a real window into lifecycle behaviour without the Elastic Stack.
 
-> **Full PMT setup — including PMT Server installation, Elasticsearch configuration, Kibana dashboard import, and connecting CF Admin to the stack — is covered in the ColdFusion Advanced Course.**
+> **Full PMT setup — PMT Server installation, Elasticsearch + Logstash + Kibana configuration, CF Admin connection (hostname, port, shared secret), and Kibana dashboard import — is a dedicated operations topic covered in a **separate ColdFusion Monitoring & Observability course**, not this Foundations course or the Advanced Course.**
 
 ::
 
