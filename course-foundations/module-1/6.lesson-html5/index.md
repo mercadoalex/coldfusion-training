@@ -56,23 +56,19 @@ tasks:
       - verify_html5_doctype
     run: |
       BODY=$(curl -s http://localhost:8500/html5_demo.cfm)
-      if ! echo "${BODY}" | grep -qi "cfoutput\|#"; then
-        FILE="/opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm"
-        if ! grep -q "cfoutput\|writeOutput" "${FILE}" 2>/dev/null; then
-          echo "No dynamic CFML output found in html5_demo.cfm"
-          exit 1
-        fi
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm"
+      if ! grep -q "cfoutput\|writeOutput\|serializeJSON" "${FILE}" 2>/dev/null; then
+        echo "No dynamic CFML output found in html5_demo.cfm"
+        exit 1
       fi
       echo "Dynamic CFML output is present"
-
 
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_dynamic_output
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  html5_page_5ef19f87: {}
 
 ---

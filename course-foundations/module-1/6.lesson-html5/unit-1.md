@@ -41,7 +41,62 @@ _ColdFusion generates the HTML and embeds JSON; all HTML5 API calls execute enti
 
 ---
 
-## Basic HTML5 page with dynamic CFML
+## Activity 1 — Create a basic HTML5 page with dynamic CFML
+
+**Activity:** In the **Terminal** tab, create `html5_demo.cfm` — an HTML5 page that uses the correct doctype and renders a dynamic timestamp with CFML:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CF + HTML5 Demo</title>
+</head>
+<body>
+  <h1>ColdFusion + HTML5</h1>
+  <cfoutput>
+    <p>Server time: <strong>#timeFormat(now(), "HH:mm:ss")#</strong></p>
+    <p>Today is: <strong>#dateFormat(now(), "dddd, mmmm d, yyyy")#</strong></p>
+  </cfoutput>
+</body>
+</html>
+EOF
+```
+
+Verify the file is served:
+
+```bash
+curl -s http://localhost:8500/html5_demo.cfm | head -20
+```
+
+::image-box
+---
+:src: __static__/browser-html5-demo-v1.png
+:alt: Browser showing html5_demo.cfm output with the H1 heading "ColdFusion + HTML5" and the server time and date rendered dynamically by CFML
+:max-width: 860px
+---
+_`html5_demo.cfm` served with a live timestamp rendered by ColdFusion._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_html5_page
+---
+#active
+Click the **Terminal** tab and run the `sudo tee` command above to create `html5_demo.cfm`, then open `/html5_demo.cfm` in the browser tab to confirm it loads.
+
+#completed
+`html5_demo.cfm` is accessible and returns HTTP 200. ✓
+::
+
+---
+
+## HTML5 doctype and page structure
+
+The `<!DOCTYPE html>` declaration on line 1 is the only doctype you need for HTML5. It tells the browser to use the modern standards-mode parser — without it, browsers fall back to quirks mode with inconsistent layout behaviour.
 
 ```cfml
 <!DOCTYPE html>
@@ -82,6 +137,39 @@ _ColdFusion generates the HTML and embeds JSON; all HTML5 API calls execute enti
 ```
 
 Notice `encodeForHTML()` — always encode untrusted data before rendering it in HTML to prevent XSS.
+
+---
+
+## Activity 2 — Add the HTML5 doctype and verify
+
+**Activity:** Confirm that `html5_demo.cfm` contains the HTML5 doctype. If you used the `tee` command in Activity 1 it is already there. Check with:
+
+```bash
+curl -s http://localhost:8500/html5_demo.cfm | grep -i "DOCTYPE"
+```
+
+You should see `<!DOCTYPE html>` in the output.
+
+::image-box
+---
+:src: __static__/terminal-html5-doctype-check-v1.png
+:alt: Terminal showing the curl command output with DOCTYPE html visible at the top of the response
+:max-width: 860px
+---
+_Terminal confirming the HTML5 doctype is present in the page source._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_html5_doctype
+---
+#active
+Run the `curl` command above and confirm `<!DOCTYPE html>` appears in the response.
+
+#completed
+HTML5 doctype is present in `html5_demo.cfm`. ✓
+::
 
 ---
 
@@ -149,7 +237,6 @@ loadTickets();
 _Two patterns for sending CF data to the browser — embedded JSON (SSR) for simple pages, `fetch()` for SPAs and dynamic updates._
 ::
 
-
 Inject server-side data as a JSON literal into a JavaScript variable:
 
 ```cfml
@@ -214,6 +301,79 @@ When you use `serializeJSON()` to bake data into the page, the browser sees it a
 
 ::
 
+---
+
+## Activity 3 — Add dynamic CFML output to the page
+
+**Activity:** Update `html5_demo.cfm` to include a `writeOutput()` or `<cfoutput>` call that renders something dynamic. The file already has this from Activity 1 — this task simply confirms it. You can also extend it by embedding a JSON array of items:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CF + HTML5 Demo</title>
+</head>
+<body>
+  <h1>ColdFusion + HTML5</h1>
+
+  <cfoutput>
+    <p>Server time: <strong>#timeFormat(now(), "HH:mm:ss")#</strong></p>
+    <p>Today is: <strong>#dateFormat(now(), "dddd, mmmm d, yyyy")#</strong></p>
+  </cfoutput>
+
+  <cfscript>
+    items = ["Apples", "Bananas", "Cherries"];
+    jsonItems = serializeJSON(items);
+  </cfscript>
+
+  <ul id="fruit-list"></ul>
+
+  <script>
+    const fruits = <cfoutput>#jsonItems#</cfoutput>;
+    const ul = document.getElementById("fruit-list");
+    fruits.forEach(f => {
+      const li = document.createElement("li");
+      li.textContent = f;
+      ul.appendChild(li);
+    });
+  </script>
+</body>
+</html>
+EOF
+```
+
+Open `/html5_demo.cfm` in the **ColdFusion 2025** browser tab to verify the fruit list renders.
+
+```bash
+curl -s http://localhost:8500/html5_demo.cfm | grep -i "writeOutput\|cfoutput\|serializeJSON"
+```
+
+::image-box
+---
+:src: __static__/browser-html5-dynamic-output-v1.png
+:alt: Browser showing html5_demo.cfm with the server time, today's date, and a bulleted fruit list rendered by JavaScript consuming the CFML-embedded JSON array
+:max-width: 860px
+---
+_`html5_demo.cfm` showing dynamic CFML output and a JavaScript-rendered list populated from embedded JSON._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_dynamic_output
+---
+#active
+Update `html5_demo.cfm` with `<cfoutput>` or `writeOutput()` and reload the page to confirm dynamic content appears.
+
+#completed
+Dynamic CFML output is present in the page. ✓
+::
+
+---
+
 ## HTML5 Form validation + CFML processing
 
 HTML5 provides built-in client-side validation via attributes like `required`, `minlength`, `type="email"`. ColdFusion handles the server-side processing when the form submits.
@@ -239,62 +399,6 @@ HTML5 provides built-in client-side validation via attributes like `required`, `
 
 ---
 
-## Exercises
-
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm` — it must return HTTP 200.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_html5_page
----
-#active
-Create `/opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm` — must return HTTP 200.
-
-#completed
-`html5_demo.cfm` is accessible. ✓
-::
-
-2. Add `<!DOCTYPE html>` to `html5_demo.cfm`.
-
-```bash
-curl -s http://localhost:8500/html5_demo.cfm | grep -i "DOCTYPE"
-```
-
-::simple-task
----
-:tasks: tasks
-:name: verify_html5_doctype
----
-#active
-Add `<!DOCTYPE html>` to `html5_demo.cfm`.
-
-#completed
-HTML5 doctype is present. ✓
-::
-
-3. Add at least one `<cfoutput>` or `writeOutput()` call to `html5_demo.cfm`.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_dynamic_output
----
-#active
-Add at least one `<cfoutput>` or `writeOutput()` call to `html5_demo.cfm`.
-
-#completed
-Dynamic CFML output is present in the page. ✓
-::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
-
----
-
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
@@ -307,10 +411,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.html5_page_5ef19f87
----
 ::
