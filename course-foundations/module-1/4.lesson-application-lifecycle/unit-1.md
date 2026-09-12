@@ -215,7 +215,7 @@ Log in with password `admin`. Now verify your `Application.cfc` is active in two
 
 **1 — /status.cfm (fastest)**
 
-Navigate to `/status.cfm` in the browser tab. This page reads directly from the running CF engine and shows:
+`status.cfm` is a diagnostic page pre-installed in the web root — you don't need to create it. In the **ColdFusion 2025** browser tab, right-click → **Open Link in New Tab**, then change the path to `/status.cfm`. The page reads directly from the running CF engine and shows:
 
 - **this.name** — confirms `Application.cfc` is loaded and `CFTraining` is the app name
 - **onApplicationStart** — shows `fired — <timestamp>` if `onApplicationStart()` ran and set `application.startTime`
