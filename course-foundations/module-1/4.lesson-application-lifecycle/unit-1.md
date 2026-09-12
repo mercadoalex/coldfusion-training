@@ -210,7 +210,27 @@ Log in with password `admin`. Once inside, click **Performance Monitoring Toolse
 :alt: Browser window showing the ColdFusion Administrator login page at the lab root URL, confirming the CF engine is running and Application.cfc is active — the dark login form is centered on the page with a password field and Login button
 :max-width: 860px
 ---
-_CF Admin login page confirming the engine is running with `Application.cfc` active._
+_CF Admin login page — log in with password `admin` to access the Performance Monitoring Toolset._
+::
+
+Inside the Performance Monitoring Toolset, click the **Applications** page in the left sidebar. This page lets you select up to 5 applications and view real-time data for each one:
+
+- **Average execution time** — how long requests are taking on average
+- **Health score** — an overall indicator of application performance
+- **Load distribution** — how requests are spread across the server
+- **Error graph** — spikes here correspond to exceptions caught by `onError()`
+- **Active session count** — live count of sessions managed by `onSessionStart()`
+- **Request distribution** — breakdown of request types hitting your endpoints
+
+Your `CFTraining` application (the `this.name` you just set) should appear in the application selector. This is where `Application.cfc` becomes visible — every metric on this page traces back to the lifecycle methods you defined.
+
+::image-box
+---
+:src: __static__/browser-cf-pmt-dashboard-v1.png
+:alt: ColdFusion Performance Monitoring Toolset Applications page — the left sidebar shows navigation items including Applications, the main panel shows up to 5 application selectors at the top, and below them six metric panels: average execution time (line graph), health score (gauge), load distribution (bar chart), error graph (line graph with spikes), active session count (numeric counter), and request distribution (pie chart)
+:max-width: 960px
+---
+_The Applications page in the Performance Monitoring Toolset — select your `CFTraining` app to see live metrics driven by your `Application.cfc` lifecycle methods._
 ::
 
 ::simple-task
