@@ -63,11 +63,33 @@ tasks:
       fi
       echo "Dynamic CFML output is present"
 
-  verify_lesson_complete:
+  verify_form_validation:
     machine: dev-machine
     user: laborant
     needs:
       - verify_dynamic_output
+    run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/html5_form_demo.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "html5_form_demo.cfm not found (got ${STATUS})"
+        exit 1
+      fi
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/html5_form_demo.cfm"
+      if ! grep -q 'type="email"' "${FILE}" 2>/dev/null; then
+        echo "html5_form_demo.cfm is missing type=\"email\" input"
+        exit 1
+      fi
+      if ! grep -q 'type="date"' "${FILE}" 2>/dev/null; then
+        echo "html5_form_demo.cfm is missing type=\"date\" input"
+        exit 1
+      fi
+      echo "HTML5 form validation demo is present with email and date inputs"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_form_validation
     run: |
       echo "Lesson complete — well done!"
 

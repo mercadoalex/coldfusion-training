@@ -500,6 +500,118 @@ HTML5 provides built-in client-side validation via attributes like `required`, `
 
 ---
 
+## Activity 4 — Build an HTML5 form with email and date validation
+
+**Activity:** In the **Terminal** tab, create `html5_form_demo.cfm` — a self-contained form that uses `type="email"` and `type="date"` for client-side validation, and echoes the submitted values back with CFML server-side processing:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_form_demo.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Form Validation Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 520px; margin: 2rem auto; }
+    label { display: block; margin-top: 1rem; font-weight: bold; }
+    input, select { width: 100%; padding: .4rem; margin-top: .25rem; box-sizing: border-box; }
+    button { margin-top: 1.2rem; padding: .5rem 1.4rem; }
+    .result { margin-top: 1.5rem; padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; }
+    .error  { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>Event Registration</h1>
+
+<cfif cgi.REQUEST_METHOD eq "POST">
+  <cfscript>
+    email     = trim(form.email      ?: "");
+    eventDate = trim(form.event_date ?: "");
+    name      = trim(form.fullname   ?: "");
+    errors    = [];
+
+    // Server-side validation — never trust client-side alone
+    if (!isValid("email", email))
+      arrayAppend(errors, "A valid email address is required.");
+    if (len(name) lt 2)
+      arrayAppend(errors, "Full name must be at least 2 characters.");
+    if (!isValid("date", eventDate))
+      arrayAppend(errors, "A valid event date is required.");
+    else if (parseDateTime(eventDate) lt now())
+      arrayAppend(errors, "Event date must be today or in the future.");
+  </cfscript>
+
+  <cfif arrayLen(errors)>
+    <div class="result">
+      <strong class="error">Please fix the following:</strong>
+      <ul>
+        <cfoutput><cfloop array="#errors#" index="e"><li class="error">#encodeForHTML(e)#</li></cfloop></cfoutput>
+      </ul>
+    </div>
+  <cfelse>
+    <div class="result">
+      <strong>Registration confirmed!</strong><br>
+      <cfoutput>
+        Name: <strong>#encodeForHTML(name)#</strong><br>
+        Email: <strong>#encodeForHTML(email)#</strong><br>
+        Event date: <strong>#dateFormat(parseDateTime(eventDate), "dddd, mmmm d, yyyy")#</strong>
+      </cfoutput>
+    </div>
+  </cfif>
+</cfif>
+
+  <form method="post" action="html5_form_demo.cfm">
+    <label for="fullname">Full name</label>
+    <input type="text"  id="fullname"   name="fullname"   required minlength="2" placeholder="Jane Smith">
+
+    <label for="email">Email address</label>
+    <input type="email" id="email"      name="email"      required placeholder="jane@example.com">
+
+    <label for="event_date">Event date</label>
+    <input type="date"  id="event_date" name="event_date" required
+           min="<cfoutput>#dateFormat(now(), 'yyyy-mm-dd')#</cfoutput>">
+
+    <button type="submit">Register</button>
+  </form>
+</body>
+</html>
+EOF
+```
+
+Open `/html5_form_demo.cfm` in the **ColdFusion 2025** browser tab. Try submitting:
+- An **empty form** — the browser blocks it and highlights the first missing field
+- An **invalid email** like `notanemail` — the browser shows a native email error
+- A **past date** — ColdFusion's server-side check catches it even if the browser `min` attribute is bypassed
+- A **valid submission** — ColdFusion echoes the confirmed registration back
+
+```bash
+curl -s http://localhost:8500/html5_form_demo.cfm | grep -i "Event Registration"
+```
+
+::image-box
+---
+:src: __static__/browser-html5-form-validation-v1.png
+:alt: Browser showing the Event Registration form with three fields — Full name, Email address, and Event date with a calendar date picker open — and below it a blue confirmation box after a valid submission showing the name, email, and formatted date echoed back by ColdFusion
+:max-width: 860px
+---
+_HTML5 `type="email"` and `type="date"` provide instant browser validation; ColdFusion re-validates and processes on the server._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_form_validation
+---
+#active
+Create `html5_form_demo.cfm` using the `sudo tee` command above, then open it in the browser and submit a valid registration to see ColdFusion echo it back.
+
+#completed
+`html5_form_demo.cfm` is accessible and contains HTML5 form validation. ✓
+::
+
+---
+
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
