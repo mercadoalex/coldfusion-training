@@ -315,6 +315,57 @@ Components / State                 Application.cfc (session, auth, CORS)
 
 ::
 
+::hint-box
+---
+:summary: Does ColdFusion have a dedicated API gateway or load balancer?
+---
+
+**No — Adobe does not sell a dedicated API gateway or load balancer.** ColdFusion is a CFML application server, not an infrastructure product. Here is how the pieces fit together and who provides what:
+
+| Layer | What it does | Who provides it |
+|---|---|---|
+| **Load balancer** | Distributes traffic across multiple CF instances | Nginx, HAProxy, AWS ALB, Cloudflare — not Adobe |
+| **API Gateway** | Rate limiting, routing rules, analytics, API keys | Kong, AWS API Gateway, Azure APIM — not Adobe |
+| **SSL termination** | HTTPS → HTTP handoff before CF sees the request | Nginx, Cloudflare, load balancer — not Adobe |
+| **Application.cfc** | Auth, CORS, session setup, error handling | ColdFusion — this is the CF-native layer |
+| **CF API Manager** | Lightweight API publish/throttle layer | Adobe — bundled with CF Enterprise edition only |
+
+**What is CF API Manager?**
+Adobe ColdFusion Enterprise ships with a built-in **API Manager** — a basic gateway that lets you publish, version, throttle, and secure CF REST endpoints from a UI. It is not a full Kong or AWS API Gateway replacement, but it covers the most common needs for teams that want governance over their CF APIs without adding external infrastructure.
+
+- Available only in **ColdFusion Enterprise** (not Standard or Developer Edition)
+- Provides: endpoint registration, API keys, throttling, subscriber management, analytics
+- Does **not** provide: load balancing, SSL termination, or cross-service routing
+
+**What about load balancing?**
+ColdFusion itself has no load balancer. If you run multiple CF instances you put Nginx or a cloud load balancer in front. A load balancer and an API gateway are two different tools — you can have one without the other:
+
+- **Load balancer only** — splits traffic across CF nodes, no API key or rate-limit awareness
+- **API gateway only** — manages API contracts and throttling, forwards to a single CF instance
+- **Both** — typical for high-traffic production: load balancer handles scale, API gateway handles governance
+
+**The typical production stack:**
+
+```
+Internet
+   │
+   ▼
+Nginx  ←── SSL termination + static files + load balance across CF nodes
+   │
+   ▼
+ColdFusion cluster (2–N nodes)
+   │  Application.cfc handles auth, CORS, session
+   │
+   ▼
+Database (MySQL / PostgreSQL / MSSQL)
+```
+
+For larger teams, Kong or AWS API Gateway sits between Nginx and CF to add rate limiting and API key management. **For most ColdFusion applications, Nginx + Application.cfc is all you need.**
+
+> **This topic is outside the scope of this Foundations course.** Infrastructure architecture, CF clustering, and API Manager configuration are covered in the **ColdFusion Advanced Course**.
+
+::
+
 ---
 
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
