@@ -94,4 +94,7 @@ tasks:
     run: |
       echo "Lesson complete — well done!"
 
+challenges:
+  multimedia_c7c70611: {}
+
 ---

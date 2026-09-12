@@ -537,3 +537,9 @@ All done? Hit **Check** to mark this lesson complete and unlock the Unit 1 Chall
 #completed
 Lesson complete — on to the Unit 1 Challenge!
 ::
+
+::card
+---
+:challenge: challenges.multimedia_c7c70611
+---
+::
