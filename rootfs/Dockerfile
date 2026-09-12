@@ -229,7 +229,8 @@ COPY rootfs/rootfs/welcome /home/${LAB_USER}/.welcome
 RUN chown ${LAB_USER}:${LAB_USER} /home/${LAB_USER}/.welcome && \
     chown -R ${LAB_USER}:${LAB_USER} /home/${LAB_USER} && \
     chown -R ${LAB_USER}:${LAB_USER} ${COMMANDBOX_HOME} && \
-    mv /tmp/cf-wwwroot/* ${CF_HOME}/cfusion/wwwroot/ 2>/dev/null || true
+    mv /tmp/cf-wwwroot/* ${CF_HOME}/cfusion/wwwroot/ 2>/dev/null || true && \
+    chown -R ${LAB_USER}:${LAB_USER} ${CF_HOME}/cfusion/wwwroot/
 
 USER ${LAB_USER}
 ENV HOME=/home/${LAB_USER}

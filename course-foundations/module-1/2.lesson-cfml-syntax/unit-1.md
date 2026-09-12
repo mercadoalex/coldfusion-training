@@ -26,12 +26,10 @@ Tags are case-insensitive and must be paired (or self-closed). The hash signs `#
 _Anatomy of a CFML tag: opening tag, optional attributes, hash-delimited interpolation, and closing tag._
 ::
 
-**Activity:** In your lab, click the **Terminal** tab. Navigate to the ColdFusion web root and create `syntax_tag.cfm` using `cat`:
+**Activity:** In your lab, click the **Terminal** tab. Create `syntax_tag.cfm` in the ColdFusion web root using `sudo tee`:
 
 ```bash
-cd /opt/coldfusion2025/cfusion/wwwroot
-
-cat > syntax_tag.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm << 'EOF'
 <cfset message = "I am using tag syntax">
 <cfoutput>#message# — tag</cfoutput>
 EOF
@@ -80,12 +78,10 @@ Both syntaxes compile to the same bytecode. You can mix them freely — a common
 _Both syntaxes are compiled by the same CFML engine to identical JVM bytecode._
 ::
 
-**Activity:** Still in the Terminal, create `syntax_script.cfm` in the same directory:
+**Activity:** Still in the Terminal, create `syntax_script.cfm`:
 
 ```bash
-cd /opt/coldfusion2025/cfusion/wwwroot
-
-cat > syntax_script.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 <cfscript>
   writeOutput("I am using cfscript — script syntax");
 </cfscript>
@@ -183,10 +179,10 @@ Tag equivalent:
 _Quick reference: CFML tag syntax (left) vs. cfscript syntax (right) for conditionals and loops._
 ::
 
-**Activity:** Update `syntax_script.cfm` to add a conditional. In the Terminal, overwrite the file with this version:
+**Activity:** Update `syntax_script.cfm` to add a conditional. In the Terminal, overwrite the file:
 
 ```bash
-cat > /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 <cfscript>
   writeOutput("I am using cfscript — script syntax");
   score = 85;
@@ -253,10 +249,10 @@ ColdFusion also supports iterating over arrays and structs:
 </cfscript>
 ```
 
-**Activity:** In the Terminal, create `syntax_loop.cfm` using a `for` loop to output the numbers 1 through 5:
+**Activity:** In the Terminal, create `syntax_loop.cfm`:
 
 ```bash
-cat > /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
 <cfscript>
   for (i = 1; i <= 5; i++) {
     writeOutput(i & "<br>");
