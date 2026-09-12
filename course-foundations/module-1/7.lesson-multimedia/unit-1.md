@@ -458,10 +458,10 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/image_thumb.cfm
 ::image-box
 ---
 :src: __static__/browser-image-thumb-v1.png
-:alt: Browser showing image_thumb.cfm with the heading "cfimage — Thumbnail Demo" and two images side by side — the original blue test image at 400×300 and the resized thumbnail at 200×150 — each with a figcaption showing the dimensions read back by ColdFusion imageGetInfo
+:alt: Browser showing image_thumb.cfm with the heading "cfimage — Thumbnail Demo" and two images side by side — the original blue test image at 400×300 and the resized thumbnail at 200×150 — each with a figcaption showing the dimensions read back by ColdFusion imageInfo
 :max-width: 860px
 ---
-_`cfimage` resizing a programmatically generated test image — original at 400×300 and thumbnail at 200×150, dimensions confirmed by `imageGetInfo()`._
+_`cfimage` resizing a programmatically generated test image — original at 400×300 and thumbnail at 200×150, dimensions confirmed by `imageInfo()`._
 ::
 
 ::simple-task
@@ -474,6 +474,40 @@ Run the `sudo tee` command above to create `image_thumb.cfm`, then open `/image_
 
 #completed
 `image_thumb.cfm` is accessible and cfimage thumbnail generation works. ✓
+::
+
+::hint-box
+---
+:summary: Troubleshooting — "Variable IMAGEGETINFO is undefined"
+---
+
+If you see this error when loading `image_thumb.cfm`:
+
+::image-box
+---
+:src: __static__/error-ocurred-cfimage-v1.png
+:alt: ColdFusion error page showing "Variable IMAGEGETINFO is undefined" with the standard CF error layout
+:max-width: 860px
+---
+_ColdFusion 2025 error — `imageGetInfo()` does not exist as a standalone function._
+::
+
+**What it means:** an earlier version of this lesson used `imageGetInfo()`, which does not exist in ColdFusion 2025. The correct function is `imageInfo()`.
+
+**The fix** — use `imageInfo()` on an image object returned by `imageRead()`:
+
+```cfml
+// ✗ Wrong — imageGetInfo() is not a CF2025 function
+origInfo = imageGetInfo(imageRead(srcPath));
+
+// ✓ Correct
+origImg  = imageRead(srcPath);
+origInfo = imageInfo(origImg);
+writeOutput(origInfo.width & "×" & origInfo.height);
+```
+
+The current code in this lesson already uses `imageInfo()`. If you see this error it means you are running an older copy of `image_thumb.cfm` — re-run the `sudo tee` command above to replace it with the corrected version.
+
 ::
 
 ---
