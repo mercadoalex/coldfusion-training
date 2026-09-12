@@ -354,6 +354,15 @@ Change the path to `/syntax_loop_all.cfm` in your browser window to see all four
 curl -s http://localhost:8500/syntax_loop_all.cfm
 ```
 
+::image-box
+---
+:src: __static__/browser-output-syntax-loop-all-v1.png
+:alt: Browser window showing the rendered output of syntax_loop_all.cfm — four labelled sections: Index loop listing step 1, step 2, step 3; Array loop listing CFML, Java, JavaScript; Struct loop listing engine=ColdFusion, version=2025, port=8500; While loop listing count is 1, count is 2, count is 3
+:max-width: 860px
+---
+_The browser renders all four loop forms — this is what you should see at `/syntax_loop_all.cfm`._
+::
+
 ::hint-box
 ---
 :summary: Need to fix a file? Edit it with vi
@@ -386,6 +395,15 @@ vi /opt/coldfusion2025/cfusion/wwwroot/syntax_loop_all.cfm
 4. Make your edit
 5. Press `Esc` to return to normal mode
 6. Type `:wq` and press Enter to save and exit
+
+::image-box
+---
+:src: __static__/vi-editor-syntax-loop-all-v1.png
+:alt: The vi text editor open in the lab Terminal showing the contents of syntax_loop_all.cfm — the CFML script block is visible with all four loop constructs, the status line at the bottom shows the filename and line count, and the cursor is positioned inside the file ready to edit
+:max-width: 860px
+---
+_vi open with `syntax_loop_all.cfm` — press `i` to start editing, `Esc` then `:wq` to save and exit._
+::
 
 ::
 
