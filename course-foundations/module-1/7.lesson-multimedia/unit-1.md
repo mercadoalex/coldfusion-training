@@ -345,12 +345,12 @@ ColdFusion ships with a built-in image manipulation library — no external depe
 <cfscript>
   // Resize an uploaded image to a 200×200 thumbnail
   cfimage(
-    action    = "resize",
-    source    = "/uploads/original.jpg",
-    dest      = "/uploads/thumb.jpg",
-    width     = "200",
-    height    = "200",
-    overwrite = true
+    action      = "resize",
+    source      = "/uploads/original.jpg",
+    destination = "/uploads/thumb.jpg",
+    width       = "200",
+    height      = "200",
+    overwrite   = true
   );
 </cfscript>
 ```
@@ -416,12 +416,12 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/image_thumb.cfm << 'EOF'
 
     // Resize to 200×150 thumbnail
     cfimage(
-      action    = "resize",
-      source    = srcPath,
-      dest      = thumbPath,
-      width     = "200",
-      height    = "150",
-      overwrite = true
+      action      = "resize",
+      source      = srcPath,
+      destination = thumbPath,
+      width       = "200",
+      height      = "150",
+      overwrite   = true
     );
 
     origInfo  = imageGetInfo(imageRead(srcPath));
