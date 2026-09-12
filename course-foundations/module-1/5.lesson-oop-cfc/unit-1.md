@@ -386,6 +386,42 @@ This is rarely needed for everyday CF work, but the entire Java ecosystem is ava
 
 ---
 
+::hint-box
+---
+:summary: Why no .jar, .war, or .jsp? How Java really works inside ColdFusion
+---
+
+**ColdFusion is already a compiled Java application.**
+When you install ColdFusion 2025, Adobe ships it as a fully compiled Java EE application deployed on an embedded Tomcat server. The CFML engine, all built-in tags, and all built-in functions are already JVM bytecode — you never compile anything yourself.
+
+When you save a `.cfc` file, ColdFusion compiles it to JVM bytecode on the first request and caches the result. No `javac`, no build step.
+
+**What `createObject("java", "...")` actually does**
+
+It asks the already-running JVM for an instance of a class that is already loaded on the classpath. Classes like `java.util.UUID` and `java.lang.StringBuilder` ship with the Java standard library and are always available. If you wrote your own Java class, you would:
+
+1. Write the `.java` source and compile it to a `.class` / `.jar`
+2. Drop the `.jar` into ColdFusion's classpath (`{cf-root}/cfusion/lib/`)
+3. Call it the same way: `createObject("java", "com.yourpackage.YourClass")`
+
+**Can a CFC call a JSP?**
+
+Not via `createObject` — a JSP is an HTTP endpoint, not a reusable class. Tomcat compiles a `.jsp` internally into a servlet, but that generated class has no stable name you can reference. The comparison by format looks like this:
+
+| Format | What it is | CFC can call it? |
+|---|---|---|
+| Java stdlib (`java.util.*` etc.) | Already on JVM classpath | ✅ Always |
+| `.jar` / `.class` | Compiled Java, added to CF classpath | ✅ Yes |
+| `.jsp` | HTTP endpoint compiled by Tomcat | ❌ Not directly |
+
+If you need logic shared between a JSP and a CFC, extract it into a plain Java class (`.jar`), then both can call it independently.
+
+**The two CFCs in this lesson** (`GreetingService.cfc` and `JavaUtilService.cfc`) are pure CFML — the Java integration is additive, showing that the full JVM class library is always within reach when you need it.
+
+::
+
+---
+
 ## Activity 4 — Call Java from inside a CFC
 
 **Activity:** In the **Terminal** tab, create `JavaUtilService.cfc` — a CFC whose methods each call a different Java class from the standard library:
