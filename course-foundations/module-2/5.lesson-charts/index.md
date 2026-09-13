@@ -24,52 +24,66 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  charts_0e333dfe: {}
+
 tasks:
-  verify_chart_page:
+  verify_bar_chart:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm)
-      if [ "${STATUS}" != "200" ]; then
-        echo "chart_demo.cfm not found (got ${STATUS})"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm"
+      if [ ! -f "${FILE}" ]; then
+        echo "chart_demo.cfm not found"
         exit 1
       fi
-      echo "chart_demo.cfm is accessible"
+      if ! grep -qi "cfchart" "${FILE}" 2>/dev/null; then
+        echo "cfchart tag not found in chart_demo.cfm"
+        exit 1
+      fi
+      if ! grep -qi "cfquery\|queryExecute" "${FILE}" 2>/dev/null; then
+        echo "No query found in chart_demo.cfm — chart must use live data"
+        exit 1
+      fi
+      echo "chart_demo.cfm exists with cfchart powered by a query"
 
-  verify_cfchart_used:
+  verify_pie_chart:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_bar_chart
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm"
+      if ! grep -qi "type.*pie\|pie.*type" "${FILE}" 2>/dev/null; then
+        echo "No pie chart series found in chart_demo.cfm"
+        exit 1
+      fi
+      echo "Pie chart series is present"
+
+  verify_chart_page:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_pie_chart
+    run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "chart_demo.cfm not accessible (got ${STATUS})"
+        exit 1
+      fi
+      BODY=$(curl -s http://localhost:8500/chart_demo.cfm)
+      if echo "${BODY}" | grep -qi "error\|exception"; then
+        echo "chart_demo.cfm is throwing an error"
+        exit 1
+      fi
+      echo "chart_demo.cfm returns HTTP 200 with no errors"
+
+  verify_lesson_complete:
     machine: dev-machine
     user: laborant
     needs:
       - verify_chart_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm"
-      if ! grep -qi "cfchart" "${FILE}" 2>/dev/null; then
-        echo "cfchart tag not found in chart_demo.cfm"
-        exit 1
-      fi
-      echo "cfchart is used in chart_demo.cfm"
-
-  verify_chart_data:
-    machine: dev-machine
-    user: laborant
-    needs:
-      - verify_cfchart_used
-    run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm"
-      if ! grep -qi "cfquery\|queryExecute" "${FILE}" 2>/dev/null; then
-        echo "chart_demo.cfm does not pull data from a query"
-        exit 1
-      fi
-      echo "Chart is powered by dynamic query data"
-
-
-  verify_lesson_complete:
-    machine: dev-machine
-    user: laborant
-    run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  charts_0e333dfe: {}
 
 ---
