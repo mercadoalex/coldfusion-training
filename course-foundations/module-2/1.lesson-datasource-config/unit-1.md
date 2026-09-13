@@ -41,34 +41,6 @@ http://localhost:8500/db-test.cfm   ← view raw table data
 
 ---
 
-## Verify via CFML
-
-```cfml
-<cfquery name="test" datasource="training_db">
-  SELECT COUNT(*) AS total FROM hd_tickets
-</cfquery>
-<cfoutput>
-  Tickets in training_db: #test.total#
-</cfoutput>
-```
-
-Create this as `verify_ds.cfm` in the web root. The page must output something containing **success**, **connected**, or **ok** for the lesson task to pass.
-
----
-
-## Configure in CF Admin
-
-The datasource is already set up — no manual steps needed. To inspect it:
-
-1. Browse to `http://localhost:8500/CFIDE/administrator`
-2. Log in with password: `admin`
-3. Go to **Data & Services → Data Sources**
-4. Click **Verify** next to `training_db`
-
-You should see a green checkmark and "OK" status.
-
----
-
 ## What is a datasource?
 
 ::image-box
@@ -82,29 +54,81 @@ _CF Admin's Data Sources panel — click Verify to confirm the pool is healthy w
 
 A ColdFusion datasource is a **named JDBC connection pool**. Pages and components reference it by name — not by connection string. The pool is configured once (in CF Admin or `Application.cfc`) and shared across all requests.
 
-```cfml
-// Inline datasource definition in Application.cfc (alternative to CF Admin)
-component {
-  this.datasource = "training_db";  // sets the default for all cfquery calls
-}
-```
+---
+
+## Configure in CF Admin
+
+The `training_db` datasource is already set up — no manual steps needed. To inspect it:
+
+1. Browse to `http://localhost:8500/CFIDE/administrator`
+2. Log in with password: `admin`
+3. Go to **Data & Services → Data Sources**
+4. Click **Verify** next to `training_db`
+
+You should see a green checkmark and "OK" status.
 
 ---
 
-## Exercises
+## Activity 1 — Verify the datasource with CFML
 
-1. Create `/opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm` — reference the `training_db` datasource.
+**Activity:** Click the **Terminal** tab in your lab. Copy and paste the script below to create `verify_ds.cfm` — a page that queries `training_db` and outputs a connection confirmation:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm << 'EOF'
+<cfquery name="test" datasource="training_db">
+  SELECT COUNT(*) AS total FROM hd_tickets
+</cfquery>
+<cfoutput>Connection OK — #test.total# tickets found</cfoutput>
+EOF
+```
+
+Verify the page responds correctly:
+
+```bash
+curl -s http://localhost:8500/verify_ds.cfm
+# Expected: Connection OK — 10 tickets found
+```
+
+::image-box
+---
+:src: __static__/browser-verify-ds-output-v1.png
+:alt: Browser window showing the rendered output of verify_ds.cfm — a single line reading "Connection OK — 10 tickets found" confirming the training_db datasource is reachable and the hd_tickets table contains rows
+:max-width: 860px
+---
+_`verify_ds.cfm` confirms the `training_db` datasource is reachable and returns a row count._
+::
 
 ::simple-task
 ---
 :tasks: tasks
-:name: verify_datasource_page
+:name: verify_no_error
 ---
 #active
-Create `verify_ds.cfm` — the response must contain **success**, **connected**, or **ok**.
+Click the **Terminal** tab and run the `sudo tee` command above to create `verify_ds.cfm`. The page must output **Connection OK** with a ticket count and must not throw any error.
 
 #completed
-Datasource connection verified. ✓
+Datasource verified — `verify_ds.cfm` runs without errors. ✓
+::
+
+---
+
+## Activity 2 — Inspect the datasource in CF Admin
+
+**Activity:** Open the **ColdFusion 2025** browser tab and navigate to the CF Administrator to inspect `training_db`:
+
+1. Browse to `http://localhost:8500/CFIDE/administrator`
+2. Log in with password: `admin`
+3. Go to **Data & Services → Data Sources**
+4. Locate the `training_db` row and click **Verify**
+5. Confirm the status column shows a green checkmark and **OK**
+
+::image-box
+---
+:src: __static__/browser-cf-admin-datasource-v1.png
+:alt: ColdFusion Administrator Data Sources page showing the training_db row with a green checkmark in the Status column and an OK label confirming the JDBC connection pool is healthy
+:max-width: 860px
+---
+_CF Admin confirms `training_db` is healthy — no CFML required to check pool status._
 ::
 
 ::simple-task
@@ -113,35 +137,58 @@ Datasource connection verified. ✓
 :name: verify_training_db
 ---
 #active
-Reference the `training_db` datasource in `verify_ds.cfm`.
+Open CF Admin at `http://localhost:8500/CFIDE/administrator`, go to **Data & Services → Data Sources**, and click **Verify** next to `training_db`. Confirm the green OK status.
 
 #completed
-`training_db` datasource is referenced. ✓
+`training_db` datasource verified in CF Admin. ✓
 ::
 
-2. Query `hd_tickets` and output a confirmation containing the word **ok** or **connected**.
+---
+
+## Activity 3 — Define the datasource in Application.cfc
+
+**Activity:** Setting `this.datasource` in `Application.cfc` makes `training_db` the default for every `cfquery` call in your application — no need to repeat the `datasource` attribute on each tag.
+
+In the **Terminal** tab, create `Application.cfc` in the web root:
 
 ```bash
-curl -s http://localhost:8500/verify_ds.cfm
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
+component {
+
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+
+}
+EOF
 ```
+
+Verify the file was written correctly:
+
+```bash
+grep "this.datasource" /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
+# Expected: this.datasource = "training_db";
+```
+
+::image-box
+---
+:src: __static__/browser-app-cfc-datasource-v1.png
+:alt: Terminal window showing the sudo tee command writing Application.cfc followed by the grep output confirming the line "this.datasource = training_db" is present in the file
+:max-width: 860px
+---
+_`Application.cfc` with `this.datasource` set — all `cfquery` calls in this application now default to `training_db`._
+::
 
 ::simple-task
 ---
 :tasks: tasks
-:name: verify_no_error
+:name: verify_app_cfc
 ---
 #active
-`verify_ds.cfm` must not output any **error** or **exception** text.
+Run the `sudo tee` command above to create `Application.cfc` in the web root with `this.datasource = "training_db"`.
 
 #completed
-No errors on the datasource verification page. ✓
+`Application.cfc` created with `this.datasource` set. ✓
 ::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -157,10 +204,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.datasource_verify_be971bb2
----
 ::
