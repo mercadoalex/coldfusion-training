@@ -77,6 +77,58 @@ A ColdFusion datasource is a **named JDBC connection pool**. Pages and component
 
 ColdFusion passes SQL directly to the underlying database engine — it does not invent its own query language. This means the full power of SQL is available inside `cfquery` and `queryExecute()`.
 
+::details-box
+---
+:summary: Access the H2 database directly from the terminal (H2 Shell)
+---
+
+You can query `training_db` directly using the H2 command-line shell — useful for exploring the schema or testing SQL without writing a `.cfm` file. **ColdFusion must be stopped first** — H2 embedded only allows one process to hold the database file at a time.
+
+**Step 1 — Stop ColdFusion:**
+
+```bash
+sudo /opt/coldfusion2025/cfusion/bin/coldfusion stop
+```
+
+**Step 2 — Open the H2 shell:**
+
+```bash
+sudo /opt/coldfusion2025/jre/bin/java \
+  -cp /opt/coldfusion2025/cfusion/lib/h2-2.2.224.jar \
+  org.h2.tools.Shell \
+  -url "jdbc:h2:/opt/coldfusion2025/cfusion/db/training_db" \
+  -user sa \
+  -password ""
+```
+
+**Step 3 — Run SQL at the prompt:**
+
+```sql
+SHOW TABLES;
+SELECT id, full_name, role FROM hd_users;
+SELECT id, title, status, priority FROM hd_tickets ORDER BY id;
+exit
+```
+
+::image-box
+---
+:src: __static__/h2-shell-sql-v1.png
+:alt: Terminal window showing the H2 Shell prompt with the Welcome to H2 Shell banner and a SELECT query returning rows from hd_tickets
+:max-width: 860px
+---
+_H2 Shell connected to `training_db` — full SQL access from the terminal._
+::
+
+**Step 4 — Restart ColdFusion when done:**
+
+```bash
+sudo /opt/coldfusion2025/cfusion/bin/coldfusion start
+```
+
+**Alternative — no restart needed:** use the CF Admin query tool at `http://localhost:8500/CFIDE/administrator` → **Data & Services → Data Sources** → click `training_db` → **Actions → Query**. This runs SQL against the live database while ColdFusion stays running.
+
+::
+
 **ANSI SQL compliance:** ColdFusion is ANSI SQL-92 compliant through the JDBC driver of the target database. H2, MySQL, PostgreSQL, and SQL Server all support the ANSI standard with their own extensions. Write standard SQL and it works across all of them; use vendor-specific syntax (e.g. `TOP` for MSSQL, `LIMIT` for MySQL/PostgreSQL) when you need database-specific features.
 
 **How complex can a query be?** As complex as the database engine supports — ColdFusion simply passes the SQL string to JDBC. All of the following work inside `cfquery`:
