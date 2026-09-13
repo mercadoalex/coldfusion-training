@@ -214,7 +214,7 @@ mkdir -p \
 if [ -f "${CF_BIN}/cfpm.sh" ]; then
   echo "[CF] Installing CF packages for Foundations curriculum..."
   chmod +x "${CF_BIN}/cfpm.sh"
-  for pkg in document orm mail debugger websocket zip; do
+  for pkg in document orm mail debugger websocket zip chart; do
     echo "[CF] Installing package: ${pkg}..."
     bash "${CF_BIN}/cfpm.sh" install "${pkg}" 2>/dev/null || \
       echo "[CF] WARNING: package ${pkg} failed (non-fatal)"

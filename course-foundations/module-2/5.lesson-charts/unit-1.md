@@ -181,22 +181,17 @@ Serve it with a plain `<img>` tag: `<img src="/charts/tickets.png" alt="Ticket c
 
 ::hint-box
 ---
-:summary: Getting "The chart package is not installed"? Install it first with cfpm.
+:summary: Getting "The chart package is not installed"? Run these two commands in the Terminal.
 ---
 
-ColdFusion 2025 ships the chart engine as an optional package. If you see this error it means the package has not been installed yet in this environment. Fix it with one command in the **Terminal** tab:
+ColdFusion 2025 ships the chart engine as an optional package that must be installed separately. This playground has it pre-installed, but if you are running this exercise on your own ColdFusion instance and see this error, fix it with two commands in the **Terminal** tab:
 
 ```bash
 sudo /opt/coldfusion2025/cfusion/bin/cfpm.sh install chart
-```
-
-Wait for the installer to finish — it will print a success message. Then restart ColdFusion so the package is loaded:
-
-```bash
 sudo /opt/coldfusion2025/cfusion/bin/coldfusion restart
 ```
 
-Wait about 30 seconds for ColdFusion to come back up, then reload `/chart_demo.cfm`. The chart will render correctly.
+Wait about 30 seconds for ColdFusion to restart, then reload `/chart_demo.cfm`.
 
 ::
 
