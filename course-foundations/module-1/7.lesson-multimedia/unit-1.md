@@ -540,6 +540,6 @@ Lesson complete — on to the Unit 1 Challenge!
 
 ::card
 ---
-:challenge: challenges.multimedia_c7c70611
+:challenge: challenges.multimedia-c7c70611
 ---
 ::
