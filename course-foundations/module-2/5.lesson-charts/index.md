@@ -71,7 +71,7 @@ tasks:
         echo "chart_demo.cfm is throwing an error"
         exit 1
       fi
-      COUNT=$(echo "${BODY}" | grep -c "CFIDE/charting" || true)
+      COUNT=$(echo "${BODY}" | grep -c "CFFileServlet/_cf_chart" || true)
       if [ "${COUNT}" -lt 2 ]; then
         echo "Expected 2 chart img tags, found ${COUNT} — not all charts rendered"
         exit 1
