@@ -108,8 +108,12 @@ The **Data & Services** section of CF Admin is the central hub for configuring e
 | **Solr Server** | Connection to an Apache Solr search server for enterprise full-text search | `cfindex`, `cfsearch` with Solr engine |
 | **Web Services** | Registered WSDL endpoints for SOAP web service consumption | `cfinvoke`, `cfobject` |
 | **REST Services** | Registered ColdFusion REST applications — maps URL paths to CFC-based REST endpoints | `cfrestregistry`, REST CFCs with `restpath` |
+| **PDF Service** | Connection to a remote ColdFusion PDF generation service for offloading heavy PDF rendering | `cfdocument`, `cfpdf` with remote engine |
+| **Cloud Credentials** | Stored credentials for AWS, Azure, and Google Cloud services (S3, SES, Rekognition, etc.) | `cffile` S3 storage, `cfmail` SES, AI/ML tags |
+| **Cloud Configuration** | Named cloud storage and service configurations that reference a Cloud Credential | `cffile action="copy"` to S3, cloud functions |
+| **GraphQL** | Schema registration and endpoint configuration for ColdFusion's built-in GraphQL support | GraphQL query execution via ColdFusion endpoints |
 
-**A note on scope:** this lesson covers Data Sources only, because relational databases are the backbone of almost every ColdFusion application. The other integrations — Solr full-text search, SOAP web services, REST registration, and NoSQL — each have their own dedicated lessons in the **Advanced ColdFusion** course track where they are explored hands-on with real examples.
+**A note on scope:** this lesson covers Data Sources only, because relational databases are the backbone of almost every ColdFusion application. The other integrations — Solr, SOAP, REST, PDF, cloud services, and GraphQL — each have their own dedicated lessons in the **Advanced ColdFusion** course track where they are explored hands-on with real examples.
 
 ::
 
