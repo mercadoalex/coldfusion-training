@@ -3,8 +3,6 @@ kind: challenge
 
 title: Unit 1 Challenge — ColdFusion Foundations
 
-name: multimedia-c7c70611
-
 description: |
   Put everything from Unit 1 together. Build a self-contained ColdFusion
   application that combines CFML syntax, variables and scopes, the application
