@@ -233,6 +233,34 @@ grep -i "cfchart" /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm
 
 Open `/chart_demo.cfm` in the **ColdFusion 2025** browser tab — you should see a blue bar chart with one bar per priority value.
 
+::hint-box
+---
+:summary: Getting "Table HD_TICKETS not found — this database is empty"? Run the seed script first.
+---
+
+::image-box
+---
+:src: __static__/ooops-db-is-empty-v1.png
+:alt: ColdFusion error page showing "Error Executing Database Query — Table HD_TICKETS not found (this database is empty)" with the SQL statement and H2 error code 42104
+:max-width: 860px
+---
+_This error means the Help Desk database has not been seeded yet — the tables exist but contain no data, or the schema was never created._
+::
+
+This error means the `hd_tickets` table does not exist yet in the H2 database. The `cfchart` query runs fine syntactically but finds no table to query. You need to run the **seed script** first to create the schema and insert the sample data.
+
+**In the browser**, open the lab index page and click **DB Test → Run Seed Script**. Wait for the confirmation screen showing the tables were created and rows inserted, then reload `/chart_demo.cfm`.
+
+Alternatively, from the **Terminal** tab:
+
+```bash
+curl -s http://localhost:8500/seed-db.cfm | grep -i "success\|created\|inserted"
+```
+
+Once the seed script has run successfully, reload `/chart_demo.cfm` and the bar chart will render correctly.
+
+::
+
 ::image-box
 ---
 :src: __static__/browser-bar-chart-v1.png
