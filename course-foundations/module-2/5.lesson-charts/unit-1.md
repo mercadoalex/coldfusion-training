@@ -403,6 +403,15 @@ curl -s http://localhost:8500/chart_demo.cfm | grep -c "CFIDE/charting"
 
 **Expected result: `2`** — one `<img>` for the bar chart, one for the pie chart. This is the definitive proof that both charts were generated from live query data and written to the chart cache successfully.
 
+::image-box
+---
+:src: __static__/terminal-cfide-charting-count-v1.png
+:alt: Terminal showing the curl pipe grep -c "CFIDE/charting" command returning 2 — confirming two cfchart img tags are present in the response, one for the bar chart and one for the pie chart
+:max-width: 860px
+---
+_`grep -c "CFIDE/charting"` returns `2` — both chart images were generated and written to the CF chart cache._
+::
+
 Also confirm there are no errors in the response:
 
 ```bash
@@ -412,10 +421,10 @@ curl -s http://localhost:8500/chart_demo.cfm | grep -i "error\|exception" || ech
 ::image-box
 ---
 :src: __static__/terminal-chart-demo-200-v1.png
-:alt: Terminal showing the grep -c command returning 2 — confirming two cfchart img tags are present in the response, one for the bar chart and one for the pie chart — followed by the error grep returning "No errors found"
+:alt: Terminal showing the error grep command returning "No errors found" — confirming chart_demo.cfm produces no ColdFusion exceptions on the page
 :max-width: 860px
 ---
-_`grep -c "CFIDE/charting"` returns 2 — both chart images were generated and written to the CF chart cache._
+_No errors or exceptions in the response — both queries ran and both charts rendered cleanly._
 ::
 
 ::simple-task
