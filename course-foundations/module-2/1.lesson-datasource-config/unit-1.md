@@ -148,6 +148,34 @@ curl -s http://localhost:8500/verify_ds.cfm
 _`verify_ds.cfm` confirms the `training_db` datasource is reachable and returns a row count._
 ::
 
+::hint-box
+---
+:summary: Troubleshooting — "Table HD_TICKETS not found (this database is empty)"
+---
+
+If you see this error when loading `verify_ds.cfm`:
+
+::image-box
+---
+:src: __static__/error-table-not-found-seed-db-v1.png
+:alt: ColdFusion error page showing "Error Executing Database Query — Table HD_TICKETS not found (this database is empty)" with the SQL statement and H2 error code 42104
+:max-width: 860px
+---
+_H2 error 42104 — the Help Desk schema has not been seeded yet._
+::
+
+**What it means:** the `training_db` datasource is connected and working, but the Help Desk tables (`hd_tickets`, `hd_users`, etc.) have not been created yet. The database file exists but is empty.
+
+**The fix** — run the seed script first:
+
+```bash
+curl -s http://localhost:8500/seed-db.cfm
+```
+
+Then reload `verify_ds.cfm`. The seed script creates all four tables and inserts the sample rows. After seeding you should see **Connection OK — 10 tickets found**.
+
+::
+
 ::simple-task
 ---
 :tasks: tasks
