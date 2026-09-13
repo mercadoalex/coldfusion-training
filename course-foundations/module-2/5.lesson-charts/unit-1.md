@@ -193,6 +193,15 @@ sudo /opt/coldfusion2025/cfusion/bin/coldfusion restart
 
 Wait about 30 seconds for ColdFusion to restart, then reload `/chart_demo.cfm`.
 
+::image-box
+---
+:src: __static__/chart-package-installation-v1.png
+:alt: Terminal showing the cfpm.sh install chart command running and completing successfully, followed by the coldfusion restart command — confirming the chart package is installed and ColdFusion has restarted
+:max-width: 860px
+---
+_`cfpm.sh install chart` installs the chart engine — restart ColdFusion after to load the package._
+::
+
 ::
 
 **What you are building:** A new file `chart_demo.cfm` that queries the Help Desk database and renders a bar chart showing open ticket counts by priority.
