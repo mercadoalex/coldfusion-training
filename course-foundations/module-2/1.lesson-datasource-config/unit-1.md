@@ -166,13 +166,49 @@ _H2 error 42104 — the Help Desk schema has not been seeded yet._
 
 **What it means:** the `training_db` datasource is connected and working, but the Help Desk tables (`hd_tickets`, `hd_users`, etc.) have not been created yet. The database file exists but is empty.
 
-**The fix** — run the seed script first:
+**The fix** — use the DB Test page in the lab:
+
+1. Open the **ColdFusion 2025** browser tab and click the **DB Test** button
+2. You will see a **Run Seed Script** option — click it
+
+::image-box
+---
+:src: __static__/browser-db-test-seed-option-v1.png
+:alt: The DB Test page in the lab showing the Run Seed Script button
+:max-width: 860px
+---
+_DB Test page — click **Run Seed Script** to create and populate the Help Desk schema._
+::
+
+3. A confirmation screen appears confirming the seed completed successfully
+
+::image-box
+---
+:src: __static__/browser-db-test-seed-confirmed-v1.png
+:alt: Confirmation screen after running the seed script showing the schema was created and rows inserted successfully
+:max-width: 860px
+---
+_Seed confirmation — all four tables created and sample rows inserted._
+::
+
+4. Click **← Back to DB Test** to see all the records now in the database
+
+::image-box
+---
+:src: __static__/browser-db-test-records-v1.png
+:alt: DB Test page showing all records from the Help Desk tables — hd_departments, hd_users, hd_tickets, and hd_comments — after the seed script ran successfully
+:max-width: 860px
+---
+_DB Test confirming all Help Desk records are present — the database is now seeded and ready._
+::
+
+Then reload `verify_ds.cfm`. After seeding you should see **Connection OK — 10 tickets found**.
+
+Alternatively, seed from the terminal:
 
 ```bash
 curl -s http://localhost:8500/seed-db.cfm
 ```
-
-Then reload `verify_ds.cfm`. The seed script creates all four tables and inserts the sample rows. After seeding you should see **Connection OK — 10 tickets found**.
 
 ::
 
