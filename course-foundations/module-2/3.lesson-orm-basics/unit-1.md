@@ -6,7 +6,7 @@ title: ORM Basics — ColdFusion Hibernate ORM
 name: orm-basics-hibernate-unit-1
 ---
 
-## What is ColdFusion ORM?
+## What is ColdFusion ORM (Object-Relational Mapping)?
 
 ColdFusion ships with **Hibernate** as its built-in ORM layer. Mark a CFC as `persistent="true"` and ColdFusion automatically maps it to a database table, generates getter/setter methods, and provides CRUD functions — no SQL DDL required.
 
