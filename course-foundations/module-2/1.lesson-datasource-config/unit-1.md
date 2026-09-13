@@ -82,7 +82,10 @@ ColdFusion passes SQL directly to the underlying database engine — it does not
 :summary: Access the H2 database directly from the terminal (H2 Shell)
 ---
 
-You can query `training_db` directly using the H2 command-line shell — useful for exploring the schema or testing SQL without writing a `.cfm` file. **ColdFusion must be stopped first** — H2 embedded only allows one process to hold the database file at a time.
+You can query `training_db` directly using the H2 command-line shell — useful for exploring the schema or testing SQL without writing a `.cfm` file.
+
+**Why ColdFusion must be stopped first:**
+H2 in embedded mode uses a file-based lock — when ColdFusion starts, it opens the database file and holds an exclusive lock on it for as long as the server is running. This is the same model used by SQLite. If you try to connect a second process (the H2 shell) while CF is running, H2 detects the lock and refuses the connection with an `AccessDeniedException`. Stopping CF releases the lock, allowing the shell to open the file exclusively. This is a fundamental characteristic of embedded databases — they trade multi-process access for simplicity and zero administration. In production you would use a server-mode database (MySQL, PostgreSQL) which allows unlimited concurrent connections from any process.
 
 **Step 1 — Stop ColdFusion:**
 
