@@ -398,7 +398,7 @@ HTTP 200 only tells you the page loaded — it does not prove the charts actuall
 Run this single command in the **Terminal** tab — it fetches the page and counts how many chart `<img>` tags are in the response:
 
 ```bash
-curl -s http://localhost:8500/chart_demo.cfm | grep -c "CFFileServlet/_cf_chart"
+curl -s http://localhost:8500/chart_demo.cfm | grep -c "_cf_chart"
 ```
 
 **Expected result: `2`** — one `<img>` for the bar chart, one for the pie chart. This is the definitive proof that both charts were generated from live query data and written to the CF chart cache successfully.
@@ -406,10 +406,10 @@ curl -s http://localhost:8500/chart_demo.cfm | grep -c "CFFileServlet/_cf_chart"
 ::image-box
 ---
 :src: __static__/terminal-cfide-charting-count-v1.png
-:alt: Terminal showing the curl pipe grep -c "CFFileServlet/_cf_chart" command returning 2 — confirming two cfchart img tags are present in the response, one for the bar chart and one for the pie chart
+:alt: Terminal showing the curl pipe grep -c "_cf_chart" command returning 2 — confirming two cfchart img tags are present in the response, one for the bar chart and one for the pie chart
 :max-width: 860px
 ---
-_`grep -c "CFFileServlet/_cf_chart"` returns `2` — both chart images were generated and written to the CF chart cache._
+_`grep -c "_cf_chart"` returns `2` — both chart images were generated and written to the CF chart cache._
 ::
 
 Also confirm there are no errors in the response:
@@ -433,7 +433,7 @@ _No errors or exceptions in the response — both queries ran and both charts re
 :name: verify_chart_page
 ---
 #active
-Run `curl -s http://localhost:8500/chart_demo.cfm | grep -c "CFFileServlet/_cf_chart"` in the Terminal. The result must be `2` — confirming both the bar chart and pie chart rendered successfully from live query data.
+Run `curl -s http://localhost:8500/chart_demo.cfm | grep -c "_cf_chart"` in the Terminal. The result must be `2` — confirming both the bar chart and pie chart rendered successfully from live query data.
 
 #completed
 Both charts rendered successfully — two `cfchart` image tags confirmed in the response. ✓
