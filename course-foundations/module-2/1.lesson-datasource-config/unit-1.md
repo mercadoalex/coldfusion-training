@@ -123,6 +123,15 @@ The **Data & Services** section of CF Admin is the central hub for configuring e
 
 Before running any queries, make sure the Help Desk schema is populated. Open the **ColdFusion 2025** browser tab and click the **DB Test** button.
 
+::image-box
+---
+:src: __static__/browser-cf-index-db-test-button-v1.png
+:alt: ColdFusion 2025 lab index page showing the DB Test button that links to the database test and seed utility
+:max-width: 860px
+---
+_Click the **DB Test** button in the ColdFusion 2025 browser tab to access the seed utility._
+::
+
 1. Click **Run Seed Script**
 
 ::image-box
