@@ -8,6 +8,8 @@ name: orm-basics-hibernate-unit-1
 
 ## What is ColdFusion ORM?
 
+ColdFusion ships with **Hibernate** as its built-in ORM layer. Mark a CFC as `persistent="true"` and ColdFusion automatically maps it to a database table, generates getter/setter methods, and provides CRUD functions — no SQL DDL required.
+
 ::image-box
 ---
 :src: __static__/orm-entity-to-table-mapping-v1.png
@@ -17,100 +19,10 @@ name: orm-basics-hibernate-unit-1
 _ColdFusion ORM maps persistent CFC properties directly to database columns via Hibernate — no SQL DDL required._
 ::
 
-ColdFusion ships with **Hibernate** as its built-in ORM layer. Mark a CFC as `persistent="true"` and ColdFusion automatically maps it to a database table, generates the schema, and provides CRUD functions.
-
+::hint-box
 ---
-
-## 1. Enable ORM in Application.cfc
-
-```cfml
-component {
-  this.name = "MyApp";
-  this.ormenabled = true;
-  this.ormsettings = {
-    datasource: "training_db",
-    dbcreate:   "update",   // "none" | "create" | "update" | "dropcreate"
-    logsql:     false
-  };
-}
-```
-
-`dbcreate: "update"` tells Hibernate to alter the schema to match your entities without dropping existing data.
-
+:summary: ORM vs cfquery — when to use each?
 ---
-
-## 2. Define an entity
-
-```cfml
-// Ticket.cfc
-component persistent="true" table="hd_tickets" {
-  property name="id"          fieldtype="id" generator="native";
-  property name="title"       ormtype="string";
-  property name="description" ormtype="string";
-  property name="status"      ormtype="string";
-  property name="priority"    ormtype="string";
-}
-```
-
-Each `property` maps to a column. `fieldtype="id"` marks the primary key; `generator="native"` uses the database's auto-increment.
-
----
-
-## 3. CRUD operations
-
-```cfml
-<cfscript>
-  // CREATE
-  t = new Ticket();
-  t.setTitle("Keyboard not working");
-  t.setDescription("Keys are unresponsive on laptop");
-  t.setStatus("open");
-  t.setPriority("medium");
-  entitySave(t);
-
-  // READ — all open tickets
-  tickets = entityLoad("Ticket", {status: "open"});
-
-  // READ — single by PK
-  t = entityLoadByPK("Ticket", 1);
-
-  // UPDATE
-  t.setStatus("closed");
-  entitySave(t);
-
-  // DELETE
-  entityDelete(t);
-</cfscript>
-```
-
-ColdFusion generates getter/setter methods automatically from the `property` declarations.
-
----
-
-## 4. HQL queries
-
-Hibernate Query Language is SQL-like but operates on entity names, not table names:
-
-```cfml
-<cfscript>
-  // HQL query
-  openTickets = ORMExecuteQuery(
-    "FROM Ticket WHERE status = :status ORDER BY id DESC",
-    { status: "open" }
-  );
-
-  // Or count
-  total = ORMExecuteQuery(
-    "SELECT COUNT(*) FROM Ticket WHERE priority = :p",
-    { p: "high" },
-    true   // unique = true returns scalar
-  );
-</cfscript>
-```
-
----
-
-## When to use ORM vs cfquery
 
 ::image-box
 ---
@@ -121,7 +33,6 @@ Hibernate Query Language is SQL-like but operates on entity names, not table nam
 _Use ORM for domain-model CRUD, `cfquery` for reporting and complex JOINs — they coexist naturally._
 ::
 
-
 | Scenario | Recommendation |
 |---|---|
 | Simple CRUD on one table | ORM — less boilerplate |
@@ -129,11 +40,154 @@ _Use ORM for domain-model CRUD, `cfquery` for reporting and complex JOINs — th
 | Reporting queries | `cfquery` — easier to optimise |
 | Domain model with relationships | ORM — handles lazy loading |
 
+Both can be mixed in the same application — use the right tool for each job.
+
+::
+
 ---
 
-## Exercises
+## Enable ORM in Application.cfc
 
-1. Enable ORM in your `Application.cfc` (`this.ormenabled = true`).
+ORM is disabled by default. Add `this.ormenabled = true` and an `ormsettings` struct to `Application.cfc`:
+
+```cfml
+component {
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.ormenabled = true;
+  this.ormsettings = {
+    datasource: "training_db",
+    dbcreate:   "update",   // "none" | "create" | "update" | "dropcreate"
+    logsql:     false
+  };
+}
+```
+
+`dbcreate: "update"` tells Hibernate to alter the schema to match your entities without dropping existing data. Use `"none"` in production once your schema is stable.
+
+::hint-box
+---
+:summary: What do the dbcreate options mean?
+---
+
+| Value | What Hibernate does |
+|---|---|
+| `none` | Never touches the schema — use in production |
+| `create` | Drops and recreates all tables on every app start |
+| `update` | Adds missing columns/tables, never drops existing data |
+| `dropcreate` | Drops everything and recreates — wipes all data on restart |
+
+**The safe rule for development:** use `update`. It keeps your seed data intact while Hibernate adjusts the schema as you add properties. Switch to `none` before going to production.
+
+::
+
+---
+
+## Define an entity CFC
+
+```cfml
+// Ticket.cfc
+component persistent="true" table="hd_tickets" {
+  property name="id"          fieldtype="id" generator="native";
+  property name="title"       ormtype="string";
+  property name="description" ormtype="string";
+  property name="status"      ormtype="string"  default="open";
+  property name="priority"    ormtype="string"  default="medium";
+  property name="category"    ormtype="string";
+}
+```
+
+Each `property` maps to a column. `fieldtype="id"` marks the primary key; `generator="native"` uses the database's auto-increment. ColdFusion generates `getTitle()`, `setTitle()`, etc. automatically.
+
+---
+
+## CRUD operations
+
+```cfml
+<cfscript>
+  // CREATE
+  t = new Ticket();
+  t.setTitle("Keyboard not working");
+  t.setStatus("open");
+  t.setPriority("medium");
+  t.setCategory("Hardware");
+  entitySave(t);
+
+  // READ — all open tickets
+  tickets = entityLoad("Ticket", { status: "open" });
+
+  // READ — single by primary key
+  t = entityLoadByPK("Ticket", 1);
+
+  // UPDATE
+  t.setStatus("resolved");
+  entitySave(t);
+
+  // DELETE
+  entityDelete(t);
+</cfscript>
+```
+
+---
+
+## HQL queries
+
+Hibernate Query Language is SQL-like but operates on **entity names**, not table names:
+
+```cfml
+<cfscript>
+  // Return all open tickets ordered by id
+  openTickets = ORMExecuteQuery(
+    "FROM Ticket WHERE status = :status ORDER BY id DESC",
+    { status: "open" }
+  );
+
+  // Count high priority tickets (unique=true returns a scalar)
+  total = ORMExecuteQuery(
+    "SELECT COUNT(*) FROM Ticket WHERE priority = :p",
+    { p: "high" },
+    true
+  );
+</cfscript>
+```
+
+---
+
+## Activity 1 — Enable ORM in Application.cfc
+
+**Activity:** In the **Terminal** tab, update `Application.cfc` to enable Hibernate ORM:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
+component {
+
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.ormenabled = true;
+  this.ormsettings = {
+    datasource : "training_db",
+    dbcreate   : "update",
+    logsql     : false
+  };
+
+}
+EOF
+```
+
+Verify `ormenabled` is present:
+
+```bash
+grep "ormenabled" /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
+```
+
+::image-box
+---
+:src: __static__/terminal-app-cfc-orm-enabled-v1.png
+:alt: Terminal showing the sudo tee command writing Application.cfc with ormenabled=true and ormsettings, followed by the grep confirming the ormenabled line is present
+:max-width: 860px
+---
+_`Application.cfc` with ORM enabled — Hibernate will now manage entity mapping for this application._
+::
 
 ::simple-task
 ---
@@ -141,13 +195,47 @@ _Use ORM for domain-model CRUD, `cfquery` for reporting and complex JOINs — th
 :name: verify_orm_enabled
 ---
 #active
-Add `this.ormenabled = true` to `Application.cfc`.
+Run the `sudo tee` command above to update `Application.cfc` with `this.ormenabled = true` and `ormsettings`.
 
 #completed
 ORM is enabled in `Application.cfc`. ✓
 ::
 
-2. Create `Ticket.cfc` with `persistent="true"` mapped to `hd_tickets`.
+---
+
+## Activity 2 — Create a persistent entity CFC
+
+**Activity:** Create `Ticket.cfc` — a persistent entity mapped to the existing `hd_tickets` table:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/Ticket.cfc << 'EOF'
+component persistent="true" table="hd_tickets" {
+
+  property name="id"          fieldtype="id"  generator="native";
+  property name="title"       ormtype="string";
+  property name="description" ormtype="string";
+  property name="status"      ormtype="string" default="open";
+  property name="priority"    ormtype="string" default="medium";
+  property name="category"    ormtype="string";
+
+}
+EOF
+```
+
+Verify the file was created with `persistent="true"`:
+
+```bash
+grep "persistent" /opt/coldfusion2025/cfusion/wwwroot/Ticket.cfc
+```
+
+::image-box
+---
+:src: __static__/terminal-ticket-cfc-persistent-v1.png
+:alt: Terminal showing the sudo tee command writing Ticket.cfc with persistent="true" and property declarations, followed by grep confirming persistent="true" is in the file
+:max-width: 860px
+---
+_`Ticket.cfc` as a Hibernate entity — `persistent="true"` and `table="hd_tickets"` map it to the existing Help Desk table._
+::
 
 ::simple-task
 ---
@@ -155,17 +243,88 @@ ORM is enabled in `Application.cfc`. ✓
 :name: verify_entity_exists
 ---
 #active
-Create a CFC with `persistent="true"` mapped to `hd_tickets`.
+Run the `sudo tee` command above to create `Ticket.cfc` with `persistent="true"` mapped to `hd_tickets`.
 
 #completed
-At least one persistent ORM entity CFC found. ✓
+Persistent ORM entity CFC found. ✓
 ::
 
-3. Create `orm_test.cfm` that loads all open tickets with `entityLoad` and verify:
+---
+
+## Activity 3 — Load entities and run an HQL query
+
+**Activity:** Create `orm_test.cfm` — a page that uses `entityLoad` and `ORMExecuteQuery` to read tickets through Hibernate:
 
 ```bash
-curl -s http://localhost:8500/orm_test.cfm | grep -vi "error\|exception"
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/orm_test.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ORM Test</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 820px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .result { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion Hibernate ORM — Test</h1>
+
+  <cfscript>
+    // entityLoad — load all open tickets via ORM
+    openTickets = entityLoad("Ticket", { status: "open" }, "title asc");
+
+    // ORMExecuteQuery — HQL count of high priority tickets
+    highCount = ORMExecuteQuery(
+      "SELECT COUNT(*) FROM Ticket WHERE priority = :p",
+      { p: "high" },
+      true
+    );
+  </cfscript>
+
+  <div class="result">
+    <strong>entityLoad:</strong> <cfoutput>#arrayLen(openTickets)#</cfoutput> open ticket(s) loaded via ORM<br>
+    <strong>HQL COUNT:</strong> <cfoutput>#highCount#</cfoutput> high priority ticket(s)
+  </div>
+
+  <h2>Open Tickets (via entityLoad)</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Priority</th><th>Category</th></tr>
+    <cfoutput>
+      <cfloop array="#openTickets#" index="t">
+        <tr>
+          <td>#t.getId()#</td>
+          <td>#encodeForHTML(t.getTitle())#</td>
+          <td>#encodeForHTML(t.getPriority())#</td>
+          <td>#encodeForHTML(t.getCategory())#</td>
+        </tr>
+      </cfloop>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+EOF
 ```
+
+Open `/orm_test.cfm` in the **ColdFusion 2025** browser tab. You should see a count of open tickets loaded by Hibernate and the high priority count from HQL.
+
+```bash
+curl -s http://localhost:8500/orm_test.cfm | grep -i "entityload"
+```
+
+::image-box
+---
+:src: __static__/browser-orm-test-v1.png
+:alt: Browser showing orm_test.cfm with a blue result box showing the entityLoad count and HQL COUNT result, and a table below listing open tickets with their ID, title, priority, and category loaded via Hibernate ORM
+:max-width: 860px
+---
+_`orm_test.cfm` — tickets loaded via `entityLoad` and counted via HQL `ORMExecuteQuery`._
+::
 
 ::simple-task
 ---
@@ -173,17 +332,11 @@ curl -s http://localhost:8500/orm_test.cfm | grep -vi "error\|exception"
 :name: verify_orm_page
 ---
 #active
-Create `orm_test.cfm` that calls `entityLoad` — must return no errors.
+Run the `sudo tee` command above to create `orm_test.cfm`, then open `/orm_test.cfm` in the browser to confirm Hibernate loads the tickets without errors.
 
 #completed
-`orm_test.cfm` runs without errors. ✓
+`orm_test.cfm` runs without errors — ORM is working. ✓
 ::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -199,10 +352,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.orm_entity_4c08a96a
----
 ::

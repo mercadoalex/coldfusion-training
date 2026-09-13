@@ -29,7 +29,7 @@ tasks:
     user: laborant
     run: |
       FILE="/opt/coldfusion2025/cfusion/wwwroot/Application.cfc"
-      if ! grep -q "ormenabled\|ormEnabled" "${FILE}" 2>/dev/null; then
+      if ! grep -qi "ormenabled" "${FILE}" 2>/dev/null; then
         echo "ORM is not enabled in Application.cfc (missing ormenabled=true)"
         exit 1
       fi
@@ -54,6 +54,11 @@ tasks:
     needs:
       - verify_entity_exists
     run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/orm_test.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "orm_test.cfm not found (got ${STATUS})"
+        exit 1
+      fi
       BODY=$(curl -s http://localhost:8500/orm_test.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "orm_test.cfm is throwing an error"
@@ -61,14 +66,12 @@ tasks:
       fi
       echo "ORM test page runs without errors"
 
-
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_orm_page
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  orm_entity_4c08a96a: {}
 
 ---
