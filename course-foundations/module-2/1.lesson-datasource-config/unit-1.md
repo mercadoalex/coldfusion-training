@@ -19,6 +19,32 @@ _A datasource is a named JDBC connection pool — pages reference it by name, th
 
 The `training_db` datasource is pre-configured in CF Admin on first boot. It is an embedded H2 database pre-seeded with a **Help Desk schema**.
 
+::hint-box
+---
+:summary: What is an embedded H2 database?
+---
+
+**H2** is a relational database engine written entirely in Java. "Embedded" means it runs **inside the same JVM process as ColdFusion** — there is no separate database server to install, start, or connect to over a network. The database file lives on disk alongside the application.
+
+**Why H2 for training?**
+
+| Property | H2 (embedded) | MySQL / PostgreSQL (external) |
+|---|---|---|
+| Setup | Zero — ships with ColdFusion | Requires a separate install and service |
+| Network | None — in-process | TCP connection to a server |
+| Performance | Fast for small datasets | Optimised for production workloads |
+| Persistence | File on disk | Dedicated server storage |
+| Use case | Development, testing, training | Production applications |
+
+H2 supports a large subset of standard SQL — `SELECT`, `INSERT`, `UPDATE`, `DELETE`, joins, indexes, transactions — so everything you learn querying `training_db` transfers directly to MySQL or PostgreSQL.
+
+**How ColdFusion connects to it:**
+ColdFusion uses a JDBC driver (`h2-*.jar`, bundled in the CF installation) to open the embedded database file. The datasource definition in CF Admin points to that file path. When CF starts, H2 opens the file and keeps it ready for queries — no separate `service start` command needed.
+
+**In production you would use an external database.** H2 is not recommended for production because it does not support the same level of concurrent write throughput, replication, or operational tooling as MySQL, PostgreSQL, or Microsoft SQL Server. But for learning CFML and SQL, it is ideal — it is always on, always fast, and requires zero administration.
+
+::
+
 | Name | Type | Purpose |
 |---|---|---|
 | `training_db` | H2 embedded | All lab exercises |
