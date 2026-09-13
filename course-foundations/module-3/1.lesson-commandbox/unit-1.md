@@ -102,18 +102,67 @@ _`server.json` pins the engine version and port — reproducible server config c
 
 ## `box.json` — project package descriptor
 
-`box.json` is CommandBox's equivalent of `package.json` — it describes your project and its dependencies:
+`box.json` is CommandBox's equivalent of `package.json` for Node or `composer.json` for PHP. It sits at the **root of your project** and answers three questions:
+
+- **What is this project?** — name, version, author, description
+- **What does it depend on?** — ForgeBox packages and their version constraints
+- **How is it built/tested?** — custom scripts you can run with `box run-script`
+
+**One `box.json` per project** — you have exactly one at the project root. If you have multiple CFML applications in subdirectories, each gets its own `box.json`.
 
 ```json
 {
   "name": "helpdesk-app",
   "version": "1.0.0",
+  "author": "Hungry Minds Training",
+  "description": "ColdFusion 2025 Help Desk application",
   "dependencies": {
+    "cbvalidation": "^4.0.0",
+    "hyper": "^4.0.0"
+  },
+  "devDependencies": {
     "testbox": "^5.0.0",
-    "cbvalidation": "^4.0.0"
+    "mockbox": "^3.0.0"
+  },
+  "scripts": {
+    "test": "testbox run"
   }
 }
 ```
+
+**`dependencies` vs `devDependencies`** — just like npm:
+
+| Key | When installed | Examples |
+|---|---|---|
+| `dependencies` | Always — production and development | cbvalidation, Hyper, cbsecurity |
+| `devDependencies` | Development only — skipped with `box install --production` | TestBox, MockBox |
+
+**The `box install` workflow:**
+
+```bash
+# Install everything in box.json (first checkout or after pulling from git)
+box install
+
+# Add a package and save it to box.json dependencies
+box install cbvalidation --save
+
+# Add a dev-only package
+box install testbox --saveDev
+
+# Install production dependencies only
+box install --production
+```
+
+All packages land in `{webroot}/modules/` — never commit that folder to git, just like `node_modules`. Add `modules/` to your `.gitignore` and let `box install` recreate it from `box.json`.
+
+**Version constraints follow semantic versioning:**
+
+| Constraint | Meaning |
+|---|---|
+| `^4.0.0` | Any 4.x.x — minor and patch updates allowed |
+| `~4.1.0` | Any 4.1.x — patch updates only |
+| `4.0.0` | Exact version only |
+| `>=4.0.0` | 4.0.0 or higher |
 
 Run `box install` to install all declared dependencies into `{webroot}/modules/`.
 
