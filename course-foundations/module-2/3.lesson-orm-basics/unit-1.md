@@ -10,6 +10,52 @@ name: orm-basics-hibernate-unit-1
 
 ColdFusion ships with **Hibernate** as its built-in ORM layer. Mark a CFC as `persistent="true"` and ColdFusion automatically maps it to a database table, generates getter/setter methods, and provides CRUD functions — no SQL DDL required.
 
+::details-box
+---
+:summary: What is Hibernate? (the engine behind ColdFusion ORM)
+---
+
+::image-box
+---
+:src: __static__/hibernate-logo-v1.png
+:alt: Hibernate ORM logo — the orange and white Hibernate wordmark with the tagline "Relational Persistence for Idiomatic Java"
+:max-width: 300px
+---
+_Hibernate — the most widely used Java ORM framework, bundled inside ColdFusion._
+::
+
+**Hibernate** is an open-source Java ORM (Object-Relational Mapping) framework originally released in 2001 by Gavin King. It is now maintained by Red Hat / JBoss and is one of the most widely deployed Java frameworks in the world. ColdFusion has bundled Hibernate since ColdFusion 9 (2009).
+
+**What Hibernate does:**
+Hibernate sits between your application code and the database. Instead of writing SQL manually, you define how your objects (CFCs in ColdFusion's case) map to database tables, and Hibernate generates and executes the SQL for you — selects, inserts, updates, deletes, joins, and even schema creation.
+
+**Key Hibernate concepts you will encounter in ColdFusion:**
+
+| Concept | What it means |
+|---|---|
+| **Entity** | A CFC with `persistent="true"` — maps to one database table |
+| **Session** | Hibernate's unit of work — CF manages this per-request automatically |
+| **HQL** | Hibernate Query Language — SQL-like but uses entity/property names |
+| **Lazy loading** | Related entities are loaded from the DB only when accessed |
+| **First-level cache** | Hibernate caches loaded entities within a session — repeated `entityLoadByPK` calls for the same ID don't hit the DB twice |
+| **Dirty checking** | Hibernate tracks changes to loaded entities — calling `entitySave()` only issues an UPDATE if properties actually changed |
+
+**Hibernate versions in ColdFusion:**
+
+| CF Version | Hibernate version |
+|---|---|
+| ColdFusion 9–10 | Hibernate 3.x |
+| ColdFusion 11–2016 | Hibernate 4.x |
+| ColdFusion 2018–2021 | Hibernate 5.x |
+| ColdFusion 2023–2025 | Hibernate 6.x |
+
+**Why does the version matter?** HQL syntax, lazy loading behaviour, and some mapping annotations changed between major versions. If you find older ColdFusion ORM examples online that behave differently, the Hibernate version is usually why.
+
+**Hibernate vs JPA:**
+Hibernate implements the **JPA** (Jakarta Persistence API) standard. JPA is the specification; Hibernate is the implementation. ColdFusion exposes Hibernate's native API (`entityLoad`, `ORMExecuteQuery`, etc.) rather than the raw JPA API, but under the hood it is all Hibernate.
+
+::
+
 ::image-box
 ---
 :src: __static__/orm-entity-to-table-mapping-v1.png
