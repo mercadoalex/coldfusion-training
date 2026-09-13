@@ -8,45 +8,73 @@ name: commandbox-cli-server-management-unit-1
 
 ## What is CommandBox?
 
+CommandBox is the **package manager, CLI, and embedded server** for the CFML ecosystem. Think of it as `npm` + `node` for ColdFusion — one tool that installs ForgeBox packages, manages Lucee/Adobe CF server instances, runs test suites, and provides a CFML REPL, all from the terminal.
+
 ::image-box
 ---
 :src: __static__/commandbox-ecosystem-overview-v1.png
-:alt: Diagram showing CommandBox at the centre of three connected roles — on the left "Package Manager" with an arrow to ForgeBox logo and label "install cbvalidation, testbox, coldbox from forgebox.io"; on the right "Server Manager" with an arrow to Lucee and Adobe CF engine logos and label "box server start"; below "CLI & REPL" with a terminal icon and label "box run-script, box testbox run" — all three arrows meet at the central CommandBox logo
+:alt: Diagram showing CommandBox at the centre of three connected roles — on the left "Package Manager" pointing to ForgeBox with label "install cbvalidation, testbox, coldbox"; on the right "Server Manager" pointing to Lucee and Adobe CF logos with label "box server start"; below "CLI and REPL" with a terminal icon and label "box run-script, box testbox run" — all three arrows meet at the central CommandBox logo
 :max-width: 860px
 ---
 _CommandBox is package manager + embedded server + CLI in one tool — the `npm` + `node` of the CFML world._
 ::
 
-CommandBox is the **package manager, CLI, and embedded server** for the CFML ecosystem. Think of it as `npm` + `node` for ColdFusion. It manages Lucee server instances, installs ForgeBox packages, and runs TestBox test suites — all from the terminal.
-
-In your lab environment, `box` is already on the PATH and Lucee is running on port **8888** via a systemd service.
+In this lab environment, `box` is already on the PATH and a Lucee 7 server is running on port **8888** via a systemd service. You do not need to install or start anything — CommandBox is ready to use.
 
 ---
 
-## Basic commands
+## The `box` command
+
+Everything in CommandBox goes through the `box` command. You can run single commands inline or drop into the interactive shell:
 
 ```bash
-# Start the default Lucee server on port 8888
+# Run a single command inline
+box version
+box server list
+
+# Drop into the interactive CommandBox shell (exit with 'exit')
+box
+```
+
+::hint-box
+---
+:summary: Running box commands — inline vs interactive shell
+---
+
+**Inline** (`box <command>`) — runs one command and returns to the system shell. Best for scripting and quick lookups.
+
+**Interactive shell** (`box` with no arguments) — drops you into a persistent CommandBox prompt with tab-completion, command history, and coloured output. Type `exit` or press `Ctrl+D` to leave.
+
+In this lesson all commands are shown in inline form so they work directly in the terminal without entering and exiting the shell.
+
+::
+
+---
+
+## Server management
+
+```bash
+# Check the status of running servers
+box server list
+
+# Start a server (picks up server.json if present)
 box server start
 
-# Start with a specific engine and port
+# Start with explicit options — engine, port, no browser
 box server start cfengine=lucee@7.0.4.34 port=8888 openbrowser=false
 
-# Check status
+# Stop a named server
+box server stop name=hungry-minds-training
+
+# Get detailed info about a running server
 box server info
-
-# Stop server
-box server stop
-
-# List running servers
-box server list
 ```
 
 ---
 
-## server.json — server configuration file
+## `server.json` — server configuration file
 
-Persist your server settings in `server.json` at the project root:
+Persist server settings in a `server.json` file at the project root so any developer starts an identical server with just `box server start`:
 
 ```json
 {
@@ -61,23 +89,20 @@ Persist your server settings in `server.json` at the project root:
 }
 ```
 
-When `server.json` exists, running `box server start` picks up all settings automatically.
-
----
-
-## box.json — project metadata
-
 ::image-box
 ---
 :src: __static__/commandbox-server-json-anatomy-v1.png
-:alt: Annotated JSON snippet showing a server.json file — the "name" field is labelled "human-readable server label", "web.http.port" is labelled "port to listen on", "app.cfengine" is labelled "engine + version pin (e.g. lucee@7.0.4.34)", and "app.webroot" is labelled "path to serve files from" — each label is connected to its JSON key by a coloured callout line
+:alt: Annotated JSON snippet of a server.json file — the "name" field is labelled "human-readable server label", "web.http.port" is labelled "port to listen on", "app.cfengine" is labelled "engine and version pin lucee@7.0.4.34", and "app.webroot" is labelled "path to serve files from" — each label connected to its JSON key by a coloured callout line
 :max-width: 860px
 ---
-_`server.json` pins the engine version and port so any developer or CI environment starts identical servers._
+_`server.json` pins the engine version and port — reproducible server config checked into source control._
 ::
 
+---
 
-`box.json` is the package descriptor (like `package.json` for Node):
+## `box.json` — project package descriptor
+
+`box.json` is CommandBox's equivalent of `package.json` — it describes your project and its dependencies:
 
 ```json
 {
@@ -90,52 +115,75 @@ _`server.json` pins the engine version and port so any developer or CI environme
 }
 ```
 
-Run `box install` to install all declared dependencies into the project.
+Run `box install` to install all declared dependencies into `{webroot}/modules/`.
 
+::details-box
+---
+:summary: ForgeBox — the CFML package registry
 ---
 
-## Install packages
+**ForgeBox** ([forgebox.io](https://forgebox.io)) is the public package registry for the CFML ecosystem — the equivalent of npm for JavaScript or Packagist for PHP. CommandBox is the client that installs packages from ForgeBox.
+
+**What lives on ForgeBox:**
+
+| Category | Examples |
+|---|---|
+| Testing | TestBox, MockBox |
+| Validation | cbvalidation |
+| MVC frameworks | ColdBox, FW/1 |
+| ORM / data | cborm, Quick ORM |
+| Security | cbsecurity, BCrypt |
+| Utilities | cfcollection, Hyper (HTTP client) |
+
+**Installing packages:**
 
 ```bash
-# Install a single package from ForgeBox
-box install cbvalidation
+# Install latest version
+box install testbox
 
-# Install a specific version
+# Install specific version
 box install coldbox@6.9.0
+
+# Install and save to box.json dependencies
+box install cbvalidation --saveDev
 
 # List installed packages
 box list
 ```
 
-Packages land in `{webroot}/modules/` by default.
+Packages install into `{webroot}/modules/` by default. The `box.json` file tracks what is installed so teammates can run `box install` to reproduce the same environment.
+
+**ForgeBox vs Maven/npm:**
+ForgeBox is smaller than npm (thousands of packages vs millions) but covers the CFML ecosystem well. Adobe ColdFusion does not use ForgeBox directly — it is primarily the Lucee/ColdBox community ecosystem. However, CommandBox can also manage Adobe CF server installs using the `adobe` engine identifier (`cfengine=adobe@2025`).
+
+::
 
 ---
 
-## Useful shortcuts
+## Activity 1 — Verify CommandBox is installed and check the version
 
-```bash
-# Open the CommandBox REPL
-box
-
-# Check CommandBox version
-box version
-
-# Update CommandBox itself
-box update --system
-
-# Run a one-liner
-box "server list --running"
-```
-
----
-
-## Exercises
-
-1. Verify CommandBox is installed:
+**What you are doing:** Confirm `box` is on the PATH and check its version. In the **Terminal** tab, run:
 
 ```bash
 box version
 ```
+
+You should see output like `CommandBox CLI v6.x.x` — the exact version installed in this environment.
+
+Also check what servers CommandBox knows about:
+
+```bash
+box server list
+```
+
+::image-box
+---
+:src: __static__/terminal-box-version-v1.png
+:alt: Terminal showing the box version command returning CommandBox CLI version number, followed by box server list showing the running Lucee server entry with its name, status, and port
+:max-width: 860px
+---
+_`box version` confirms CommandBox is installed — `box server list` shows the Lucee server already running in this environment._
+::
 
 ::simple-task
 ---
@@ -143,17 +191,40 @@ box version
 :name: verify_box_installed
 ---
 #active
-Confirm CommandBox is on the PATH: `box version`
+Run `box version` in the Terminal to confirm CommandBox is installed and on the PATH.
 
 #completed
 CommandBox (`box`) is installed. ✓
 ::
 
-2. Confirm the Lucee server is running on port 8888:
+---
+
+## Activity 2 — Confirm the Lucee server is running on port 8888
+
+**What you are doing:** The Lucee 7 server started by CommandBox is already running on port **8888** via a systemd service. Confirm it is responding correctly.
+
+In the **Terminal** tab, run:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm
 ```
+
+You should see **HTTP 200**. Then open the **Lucee Dev Server** browser tab to see the running application.
+
+Also check the server status from CommandBox:
+
+```bash
+box server info
+```
+
+::image-box
+---
+:src: __static__/terminal-lucee-server-running-v1.png
+:alt: Terminal showing the curl command returning HTTP 200 for localhost port 8888, followed by box server info output showing the server name, engine version, port, and status as running
+:max-width: 860px
+---
+_HTTP 200 on port 8888 confirms the Lucee server is up — `box server info` shows the engine version and webroot._
+::
 
 ::simple-task
 ---
@@ -161,17 +232,48 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm
 :name: verify_server_running
 ---
 #active
-The CommandBox Lucee server must be responding on port 8888.
+Run `curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm` in the Terminal. Confirm it returns HTTP 200.
 
 #completed
-CommandBox server is running on port 8888. ✓
+Lucee server is running on port 8888. ✓
 ::
 
-3. Create `/home/laborant/app/box.json` to initialise the CommandBox project:
+---
+
+## Activity 3 — Initialise the project with `box.json`
+
+**What you are doing:** Create a `box.json` file in the app directory to register it as a CommandBox project. This is the equivalent of `npm init` — it records the project name, version, and any dependencies.
+
+**File to create:** `/home/laborant/app/box.json`
+
+In the **Terminal** tab, run:
+
+```bash
+sudo tee /home/laborant/app/box.json << 'EOF'
+{
+  "name": "helpdesk-app",
+  "version": "1.0.0",
+  "author": "Hungry Minds Training",
+  "description": "ColdFusion 2025 Foundations — Help Desk training application",
+  "dependencies": {}
+}
+EOF
+```
+
+Verify the file was created:
 
 ```bash
 cat /home/laborant/app/box.json
 ```
+
+::image-box
+---
+:src: __static__/terminal-box-json-created-v1.png
+:alt: Terminal showing the sudo tee command writing box.json, followed by cat displaying its contents — name helpdesk-app, version 1.0.0, author Hungry Minds Training, description, and empty dependencies object
+:max-width: 860px
+---
+_`box.json` initialised — the project is now a CommandBox-managed package with a name, version, and dependency manifest._
+::
 
 ::simple-task
 ---
@@ -179,17 +281,11 @@ cat /home/laborant/app/box.json
 :name: verify_box_json
 ---
 #active
-Create `/home/laborant/app/box.json` to initialise the CommandBox project.
+Run the `sudo tee` command above to create `/home/laborant/app/box.json`, then run `cat /home/laborant/app/box.json` to confirm the file exists.
 
 #completed
 `box.json` found — CommandBox project is initialised. ✓
 ::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -205,10 +301,4 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
-::
-
-::card
----
-:challenge: challenges.commandbox_server_9bac5899
----
 ::

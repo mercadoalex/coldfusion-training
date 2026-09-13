@@ -23,6 +23,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  commandbox_server_9bac5899: {}
+
 tasks:
   verify_box_installed:
     machine: dev-machine
@@ -42,10 +45,10 @@ tasks:
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm)
       if [ "${STATUS}" != "200" ]; then
-        echo "CommandBox server is not running on port 8888 (got ${STATUS})"
+        echo "Lucee server is not running on port 8888 (got ${STATUS})"
         exit 1
       fi
-      echo "CommandBox server is running on port 8888"
+      echo "Lucee server is running on port 8888"
 
   verify_box_json:
     machine: dev-machine
@@ -53,20 +56,18 @@ tasks:
     needs:
       - verify_server_running
     run: |
-      if [ ! -f "/home/laborant/app/box.json" ] && [ ! -f "/home/laborant/app/box.json" ]; then
-        echo "box.json not found — project not initialized with CommandBox"
+      if [ ! -f "/home/laborant/app/box.json" ]; then
+        echo "box.json not found at /home/laborant/app/box.json"
         exit 1
       fi
-      echo "box.json found — CommandBox project is initialized"
-
+      echo "box.json found — CommandBox project is initialised"
 
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_box_json
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  commandbox_server_9bac5899: {}
 
 ---
