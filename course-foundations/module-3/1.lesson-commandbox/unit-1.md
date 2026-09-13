@@ -158,6 +158,28 @@ ForgeBox is smaller than npm (thousands of packages vs millions) but covers the 
 
 ::
 
+::hint-box
+---
+:summary: Most commonly used ForgeBox packages — what they do
+---
+
+| Package | What it does |
+|---|---|
+| **TestBox** | BDD/TDD testing framework — the standard way to write unit and integration tests in CFML |
+| **MockBox** | Mocking library — creates mock objects and stubs for testing |
+| **ColdBox** | The most popular MVC framework for ColdFusion/Lucee — routing, interceptors, DI container |
+| **cbvalidation** | Validates structs, forms, and model objects with declarative rules |
+| **cbsecurity** | Authentication and authorisation framework |
+| **cborm** | Enhanced ORM layer on top of ColdFusion's built-in Hibernate ORM |
+| **Quick ORM** | ActiveRecord-style ORM — simpler alternative to native CF ORM |
+| **Hyper** | HTTP client — makes REST API calls cleanly from CFML |
+| **BCrypt** | Password hashing — industry-standard bcrypt implementation for CFML |
+| **cfcollection** | Functional collection helpers — `map`, `filter`, `reduce` for queries and arrays |
+
+They install into `{webroot}/modules/` and your app loads them via `Application.cfc` or the ColdBox module system. All are one `box install <name>` away.
+
+::
+
 ---
 
 ## Activity 1 — Verify CommandBox is installed and check the version
