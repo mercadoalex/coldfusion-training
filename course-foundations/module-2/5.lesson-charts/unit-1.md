@@ -60,7 +60,7 @@ _Available `cfchartseries` types — choose based on whether you are comparing c
   chartheight = "400"       <!-- height in pixels -->
   title       = "My Chart"  <!-- heading displayed above the chart -->
   show3d      = "false"     <!-- true adds a 3D perspective effect -->
-  bgcolor     = "##ffffff"  <!-- background colour (## escapes # in CFML) -->
+  backgroundColor     = "##ffffff"  <!-- background colour (## escapes # in CFML) -->
   name        = "myChart"   <!-- capture to variable instead of inline output -->
 >
 ```
@@ -70,7 +70,7 @@ _Available `cfchartseries` types — choose based on whether you are comparing c
 :summary: Why does the colour attribute use ## instead of #? (CFML expression escaping)
 ---
 
-In CFML, `#` is the delimiter for expressions — `#myVar#` outputs the value of `myVar`. Inside a tag attribute, a literal `#` sign must be escaped by doubling it: `##`. So `bgcolor="##ffffff"` means the literal colour `#ffffff`, not a variable named `ffffff`. You will see this pattern throughout `cfchart` colour attributes.
+In CFML, `#` is the delimiter for expressions — `#myVar#` outputs the value of `myVar`. Inside a tag attribute, a literal `#` sign must be escaped by doubling it: `##`. So `backgroundColor="##ffffff"` means the literal colour `#ffffff`, not a variable named `ffffff`. You will see this pattern throughout `cfchart` colour attributes.
 
 ::
 
@@ -213,7 +213,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm << 'EOF'
 
   <cfchart format="png" chartwidth="600" chartheight="380"
            title="Open Tickets by Priority" show3d="false"
-           bgcolor="##ffffff">
+           backgroundColor="##ffffff">
     <cfchartseries type="bar" query="byPriority"
                    itemcolumn="priority" valuecolumn="total"
                    seriescolor="##3b82d4" serieslabel="Open tickets">
@@ -292,7 +292,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm << 'EOF'
 
   <cfchart format="png" chartwidth="600" chartheight="380"
            title="Open Tickets by Priority" show3d="false"
-           bgcolor="##ffffff">
+           backgroundColor="##ffffff">
     <cfchartseries type="bar" query="byPriority"
                    itemcolumn="priority" valuecolumn="total"
                    seriescolor="##3b82d4" serieslabel="Open tickets">
@@ -310,7 +310,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm << 'EOF'
 
   <cfchart format="png" chartwidth="500" chartheight="400"
            title="All Tickets by Status" show3d="false"
-           bgcolor="##ffffff">
+           backgroundColor="##ffffff">
     <cfchartseries type="pie" query="byStatus"
                    itemcolumn="status" valuecolumn="total">
     </cfchartseries>
