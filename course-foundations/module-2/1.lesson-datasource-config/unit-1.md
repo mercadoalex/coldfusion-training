@@ -459,8 +459,8 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm << 'EOF'
     // ── Step 1: ONE database query — fetch everything ──────────────────────
     allTickets = queryExecute(
       "SELECT t.id, t.title, t.status, t.priority, t.category,
-              (SELECT name FROM hd_users WHERE id = t.requester_id) AS requester,
-              (SELECT name FROM hd_users WHERE id = t.assigned_to)  AS assignee
+              (SELECT full_name FROM hd_users WHERE id = t.requester_id) AS requester,
+              (SELECT full_name FROM hd_users WHERE id = t.assignee_id)  AS assignee
        FROM   hd_tickets t
        ORDER  BY t.id DESC",
       {},
