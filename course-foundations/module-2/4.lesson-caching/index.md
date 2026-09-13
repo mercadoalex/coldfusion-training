@@ -23,53 +23,62 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  caching_10837ff1: {}
+
 tasks:
-  verify_cache_page:
+  verify_query_cache:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/cache_demo.cfm)
-      if [ "${STATUS}" != "200" ]; then
-        echo "cache_demo.cfm not found (got ${STATUS})"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
+      if [ ! -f "${FILE}" ]; then
+        echo "cache_demo.cfm not found"
         exit 1
       fi
-      echo "cache_demo.cfm is accessible"
+      if ! grep -qi "cachedwithin" "${FILE}" 2>/dev/null; then
+        echo "No cachedwithin query caching found in cache_demo.cfm"
+        exit 1
+      fi
+      echo "Query caching with cachedwithin is present"
 
-  verify_cache_used:
+  verify_app_cache:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_query_cache
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
+      if ! grep -qi "cacheput\|cacheget" "${FILE}" 2>/dev/null; then
+        echo "No cacheGet/cachePut application caching found in cache_demo.cfm"
+        exit 1
+      fi
+      echo "Application caching with cacheGet/cachePut is present"
+
+  verify_cache_page:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_app_cache
+    run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/cache_demo.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "cache_demo.cfm not accessible (got ${STATUS})"
+        exit 1
+      fi
+      BODY=$(curl -s http://localhost:8500/cache_demo.cfm)
+      if echo "${BODY}" | grep -qi "error\|exception"; then
+        echo "cache_demo.cfm is throwing an error"
+        exit 1
+      fi
+      echo "cache_demo.cfm runs cleanly and returns HTTP 200"
+
+  verify_lesson_complete:
     machine: dev-machine
     user: laborant
     needs:
       - verify_cache_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
-      if ! grep -qi "cfcache\|cacheput\|cacheget\|cachedwithin" "${FILE}" 2>/dev/null; then
-        echo "No caching directives found in cache_demo.cfm"
-        exit 1
-      fi
-      echo "Caching directives are present"
-
-  verify_cache_no_error:
-    machine: dev-machine
-    user: laborant
-    needs:
-      - verify_cache_used
-    run: |
-      curl -s http://localhost:8500/cache_demo.cfm > /dev/null
-      BODY=$(curl -s http://localhost:8500/cache_demo.cfm)
-      if echo "${BODY}" | grep -qi "error\|exception"; then
-        echo "cache_demo.cfm throwing error on second request"
-        exit 1
-      fi
-      echo "Cache demo page returns clean on repeated requests"
-
-
-  verify_lesson_complete:
-    machine: dev-machine
-    user: laborant
-    run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  caching_10837ff1: {}
 
 ---
