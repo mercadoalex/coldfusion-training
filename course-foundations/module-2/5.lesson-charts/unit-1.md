@@ -67,7 +67,7 @@ _Available `cfchartseries` types — choose based on whether you are comparing c
 
 ::hint-box
 ---
-:summary: Why ## instead of # for colours?
+:summary: Why does the colour attribute use ## instead of #? (CFML expression escaping)
 ---
 
 In CFML, `#` is the delimiter for expressions — `#myVar#` outputs the value of `myVar`. Inside a tag attribute, a literal `#` sign must be escaped by doubling it: `##`. So `bgcolor="##ffffff"` means the literal colour `#ffffff`, not a variable named `ffffff`. You will see this pattern throughout `cfchart` colour attributes.
