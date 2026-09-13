@@ -212,7 +212,11 @@ For this training environment, TTL-only is fine. In production, always invalidat
 
 ## Activity 1 — Query caching with `cachedwithin`
 
-**Activity:** In the **Terminal** tab, create `cache_demo.cfm` with a `cachedwithin` query that caches the open-ticket list for 5 minutes:
+You are going to create a new file called `cache_demo.cfm` in the ColdFusion web root. This file does not exist yet — the command below creates it for you.
+
+**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`
+
+In the **Terminal** tab, run the `sudo tee` command below. It writes the full file in one step — no editor needed:
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
@@ -296,7 +300,11 @@ Query caching with `cachedwithin` is present. ✓
 
 ## Activity 2 — Application cache with `cacheGet` / `cachePut`
 
-**Activity:** Extend `cache_demo.cfm` to add an application-cache section using `cacheGet` / `cachePut`:
+You are going to **replace** the `cache_demo.cfm` file you created in Activity 1 with an extended version that adds a second section using `cacheGet` / `cachePut`. The `sudo tee` command overwrites the file completely — that is intentional.
+
+**File to overwrite:** `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`
+
+In the **Terminal** tab, run:
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
