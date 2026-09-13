@@ -72,6 +72,27 @@ Also note: `cachedwithin` only works on `<cfquery>` — it does **not** apply to
 
 ColdFusion's built-in **ehcache** layer lets you store any value — a query result, a struct, an array — under a string key with a TTL:
 
+::hint-box
+---
+:summary: What is TTL (Time-To-Live)?
+---
+
+**TTL** stands for **Time-To-Live** — it is the maximum age a cached value is allowed to reach before ColdFusion automatically discards it.
+
+You set a TTL using `createTimeSpan(days, hours, minutes, seconds)`:
+
+```cfml
+createTimeSpan(0, 0, 5, 0)   // 5 minutes
+createTimeSpan(0, 1, 0, 0)   // 1 hour
+createTimeSpan(1, 0, 0, 0)   // 1 day
+```
+
+Once the TTL expires, the next request finds nothing in the cache (a **cache miss**), re-runs the original work, and stores a fresh value with a new TTL. Until then, every request gets the cached copy without touching the database.
+
+A related concept you will see in the ehcache section is **TTI (Time-To-Idle)** — that clock resets every time the cached value is accessed, so a frequently-read entry can stay in cache indefinitely as long as it keeps getting hit.
+
+::
+
 ```cfml
 <cfscript>
   data = cacheGet("openTickets");
