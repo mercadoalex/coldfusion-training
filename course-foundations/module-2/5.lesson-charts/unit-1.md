@@ -247,17 +247,7 @@ Open `/chart_demo.cfm` in the **ColdFusion 2025** browser tab — you should see
 _This error means the Help Desk database has not been seeded yet — the tables exist but contain no data, or the schema was never created._
 ::
 
-This error means the `hd_tickets` table does not exist yet in the H2 database. The `cfchart` query runs fine syntactically but finds no table to query. You need to run the **seed script** first to create the schema and insert the sample data.
-
-**In the browser**, open the lab index page and click **DB Test → Run Seed Script**. Wait for the confirmation screen showing the tables were created and rows inserted, then reload `/chart_demo.cfm`.
-
-Alternatively, from the **Terminal** tab:
-
-```bash
-curl -s http://localhost:8500/seed-db.cfm | grep -i "success\|created\|inserted"
-```
-
-Once the seed script has run successfully, reload `/chart_demo.cfm` and the bar chart will render correctly.
+The database has not been seeded yet. In the **ColdFusion 2025** browser tab, go back to the home page and click the **DB Test** button, then click **Run Seed Script**. Once the confirmation screen appears, reload `/chart_demo.cfm` and the chart will render correctly.
 
 ::
 
