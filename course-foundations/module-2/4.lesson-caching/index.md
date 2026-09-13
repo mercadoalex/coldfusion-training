@@ -73,11 +73,24 @@ tasks:
       fi
       echo "cache_demo.cfm runs cleanly and returns HTTP 200"
 
-  verify_lesson_complete:
+  verify_cache_invalidation:
     machine: dev-machine
     user: laborant
     needs:
       - verify_cache_page
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
+      if ! grep -qi "cacheremove\|cacheremoveall" "${FILE}" 2>/dev/null; then
+        echo "No cacheRemove or cacheRemoveAll found in cache_demo.cfm"
+        exit 1
+      fi
+      echo "Cache invalidation with cacheRemove is present"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_cache_invalidation
     run: |
       echo "Lesson complete — well done!"
 

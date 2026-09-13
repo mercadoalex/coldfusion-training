@@ -498,6 +498,150 @@ Run the two `curl` commands above. Both should return HTTP 200 and the grep shou
 
 ---
 
+## Activity 4 — Invalidate the cache with `cacheRemove`
+
+**What this activity proves:**
+
+You have seen that `cachePut` stores a value and `cacheGet` retrieves it. Now you will prove the other side of the cycle: **explicit invalidation**. After calling `cacheRemove`, the next `cacheGet` for that key returns `null` — a forced cache miss — so ColdFusion re-queries the database and stores a fresh value. This is exactly what you would do in production after a write operation (INSERT, UPDATE, DELETE) to ensure stale data is never served.
+
+**File to update:** `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`
+
+In the **Terminal** tab, overwrite `cache_demo.cfm` with this final version that adds a Section 3 — Cache Invalidation:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ColdFusion Cache Demo</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .box  { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+    .miss { border-left-color: #ef4444; background: #fff0f0; }
+    .hit  { border-left-color: #22c55e; background: #f0fff4; }
+    .warn { border-left-color: #f59e0b; background: #fffbeb; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion Caching Demo</h1>
+
+  <h2>1. Query Cache — cachedwithin</h2>
+
+  <cfquery name="openTickets" datasource="training_db"
+           cachedwithin="#createTimeSpan(0,0,5,0)#">
+    SELECT id, title, status, priority
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    ORDER  BY id DESC
+  </cfquery>
+
+  <div class="box">
+    <strong>cachedwithin query:</strong>
+    <cfoutput>#openTickets.recordCount#</cfoutput> open ticket(s) — cached for 5 minutes
+  </div>
+
+  <h2>2. Application Cache — cacheGet / cachePut</h2>
+
+  <cfscript>
+    cacheKey = "highPriorityTickets";
+    highTickets = cacheGet(cacheKey);
+    cacheHit = !isNull(highTickets);
+
+    if (!cacheHit) {
+      highTickets = queryExecute(
+        "SELECT id, title, priority, category FROM hd_tickets WHERE priority = 'high' ORDER BY id DESC",
+        {},
+        { datasource: "training_db" }
+      );
+      cachePut(cacheKey, highTickets, createTimeSpan(0,0,5,0));
+    }
+  </cfscript>
+
+  <cfoutput>
+  <div class="box #cacheHit ? 'hit' : 'miss'#">
+    <strong>Cache #cacheHit ? 'HIT' : 'MISS'#:</strong>
+    #highTickets.recordCount# high-priority ticket(s) from #cacheHit ? 'cache' : 'database'#
+  </div>
+  </cfoutput>
+
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Priority</th><th>Category</th></tr>
+    <cfoutput query="highTickets">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(priority)#</td>
+        <td>#encodeForHTML(category)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+  <h2>3. Cache Invalidation — cacheRemove</h2>
+
+  <cfscript>
+    // Check if the key exists before invalidation
+    beforeRemove = !isNull(cacheGet("highPriorityTickets"));
+
+    // Invalidate the key
+    cacheRemove("highPriorityTickets");
+
+    // Check immediately after — must be null now
+    afterRemove = isNull(cacheGet("highPriorityTickets"));
+  </cfscript>
+
+  <cfoutput>
+  <div class="box warn">
+    <strong>Before cacheRemove:</strong> key was #beforeRemove ? 'PRESENT in cache' : 'already absent'#<br>
+    <strong>After cacheRemove:</strong> key is #afterRemove ? 'GONE — next request will be a cache miss' : 'still present (unexpected)'#
+  </div>
+  </cfoutput>
+
+</body>
+</html>
+EOF
+```
+
+Now reload `/cache_demo.cfm` twice in the browser:
+
+1. **First reload** — Section 2 shows **Cache HIT** (green) because the key is still warm from before. Section 3 shows **Before: PRESENT** → **After: GONE**.
+2. **Second reload** — Section 2 shows **Cache MISS** (red) again — `cacheRemove` wiped the key so ColdFusion had to re-query the database.
+
+This is the complete invalidation cycle: store → serve from cache → invalidate → forced miss → re-store.
+
+Verify `cacheRemove` is in the file:
+
+```bash
+grep -i "cacheremove" /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm
+```
+
+::image-box
+---
+:src: __static__/browser-cache-invalidation-v1.png
+:alt: Browser showing cache_demo.cfm Section 3 — a yellow warning box reads "Before cacheRemove: key was PRESENT in cache" and "After cacheRemove: key is GONE — next request will be a cache miss", confirming the invalidation worked
+:max-width: 860px
+---
+_Section 3 confirms the invalidation cycle — the key was present, `cacheRemove` wiped it, and the next request is forced back to a cache miss._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cache_invalidation
+---
+#active
+Run the `sudo tee` command above to add Section 3 to `cache_demo.cfm`, then reload the page twice — confirm Section 3 shows the key going from PRESENT to GONE, and that Section 2 shows Cache MISS on the second reload.
+
+#completed
+Cache invalidation with `cacheRemove` is present and verified. ✓
+::
+
+---
+
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
