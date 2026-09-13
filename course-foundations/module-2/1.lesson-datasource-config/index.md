@@ -69,11 +69,34 @@ tasks:
       fi
       echo "Application.cfc found with this.datasource defined"
 
-  verify_lesson_complete:
+  verify_qoq:
     machine: dev-machine
     user: laborant
     needs:
       - verify_app_cfc
+    run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/qoq_demo.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "qoq_demo.cfm not found (got ${STATUS})"
+        exit 1
+      fi
+      BODY=$(curl -s http://localhost:8500/qoq_demo.cfm)
+      if echo "${BODY}" | grep -qi "error\|exception"; then
+        echo "qoq_demo.cfm returned an error"
+        exit 1
+      fi
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm"
+      if ! grep -q "dbtype.*query\|dbtype: .query" "${FILE}" 2>/dev/null; then
+        echo "qoq_demo.cfm does not use dbtype=query (Query of Queries)"
+        exit 1
+      fi
+      echo "Query of Queries demo is working"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_qoq
     run: |
       echo "Lesson complete — well done!"
 

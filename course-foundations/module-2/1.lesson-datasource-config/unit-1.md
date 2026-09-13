@@ -439,6 +439,140 @@ Run the `sudo tee` command above to create `Application.cfc` in the web root wit
 
 ---
 
+## Activity 4 — Query of Queries (QoQ)
+
+**Activity:** Create `qoq_demo.cfm` — a page that fetches all tickets from the database in one query, then uses ColdFusion's Query of Queries feature to filter and sort the results **in memory** without a second database hit:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Query of Queries Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 820px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .badge-high     { color: #c0392b; font-weight: bold; }
+    .badge-medium   { color: #d97706; font-weight: bold; }
+    .badge-low      { color: #16a34a; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Query of Queries — Help Desk Demo</h1>
+
+  <cfscript>
+    // ── Step 1: ONE database query — fetch everything ──────────────────────
+    allTickets = queryExecute(
+      "SELECT t.id, t.title, t.status, t.priority, t.category,
+              u_req.name  AS requester,
+              u_asg.name  AS assignee
+       FROM   hd_tickets t
+       JOIN   hd_users u_req ON t.requester_id  = u_req.id
+       JOIN   hd_users u_asg ON t.assigned_to   = u_asg.id
+       ORDER  BY t.id DESC",
+      {},
+      { datasource: "training_db" }
+    );
+
+    // ── Step 2: QoQ — filter open + high priority (NO database hit) ────────
+    openHighPriority = queryExecute(
+      "SELECT id, title, priority, category, assignee
+       FROM   allTickets
+       WHERE  status   = 'open'
+       AND    priority = 'high'
+       ORDER  BY id DESC",
+      {},
+      { dbtype: "query" }
+    );
+
+    // ── Step 3: QoQ — group count by status (NO database hit) ──────────────
+    statusSummary = queryExecute(
+      "SELECT status, COUNT(id) AS total
+       FROM   allTickets
+       GROUP  BY status
+       ORDER  BY total DESC",
+      {},
+      { dbtype: "query" }
+    );
+  </cfscript>
+
+  <h2>All Tickets — <cfoutput>#allTickets.recordCount#</cfoutput> rows (from DB)</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Status</th><th>Priority</th><th>Assignee</th></tr>
+    <cfoutput query="allTickets">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(status)#</td>
+        <td class="badge-#encodeForHTMLAttribute(priority)#">#encodeForHTML(priority)#</td>
+        <td>#encodeForHTML(assignee)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+  <h2>Open + High Priority — <cfoutput>#openHighPriority.recordCount#</cfoutput> rows (QoQ — no DB hit)</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Category</th><th>Assignee</th></tr>
+    <cfoutput query="openHighPriority">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(category)#</td>
+        <td>#encodeForHTML(assignee)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+  <h2>Tickets by Status — (QoQ — no DB hit)</h2>
+  <table>
+    <tr><th>Status</th><th>Count</th></tr>
+    <cfoutput query="statusSummary">
+      <tr><td>#encodeForHTML(status)#</td><td>#total#</td></tr>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+EOF
+```
+
+Open `/qoq_demo.cfm` in the **ColdFusion 2025** browser tab. You should see:
+- All 10 tickets from the database
+- A filtered list of **open + high priority** tickets — expect 2 rows: **Cannot connect to VPN** and **Payroll export failing**
+- A status summary grouped by status (open, in_progress, resolved) — all derived from the same in-memory result set
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/qoq_demo.cfm
+# Expected: 200
+```
+
+::image-box
+---
+:src: __static__/browser-qoq-demo-v1.png
+:alt: Browser showing qoq_demo.cfm with three tables — the full 10-ticket list from the database, a filtered table showing only open high-priority tickets derived via Query of Queries, and a status summary grouped by status — all from a single database query
+:max-width: 860px
+---
+_One database query, three views — QoQ filters and aggregates the in-memory result without touching the database again._
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_qoq
+---
+#active
+Create `qoq_demo.cfm` using the `sudo tee` command above, then open `/qoq_demo.cfm` in the browser to confirm all three tables render without errors.
+
+#completed
+`qoq_demo.cfm` is accessible and Query of Queries works. ✓
+::
+
+---
+
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
