@@ -101,8 +101,9 @@ fi
 
 # ─── PATH entry for all users ────────────────────────────────────────────────
 cat > /etc/profile.d/commandbox.sh <<'PROFILE'
-# CommandBox CLI — added by cf-training rootfs
-export PATH="$PATH:/usr/bin"
+# CommandBox CLI + ColdFusion bundled JRE — added by cf-training rootfs
+export JAVA_HOME="/opt/coldfusion2025/jre"
+export PATH="$JAVA_HOME/bin:$PATH:/usr/bin"
 PROFILE
 
 # ─── Pre-create runtime directories so chown in Dockerfile Layer 9 covers them ──

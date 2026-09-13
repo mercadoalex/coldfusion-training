@@ -192,6 +192,21 @@ box version
 
 You should see output like `CommandBox CLI v6.x.x` — the exact version installed in this environment.
 
+::hint-box
+---
+:summary: Getting "exec: java: not found"? Run this fix in the Terminal.
+---
+
+CommandBox requires Java to run. This playground uses the JRE bundled with ColdFusion 2025, but it may not be on the PATH for your shell session yet. Fix it with one command:
+
+```bash
+export JAVA_HOME="/opt/coldfusion2025/jre" && export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+Then run `box version` again — it will work. This is a one-time fix for the current session. The next playground rebuild will have Java pre-configured on the PATH permanently.
+
+::
+
 Also check what servers CommandBox knows about:
 
 ```bash
