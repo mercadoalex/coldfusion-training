@@ -444,28 +444,36 @@ Application caching with `cacheGet`/`cachePut` is present. ✓
 
 ---
 
-## Activity 3 — Verify the cache page runs cleanly
+## Activity 3 — Verify the cache is working on repeated requests
 
-**Activity:** Confirm `cache_demo.cfm` returns HTTP 200 with no errors on repeated requests:
+**What this activity proves:**
+
+The first `curl` request is a **cache miss** — ColdFusion has nothing stored yet, so it runs the `cfquery` against the database and calls `cachePut` to store the result. The second `curl` request — sent immediately after — is a **cache hit**: ColdFusion finds the stored value in ehcache and returns it without touching the database at all. Both requests return HTTP 200 and produce identical output, which is exactly how caching should behave. If the cache were broken (wrong key, serialisation error, ORM session conflict), the second request would either throw an exception or return an error page — you would see `error` or `exception` in the output.
+
+In summary: **two clean HTTP 200 responses with identical output and no errors = the cache read/write cycle is working correctly.**
+
+Run the two requests back-to-back in the **Terminal** tab:
 
 ```bash
 curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/cache_demo.cfm
 curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/cache_demo.cfm
 ```
 
-Both requests should return **HTTP 200**. Check for any error output:
+Then confirm there are no errors in the rendered output:
 
 ```bash
 curl -s http://localhost:8500/cache_demo.cfm | grep -i "error\|exception" || echo "No errors found"
 ```
 
+Both status lines should read **HTTP 200** and the grep should return **No errors found**. If you open the page in the browser and refresh, you will also see the Section 2 box switch from red **Cache MISS** to green **Cache HIT** — visual confirmation that the second request was served entirely from ehcache.
+
 ::image-box
 ---
 :src: __static__/terminal-cache-demo-200-v1.png
-:alt: Terminal showing two curl commands each returning HTTP 200, followed by the grep command returning "No errors found" — confirming cache_demo.cfm serves cleanly on repeated requests
+:alt: Terminal showing two curl commands each returning HTTP 200, followed by the grep command returning "No errors found" — confirming cache_demo.cfm serves cleanly on repeated requests with no database errors on the second call
 :max-width: 860px
 ---
-_Two clean HTTP 200 responses — the second request is served entirely from cache._
+_Two HTTP 200 responses with no errors — first request warms the cache, second request is served from ehcache without hitting the database._
 ::
 
 ::simple-task
@@ -474,10 +482,10 @@ _Two clean HTTP 200 responses — the second request is served entirely from cac
 :name: verify_cache_page
 ---
 #active
-Run the two `curl` commands above to confirm `cache_demo.cfm` returns HTTP 200 with no errors on both the first and second request.
+Run the two `curl` commands above. Both should return HTTP 200 and the grep should show no errors — confirming the cache read/write cycle completes without exceptions.
 
 #completed
-`cache_demo.cfm` runs cleanly on repeated requests. ✓
+`cache_demo.cfm` runs cleanly on repeated requests — cache is working. ✓
 ::
 
 ---
