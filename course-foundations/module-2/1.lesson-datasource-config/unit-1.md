@@ -468,11 +468,11 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm << 'EOF'
     // ── Step 1: ONE database query — fetch everything ──────────────────────
     allTickets = queryExecute(
       "SELECT t.id, t.title, t.status, t.priority, t.category,
-              u_req.name  AS requester,
-              u_asg.name  AS assignee
+              ur.name AS requester,
+              ua.name AS assignee
        FROM   hd_tickets t
-       JOIN   hd_users u_req ON t.requester_id  = u_req.id
-       JOIN   hd_users u_asg ON t.assigned_to   = u_asg.id
+       JOIN   hd_users ur ON ur.id = t.requester_id
+       JOIN   hd_users ua ON ua.id = t.assigned_to
        ORDER  BY t.id DESC",
       {},
       { datasource: "training_db" }
