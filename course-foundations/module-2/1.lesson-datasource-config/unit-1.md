@@ -69,15 +69,6 @@ http://localhost:8500/db-test.cfm   ← view raw table data
 
 ## What is a datasource?
 
-::image-box
----
-:src: __static__/cf-admin-datasource-screen-v1.png
-:alt: Screenshot mock-up of the ColdFusion Administrator Data Sources page — a table with columns Name, Driver, Status, and Actions; one row shows "training_db" with driver "H2 Database Engine", status shown as a green checkmark "OK", and action buttons Verify and Edit — styled to match the flat CF Admin UI with a dark sidebar on the left listing menu items
-:max-width: 860px
----
-_CF Admin's Data Sources panel — click Verify to confirm the pool is healthy without writing any CFML._
-::
-
 A ColdFusion datasource is a **named JDBC connection pool**. Pages and components reference it by name — not by connection string. The pool is configured once (in CF Admin or `Application.cfc`) and shared across all requests.
 
 ---
