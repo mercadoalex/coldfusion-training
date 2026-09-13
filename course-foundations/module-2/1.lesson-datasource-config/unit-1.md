@@ -82,6 +82,120 @@ A ColdFusion datasource is a **named JDBC connection pool**. Pages and component
 
 ---
 
+## SQL in ColdFusion
+
+ColdFusion passes SQL directly to the underlying database engine — it does not invent its own query language. This means the full power of SQL is available inside `cfquery` and `queryExecute()`.
+
+**ANSI SQL compliance:** ColdFusion is ANSI SQL-92 compliant through the JDBC driver of the target database. H2, MySQL, PostgreSQL, and SQL Server all support the ANSI standard with their own extensions. Write standard SQL and it works across all of them; use vendor-specific syntax (e.g. `TOP` for MSSQL, `LIMIT` for MySQL/PostgreSQL) when you need database-specific features.
+
+**How complex can a query be?** As complex as the database engine supports — ColdFusion simply passes the SQL string to JDBC. All of the following work inside `cfquery`:
+
+```cfml
+<cfquery name="dashboard" datasource="training_db">
+  SELECT
+    d.name                          AS department,
+    COUNT(t.id)                     AS total_tickets,
+    SUM(CASE WHEN t.status = 'open'     THEN 1 ELSE 0 END) AS open_count,
+    SUM(CASE WHEN t.status = 'closed'   THEN 1 ELSE 0 END) AS closed_count,
+    AVG(DATEDIFF('HOUR', t.created_at, COALESCE(t.closed_at, NOW()))) AS avg_hours
+  FROM       hd_departments d
+  LEFT JOIN  hd_tickets     t ON t.department_id = d.id
+  LEFT JOIN  hd_users       u ON t.assigned_to   = u.id
+  WHERE      t.created_at >= DATEADD('DAY', -30, NOW())
+  GROUP BY   d.id, d.name
+  HAVING     COUNT(t.id) > 0
+  ORDER BY   open_count DESC
+</cfquery>
+```
+
+This single query uses `LEFT JOIN`, `CASE WHEN`, `AVG`, `DATEDIFF`, `COALESCE`, `GROUP BY`, `HAVING`, and `ORDER BY` — all standard SQL, all work in H2 and transfer directly to MySQL or PostgreSQL.
+
+::hint-box
+---
+:summary: Joins, subqueries, CTEs, nested queries — what's supported?
+---
+
+**JOINs** — all standard join types work:
+
+```cfml
+<cfquery name="tickets" datasource="training_db">
+  SELECT t.title, u.name AS assigned_to, d.name AS department
+  FROM   hd_tickets     t
+  JOIN   hd_users       u ON t.assigned_to   = u.id
+  JOIN   hd_departments d ON t.department_id = d.id
+  WHERE  t.status = 'open'
+</cfquery>
+```
+
+**Subqueries** — a `SELECT` inside a `WHERE` or `FROM` clause:
+
+```cfml
+<cfquery name="highPriority" datasource="training_db">
+  SELECT title, priority
+  FROM   hd_tickets
+  WHERE  id IN (
+    SELECT ticket_id
+    FROM   hd_comments
+    WHERE  is_internal = 1
+  )
+</cfquery>
+```
+
+**CTEs (Common Table Expressions)** — supported in H2, MySQL 8+, PostgreSQL, MSSQL:
+
+```cfml
+<cfquery name="summary" datasource="training_db">
+  WITH open_tickets AS (
+    SELECT department_id, COUNT(*) AS cnt
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    GROUP  BY department_id
+  )
+  SELECT d.name, ot.cnt
+  FROM   hd_departments d
+  JOIN   open_tickets   ot ON d.id = ot.department_id
+  ORDER  BY ot.cnt DESC
+</cfquery>
+```
+
+**Nested `cfquery` (query of queries):** ColdFusion has a feature called **Query of Queries (QoQ)** — you can run SQL against the result of a previous `cfquery` entirely in memory, without hitting the database again:
+
+```cfml
+<!--- First query hits the database --->
+<cfquery name="allTickets" datasource="training_db">
+  SELECT id, title, priority, status FROM hd_tickets
+</cfquery>
+
+<!--- Second query runs against the in-memory result — no DB hit --->
+<cfquery name="criticalOnly" dbtype="query">
+  SELECT * FROM allTickets
+  WHERE priority = 'critical'
+  ORDER BY id DESC
+</cfquery>
+
+<cfoutput query="criticalOnly">
+  #title# (#status#)<br>
+</cfoutput>
+```
+
+The key is `dbtype="query"` instead of `datasource="..."` — this tells ColdFusion to treat the named query result as a table.
+
+**Dynamic SQL with `cfqueryparam`:** always use `cfqueryparam` for any variable in a query — it prevents SQL injection and enables prepared statement caching:
+
+```cfml
+<cfquery name="byStatus" datasource="training_db">
+  SELECT id, title FROM hd_tickets
+  WHERE status    = <cfqueryparam value="#status#"    cfsqltype="cf_sql_varchar">
+  AND   priority  = <cfqueryparam value="#priority#"  cfsqltype="cf_sql_varchar">
+</cfquery>
+```
+
+Never interpolate variables directly into SQL strings — `WHERE status = '#status#'` is a SQL injection vulnerability.
+
+::
+
+---
+
 ## Configure in CF Admin
 
 The `training_db` datasource is already set up — no manual steps needed. To inspect it:
