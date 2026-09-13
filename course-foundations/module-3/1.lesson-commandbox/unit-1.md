@@ -194,7 +194,7 @@ You should see output like `CommandBox CLI v6.x.x` — the exact version install
 
 ::hint-box
 ---
-:summary: Getting "exec: java: not found"? Run this fix in the Terminal.
+:summary: Getting exec java not found? Run this fix in the Terminal.
 ---
 
 CommandBox requires Java to run. This playground uses the JRE bundled with ColdFusion 2025, but it may not be on the PATH for your shell session yet. Fix it with one command:
@@ -207,19 +207,13 @@ Then run `box version` again — it will work. This is a one-time fix for the cu
 
 ::
 
-Also check what servers CommandBox knows about:
-
-```bash
-box server list
-```
-
 ::image-box
 ---
 :src: __static__/terminal-box-version-v1.png
-:alt: Terminal showing the box version command returning CommandBox CLI version number, followed by box server list showing the running Lucee server entry with its name, status, and port
+:alt: Terminal showing the box version command returning CommandBox CLI version 6.3.5
 :max-width: 860px
 ---
-_`box version` confirms CommandBox is installed — `box server list` shows the Lucee server already running in this environment._
+_`box version` confirms CommandBox is installed and operational._
 ::
 
 ::simple-task
@@ -238,7 +232,7 @@ CommandBox (`box`) is installed. ✓
 
 ## Activity 2 — Confirm the Lucee server is running on port 8888
 
-**What you are doing:** The Lucee 7 server started by CommandBox is already running on port **8888** via a systemd service. Confirm it is responding correctly.
+**What you are doing:** The Lucee 7 server is already running on port **8888** via a systemd service — it was started automatically when the playground launched, not by `box server start`. Confirm it is responding correctly with a direct HTTP check.
 
 In the **Terminal** tab, run:
 
@@ -248,19 +242,28 @@ curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm
 
 You should see **HTTP 200**. Then open the **Lucee Dev Server** browser tab to see the running application.
 
-Also check the server status from CommandBox:
+::hint-box
+---
+:summary: Why does box server list show nothing?
+---
+
+`box server list` only shows servers that CommandBox itself started with `box server start`. The Lucee server in this playground is managed by **systemd** (`lucee-server.service`) — it started before you logged in and runs independently of CommandBox's server registry. That is why `box server list` returns empty — the server is running, CommandBox just did not start it.
+
+To check the systemd service status directly:
 
 ```bash
-box server info
+systemctl status lucee-server.service
 ```
+
+::
 
 ::image-box
 ---
 :src: __static__/terminal-lucee-server-running-v1.png
-:alt: Terminal showing the curl command returning HTTP 200 for localhost port 8888, followed by box server info output showing the server name, engine version, port, and status as running
+:alt: Terminal showing the curl command returning HTTP 200 for localhost port 8888 confirming the Lucee server is responding
 :max-width: 860px
 ---
-_HTTP 200 on port 8888 confirms the Lucee server is up — `box server info` shows the engine version and webroot._
+_HTTP 200 on port 8888 confirms the Lucee server is up and serving requests._
 ::
 
 ::simple-task
