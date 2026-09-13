@@ -229,6 +229,59 @@ Hibernate Query Language is SQL-like but operates on **entity names**, not table
 </cfscript>
 ```
 
+::details-box
+---
+:summary: Hibernate Query Language (HQL) — deep dive
+---
+
+**HQL** is an object-oriented query language built into Hibernate. It looks like SQL but operates on **persistent objects and their properties** — never on raw table or column names. At runtime, Hibernate translates HQL into database-specific SQL automatically, so the same HQL works on H2, MySQL, PostgreSQL, and Oracle without changes.
+
+**What makes HQL different from SQL:**
+
+| SQL | HQL equivalent | What changed |
+|---|---|---|
+| `FROM student_table` | `FROM Student` | Entity class name, not the table name |
+| `WHERE student_table.dept_id = 1` | `WHERE s.department = :dept` | Property name, not the column name |
+| `JOIN tickets t ON t.assignee = u.id` | `JOIN t.assignee a` | Navigate object relationships — no ON clause needed |
+
+**Supported clauses and features:**
+
+| Feature | Example |
+|---|---|
+| Basic select | `FROM Ticket` |
+| Filtering | `FROM Ticket WHERE status = :s` |
+| Ordering | `FROM Ticket ORDER BY createdAt DESC` |
+| Aggregates | `SELECT COUNT(*), AVG(t.id) FROM Ticket t` |
+| GROUP BY / HAVING | `SELECT t.priority, COUNT(*) FROM Ticket t GROUP BY t.priority HAVING COUNT(*) > 2` |
+| Bulk UPDATE | `UPDATE Ticket SET status = 'closed' WHERE priority = 'low'` |
+| Bulk DELETE | `DELETE FROM Ticket WHERE status = 'resolved' AND priority = 'low'` |
+| Named parameters | `WHERE id = :id` — safe, reusable, no SQL injection |
+| Polymorphic queries | Querying a parent entity returns instances of all mapped subclasses |
+
+**HQL in ColdFusion vs raw Hibernate (Java):**
+
+In Java/Hibernate you call `session.createQuery(hql, Entity.class)` directly. In ColdFusion, the same thing is done with `ORMExecuteQuery()`:
+
+```cfml
+<cfscript>
+  // Equivalent to: session.createQuery("FROM Ticket t WHERE t.id = :id").setParameter("id", 1).getResultList()
+  results = ORMExecuteQuery("FROM Ticket t WHERE t.id = :id", { id: 1 });
+
+  // unique=true → equivalent to getSingleResult() — use for COUNT, MAX, etc.
+  total = ORMExecuteQuery("SELECT COUNT(*) FROM Ticket", {}, true);
+</cfscript>
+```
+
+**HQL vs JPQL:**
+HQL is a **superset of JPQL** (Jakarta Persistence Query Language — the JPA standard). Any valid JPQL query is valid HQL, but HQL adds extra features (bulk DML, non-standard functions, Hibernate-specific extensions) that JPQL does not support. If you see JPQL examples online, they will work in ColdFusion ORM unchanged.
+
+**Key things to remember:**
+- Always use **named parameters** (`:paramName`) — never concatenate values into an HQL string
+- Entity and property names are **case-sensitive** — `FROM ticket` will fail if the entity is named `Ticket`
+- HQL operates on the **Hibernate session** — changes made via bulk UPDATE/DELETE bypass dirty-checking and first-level cache; call `ORMClearAllSession()` after bulk operations if you continue loading entities in the same request
+
+::
+
 ---
 
 ## Activity 1 — Enable ORM in Application.cfc
