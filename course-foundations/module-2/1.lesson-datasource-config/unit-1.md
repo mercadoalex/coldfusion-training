@@ -93,6 +93,26 @@ The `training_db` datasource is already set up — no manual steps needed. To in
 
 You should see a green checkmark and "OK" status.
 
+::hint-box
+---
+:summary: What else is under Data & Services in CF Admin?
+---
+
+The **Data & Services** section of CF Admin is the central hub for configuring every type of external data connection and service integration ColdFusion supports. This course focuses on **Data Sources** — the others are covered in depth in the Advanced ColdFusion courses.
+
+| Option | What it configures | Used with |
+|---|---|---|
+| **Data Sources** | Named JDBC connection pools to relational databases (H2, MySQL, PostgreSQL, MSSQL, Oracle) | `cfquery`, `queryExecute()`, ORM |
+| **NoSQL Sources** | Connections to MongoDB document stores | `cfmongodb`, custom Java integration |
+| **ColdFusion Collections** | Verity full-text search indexes — collections of documents indexed for keyword search | `cfindex`, `cfsearch` |
+| **Solr Server** | Connection to an Apache Solr search server for enterprise full-text search | `cfindex`, `cfsearch` with Solr engine |
+| **Web Services** | Registered WSDL endpoints for SOAP web service consumption | `cfinvoke`, `cfobject` |
+| **REST Services** | Registered ColdFusion REST applications — maps URL paths to CFC-based REST endpoints | `cfrestregistry`, REST CFCs with `restpath` |
+
+**A note on scope:** this lesson covers Data Sources only, because relational databases are the backbone of almost every ColdFusion application. The other integrations — Solr full-text search, SOAP web services, REST registration, and NoSQL — each have their own dedicated lessons in the **Advanced ColdFusion** course track where they are explored hands-on with real examples.
+
+::
+
 ---
 
 ## Activity 1 — Verify the datasource with CFML
