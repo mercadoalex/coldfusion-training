@@ -305,13 +305,24 @@ grep -i "cachedwithin" /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm
 _`cachedwithin` on `<cfquery>` — ColdFusion caches the result set for 5 minutes after the first execution._
 ::
 
+Open `/cache_demo.cfm` in the **ColdFusion 2025** browser tab to confirm the page loads and the ticket count is shown:
+
+::image-box
+---
+:src: __static__/browser-cachedwithin-query-v1.png
+:alt: Browser showing cache_demo.cfm after Activity 1 — a blue info box reads "cachedwithin query: N open tickets — cached for 5 minutes" and a table below lists the open tickets with columns ID, Title, Status, and Priority
+:max-width: 860px
+---
+_`cache_demo.cfm` after Activity 1 — the `cachedwithin` query result rendered in the browser; every reload within 5 minutes skips the database._
+::
+
 ::simple-task
 ---
 :tasks: tasks
 :name: verify_query_cache
 ---
 #active
-Run the `sudo tee` command above to create `cache_demo.cfm` with a `cachedwithin` query that caches the open-ticket list for 5 minutes.
+Run the `sudo tee` command above to create `cache_demo.cfm`, then open `/cache_demo.cfm` in the browser to confirm the ticket count appears.
 
 #completed
 Query caching with `cachedwithin` is present. ✓
