@@ -25,6 +25,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  multimedia-c7c70611: {}
+
 tasks:
   verify_media_page:
     machine: dev-machine
@@ -93,8 +96,5 @@ tasks:
       - verify_image_thumb
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  multimedia-c7c70611: {}
 
 ---
