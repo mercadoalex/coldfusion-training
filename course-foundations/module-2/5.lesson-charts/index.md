@@ -66,17 +66,17 @@ tasks:
     needs:
       - verify_pie_chart
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm)
-      if [ "${STATUS}" != "200" ]; then
-        echo "chart_demo.cfm not accessible (got ${STATUS})"
-        exit 1
-      fi
       BODY=$(curl -s http://localhost:8500/chart_demo.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "chart_demo.cfm is throwing an error"
         exit 1
       fi
-      echo "chart_demo.cfm returns HTTP 200 with no errors"
+      COUNT=$(echo "${BODY}" | grep -c "CFIDE/charting" || true)
+      if [ "${COUNT}" -lt 2 ]; then
+        echo "Expected 2 chart img tags, found ${COUNT} — not all charts rendered"
+        exit 1
+      fi
+      echo "Both charts rendered successfully — ${COUNT} cfchart image tags confirmed"
 
   verify_lesson_complete:
     machine: dev-machine

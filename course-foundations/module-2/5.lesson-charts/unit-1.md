@@ -389,32 +389,33 @@ Pie chart series is present. ✓
 
 ---
 
-## Activity 3 — Confirm the page serves cleanly
+## Activity 3 — Confirm both charts rendered successfully
 
-**What this proves:** Both charts render without errors on every request — the queries run, ColdFusion generates the images, and the page returns HTTP 200. If either query fails or a chart attribute is wrong, ColdFusion throws an exception visible in the response body.
+**What this activity proves:**
 
-In the **Terminal** tab, run two requests back-to-back:
+HTTP 200 only tells you the page loaded — it does not prove the charts actually rendered. The real proof is in the HTML that `cfchart` emits. When ColdFusion successfully generates a chart image it writes it to its internal chart cache and emits an `<img>` tag with a `src` pointing to `/CFIDE/charting/cache/...`. If that `<img>` tag is present in the response, both the query ran and the chart image was generated. If the chart failed, ColdFusion throws an exception and no `<img>` tag appears.
+
+Run this single command in the **Terminal** tab — it fetches the page and counts how many chart `<img>` tags are in the response:
 
 ```bash
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/chart_demo.cfm
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/chart_demo.cfm
+curl -s http://localhost:8500/chart_demo.cfm | grep -c "CFIDE/charting"
 ```
 
-Then check the response body for errors:
+**Expected result: `2`** — one `<img>` for the bar chart, one for the pie chart. This is the definitive proof that both charts were generated from live query data and written to the chart cache successfully.
+
+Also confirm there are no errors in the response:
 
 ```bash
 curl -s http://localhost:8500/chart_demo.cfm | grep -i "error\|exception" || echo "No errors found"
 ```
 
-Both requests should return **HTTP 200** and the grep should return **No errors found** — confirming both charts are generated cleanly from live database data on every request.
-
 ::image-box
 ---
 :src: __static__/terminal-chart-demo-200-v1.png
-:alt: Terminal showing two curl commands each returning HTTP 200 and the grep returning "No errors found" — confirming chart_demo.cfm renders both charts cleanly on repeated requests
+:alt: Terminal showing the grep -c command returning 2 — confirming two cfchart img tags are present in the response, one for the bar chart and one for the pie chart — followed by the error grep returning "No errors found"
 :max-width: 860px
 ---
-_Two clean HTTP 200 responses — both cfchart images generated from live query data with no errors._
+_`grep -c "CFIDE/charting"` returns 2 — both chart images were generated and written to the CF chart cache._
 ::
 
 ::simple-task
@@ -423,10 +424,10 @@ _Two clean HTTP 200 responses — both cfchart images generated from live query 
 :name: verify_chart_page
 ---
 #active
-Run the two `curl` commands above to confirm `chart_demo.cfm` returns HTTP 200 with no errors on both requests.
+Run `curl -s http://localhost:8500/chart_demo.cfm | grep -c "CFIDE/charting"` in the Terminal. The result must be `2` — confirming both the bar chart and pie chart rendered successfully from live query data.
 
 #completed
-`chart_demo.cfm` returns HTTP 200 with no errors. ✓
+Both charts rendered successfully — two `cfchart` image tags confirmed in the response. ✓
 ::
 
 ---
