@@ -371,7 +371,7 @@ Datasource verified — `verify_ds.cfm` runs without errors. ✓
 
 ::image-box
 ---
-:src: __static__/browser-cf-admin-datasource-v1.png
+:src: __static__/cf-admin-datasource-screen-v1.png
 :alt: ColdFusion Administrator Data Sources page showing the training_db row with a green checkmark in the Status column and an OK label confirming the JDBC connection pool is healthy
 :max-width: 860px
 ---
