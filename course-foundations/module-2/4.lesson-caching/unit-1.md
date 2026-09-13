@@ -430,6 +430,14 @@ curl -s http://localhost:8500/cache_demo.cfm | grep -i "cache"
 _First request shows Cache MISS (red) as data is fetched from the DB and stored; refresh shows Cache HIT (green) — DB skipped._
 ::
 
+**What you just achieved with `cacheGet` / `cachePut`:**
+
+On the **first load** (Cache MISS), the code called `cacheGet("highPriorityTickets")` and got back `null` — nothing was stored yet. ColdFusion then ran the `queryExecute` against the database, got the results, and immediately called `cachePut("highPriorityTickets", data, createTimeSpan(0,0,5,0))` to store them in ehcache for 5 minutes. The page rendered the data and showed the red MISS indicator.
+
+On the **second load** (Cache HIT), `cacheGet("highPriorityTickets")` returned the stored query object — the `if (isNull(data))` block was skipped entirely. No SQL was sent to the database. The same ticket data was rendered from memory in ehcache and the green HIT indicator confirmed it.
+
+The result: for the next 5 minutes, **every request to this page serves the high-priority ticket list from memory** — the database is not involved at all. After 5 minutes the TTL expires, the next request gets a MISS, re-queries the database, and the cycle starts again. This is the core pattern behind nearly every ColdFusion caching strategy.
+
 ::simple-task
 ---
 :tasks: tasks
