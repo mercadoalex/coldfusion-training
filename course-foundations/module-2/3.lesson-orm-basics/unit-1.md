@@ -12,6 +12,38 @@ ColdFusion ships with **Hibernate** as its built-in ORM layer. Mark a CFC as `pe
 
 ::details-box
 ---
+:summary: Why use ORM? Real advantages — and honest trade-offs
+---
+
+ORM adds a layer of abstraction. That layer has real benefits — but it is not free. Here is an honest breakdown:
+
+**What you genuinely gain:**
+
+| Advantage | Why it matters |
+|---|---|
+| **Less boilerplate code** | No manual `INSERT`, `UPDATE`, or `SELECT id, title, status FROM...` for every table. `entitySave(t)` handles it. |
+| **Schema kept in sync with code** | With `dbcreate="update"`, adding a property to your CFC adds the column to the table automatically — no ALTER TABLE scripts to manage. |
+| **Auto-generated getters/setters** | ColdFusion generates `getTitle()`, `setTitle()`, etc. from `property` declarations — one less thing to write. |
+| **Object graph navigation** | With relationships defined (one-to-many, many-to-one), you can write `ticket.getAssignee().getEmail()` instead of a JOIN query. |
+| **Database portability** | Switch from H2 to MySQL or PostgreSQL by changing the datasource — the same entity code works unchanged. |
+| **First-level cache** | Loading the same entity twice in one request hits the database only once — Hibernate returns the cached object automatically. |
+
+**What you do NOT gain (common misconceptions):**
+
+| Misconception | Reality |
+|---|---|
+| "ORM is faster than SQL" | It is not. ORM-generated SQL is often less optimal than hand-written SQL. For complex reports and aggregates, `cfquery` is faster and easier to tune. |
+| "ORM gives you more control" | The opposite — ORM abstracts the SQL away. You have *less* direct control. Use `cfquery` when you need precise SQL. |
+| "ORM makes data easier to find" | For simple lookups by PK or a single field, yes. For complex searches across multiple tables, HQL is harder to write and debug than SQL. |
+| "ORM eliminates the need to know SQL" | No. You still need to understand SQL to debug ORM-generated queries, tune performance, and write HQL correctly. |
+
+**The honest summary:**
+ORM pays off when your application has a clear **domain model** — objects with state and behaviour (a `Ticket` that can be opened, assigned, resolved). It saves time on repetitive CRUD. It pays off *less* when your application is primarily **report-driven** — reading and aggregating data across many tables. Most real ColdFusion applications use both: ORM for domain objects, `cfquery` for reporting and complex queries.
+
+::
+
+::details-box
+---
 :summary: What is Hibernate? (the engine behind ColdFusion ORM)
 ---
 
