@@ -1,12 +1,12 @@
 ---
 kind: challenge
 
-title: Media Upload Handler
+title: Unit 1 Challenge — ColdFusion Foundations
 
 description: |
-  Create media_demo.cfm with an HTML5 video or audio element, and
-  upload_media.cfm that accepts a file upload using cffile. Both pages
-  must return HTTP 200.
+  Put everything from Unit 1 together. Build a self-contained ColdFusion
+  application that combines CFML syntax, variables and scopes, the application
+  lifecycle, OOP with CFCs, HTML5 integration, and multimedia handling.
 
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
@@ -16,60 +16,154 @@ categories:
 
 tagz:
 - coldfusion
-- cffile
+- cfml
+- oop
+- html5
 - multimedia
 
 playground:
   name: cf-alex-edcdf975
 
 tasks:
-  verify_media_page:
+  verify_app_cfc:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm)
-      if [ "${STATUS}" != "200" ]; then
-        echo "media_demo.cfm not found (got ${STATUS})"
-        exit 1
-      fi
-      echo "media_demo.cfm accessible"
-
-  verify_html5_media_element:
-    machine: dev-machine
-    user: laborant
-    needs:
-      - verify_media_page
-    run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm"
-      if ! grep -qi "<video\|<audio" "${FILE}" 2>/dev/null; then
-        echo "No HTML5 video or audio element found"
-        exit 1
-      fi
-      echo "HTML5 media element present"
-
-  verify_upload_handler:
-    machine: dev-machine
-    user: laborant
-    needs:
-      - verify_html5_media_element
-    run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/Application.cfc"
       if [ ! -f "${FILE}" ]; then
-        echo "upload_media.cfm not found"
+        echo "Application.cfc not found in unit1challenge/"
         exit 1
       fi
-      echo "upload_media.cfm exists"
+      if ! grep -qi "this.name" "${FILE}" 2>/dev/null; then
+        echo "Application.cfc is missing this.name"
+        exit 1
+      fi
+      echo "Application.cfc found with this.name set"
+
+  verify_portfolio_cfc:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_app_cfc
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/PortfolioService.cfc"
+      if [ ! -f "${FILE}" ]; then
+        echo "PortfolioService.cfc not found"
+        exit 1
+      fi
+      if ! grep -qi "component" "${FILE}" 2>/dev/null; then
+        echo "PortfolioService.cfc is missing component declaration"
+        exit 1
+      fi
+      COUNT=$(grep -ci "function" "${FILE}")
+      if [ "${COUNT}" -lt 2 ]; then
+        echo "PortfolioService.cfc needs at least 2 functions (got ${COUNT})"
+        exit 1
+      fi
+      echo "PortfolioService.cfc found with ${COUNT} functions"
+
+  verify_index_page:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_portfolio_cfc
+    run: |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/unit1challenge/index.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "unit1challenge/index.cfm not accessible (got ${STATUS})"
+        exit 1
+      fi
+      BODY=$(curl -s http://localhost:8500/unit1challenge/index.cfm)
+      if ! echo "${BODY}" | grep -qi "<!DOCTYPE html>"; then
+        echo "index.cfm is missing HTML5 doctype"
+        exit 1
+      fi
+      echo "index.cfm is accessible and has HTML5 doctype"
+
+  verify_dynamic_output:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_index_page
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/index.cfm"
+      if ! grep -qi "cfoutput\|writeOutput\|new PortfolioService\|createObject" "${FILE}" 2>/dev/null; then
+        echo "index.cfm does not use PortfolioService or produce dynamic output"
+        exit 1
+      fi
+      echo "index.cfm uses dynamic CFML output"
+
+  verify_html5_media:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_dynamic_output
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/index.cfm"
+      if ! grep -qi "<video\|<audio\|type=\"email\"\|type=\"date\"" "${FILE}" 2>/dev/null; then
+        echo "index.cfm is missing an HTML5 media element or form input type"
+        exit 1
+      fi
+      echo "HTML5 media or form input type found"
+
+  verify_session_or_application_scope:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_html5_media
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/Application.cfc"
+      if ! grep -qi "session\|application\|onSessionStart\|onApplicationStart" "${FILE}" 2>/dev/null; then
+        echo "Application.cfc does not use session or application scope"
+        exit 1
+      fi
+      echo "Application lifecycle scope usage confirmed"
+
 ---
 
-## Your mission
+## Unit 1 Challenge — Build a ColdFusion Portfolio Page
 
-**media_demo.cfm** — an HTML page with at least one `<video>` or `<audio>` element.
+You have completed all seven lessons of Unit 1. Now bring it all together.
 
-**upload_media.cfm** — a handler that uses `cffile action="upload"` to accept a file.
+### Your mission
+
+Build a small self-contained ColdFusion application inside the directory `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/`. It must include all of the following:
+
+---
+
+### 1. Application lifecycle — `Application.cfc`
+
+Create `Application.cfc` that:
+- Sets `this.name` to `"Unit1Challenge"`
+- Uses `onApplicationStart()` to store a launch timestamp in the `application` scope
+- Uses `onSessionStart()` to initialise a visit counter in the `session` scope
+
+---
+
+### 2. OOP — `PortfolioService.cfc`
+
+Create a CFC with at least:
+- A constructor `init()` that stores your name in `variables` scope
+- A `getProjects()` method that returns an array of structs, each with `title`, `description`, and `type` keys (use hardcoded data — no database needed)
+- A `getSummary()` method that returns a one-line string using Java's `StringBuilder` via `createObject("java", "java.lang.StringBuilder")`
+
+---
+
+### 3. Main page — `index.cfm`
+
+Create an HTML5 page (`<!DOCTYPE html>`) that:
+- Instantiates `PortfolioService` and calls both methods
+- Renders the projects list dynamically with `<cfoutput>` and `encodeForHTML()`
+- Embeds the projects array as JSON into a JavaScript variable using `serializeJSON()`
+- Includes at least one HTML5 element — either a `<video>` or `<audio>` player, or a form with `type="email"` or `type="date"` inputs
+- Displays the application launch time and session visit count from their respective scopes
+
+---
+
+### Verify your work
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm
+curl -s http://localhost:8500/unit1challenge/index.cfm | head -30
 ```
 
-Both must return **200**.
+All six checks must pass green to complete the challenge.
