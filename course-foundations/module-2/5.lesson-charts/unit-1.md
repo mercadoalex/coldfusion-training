@@ -412,19 +412,20 @@ curl -s http://localhost:8500/chart_demo.cfm | grep -c "_cf_chart"
 _`grep -c "_cf_chart"` returns `2` — both chart images were generated and written to the CF chart cache._
 ::
 
-Also confirm there are no errors in the response:
+Also confirm the page returns HTTP 200 and contains no errors:
 
 ```bash
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/chart_demo.cfm
 curl -s http://localhost:8500/chart_demo.cfm | grep -i "error\|exception" || echo "No errors found"
 ```
 
 ::image-box
 ---
 :src: __static__/terminal-chart-demo-200-v1.png
-:alt: Terminal showing the error grep command returning "No errors found" — confirming chart_demo.cfm produces no ColdFusion exceptions on the page
+:alt: Terminal showing the curl command returning HTTP 200 followed by the error grep returning "No errors found" — confirming chart_demo.cfm is accessible and produces no ColdFusion exceptions
 :max-width: 860px
 ---
-_No errors or exceptions in the response — both queries ran and both charts rendered cleanly._
+_HTTP 200 and no errors — the page is accessible and both charts rendered without exceptions._
 ::
 
 ::simple-task
