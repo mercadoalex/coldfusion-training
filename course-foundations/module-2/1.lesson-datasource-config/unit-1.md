@@ -93,6 +93,15 @@ The `training_db` datasource is already set up — no manual steps needed. To in
 
 You should see a green checkmark and "OK" status.
 
+::image-box
+---
+:src: __static__/browser-cf-admin-datasource-verified-v1.png
+:alt: ColdFusion Administrator Data Sources page showing the training_db row with a green checkmark and OK status after clicking Verify
+:max-width: 860px
+---
+_CF Admin confirming `training_db` is connected and healthy._
+::
+
 ::hint-box
 ---
 :summary: What else is under Data & Services in CF Admin?
