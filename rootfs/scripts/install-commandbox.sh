@@ -82,10 +82,11 @@ EOF
 # from downloads/ in the build context), we manually place it into the
 # CommandBox engine cache so students get instant first-start with no download.
 #
-# Cache path: /root/.CommandBox/engine/cfml/server/lucee_<version>/
-#             CommandBox looks for cf-engine-<version>.zip here on startup.
+# Cache path: /opt/commandbox/engine/cfml/server/lucee_<version>/
+# The service runs as laborant with COMMANDBOX_HOME=/opt/commandbox so the
+# engine cache must live there — not under /root/.CommandBox (build-time user).
 LUCEE_ZIP="/tmp/cf-downloads/lucee-engine-${LUCEE_VERSION}.zip"
-CB_ENGINE_CACHE="/root/.CommandBox/engine/cfml/server/lucee_${LUCEE_VERSION}"
+CB_ENGINE_CACHE="${CB_HOME}/engine/cfml/server/lucee_${LUCEE_VERSION}"
 
 if [ -f "${LUCEE_ZIP}" ]; then
   echo "[BOX] Pre-baking Lucee ${LUCEE_VERSION} engine cache from local ZIP..."
@@ -94,9 +95,7 @@ if [ -f "${LUCEE_ZIP}" ]; then
   echo "[BOX] Lucee engine cached at ${CB_ENGINE_CACHE}"
 else
   echo "[BOX] NOTE: lucee-engine-${LUCEE_VERSION}.zip not found in downloads/."
-  echo "[BOX] Lucee will download on first 'box server start' inside the VM (~30s)."
-  echo "[BOX] To pre-bake: curl -L -o downloads/lucee-engine-${LUCEE_VERSION}.zip \\"
-  echo "[BOX]   https://downloads.ortussolutions.com/lucee/lucee/${LUCEE_VERSION}/cf-engine-${LUCEE_VERSION}.zip"
+  echo "[BOX] Lucee will download on first box server start inside the VM (~30s)."
 fi
 
 # ─── PATH entry for all users ────────────────────────────────────────────────
