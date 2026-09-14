@@ -113,10 +113,7 @@ Any CFC function marked `access="remote"` is **automatically exposed as a SOAP w
 // TicketService.cfc
 component displayname="TicketService" style="document" {
 
-  remote struct function getTicketById(required numeric id)
-    returntype = "struct"
-    output     = "false"
-  {
+  remote struct function getTicketById(required numeric id) output="false" {
     var q = queryExecute(
       "SELECT id, title, status, priority FROM hd_tickets WHERE id = :id",
       { id: { value: arguments.id, cfsqltype: "cf_sql_integer" } },
@@ -328,10 +325,7 @@ In the **Terminal** tab, first create the `TicketService.cfc` that will be consu
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc << 'EOF'
 component displayname="TicketService" style="document" {
 
-  remote struct function getTicketById(required numeric id)
-    returntype="struct"
-    output="false"
-  {
+  remote struct function getTicketById(required numeric id) output="false" {
     var q = queryExecute(
       "SELECT id, title, status, priority FROM hd_tickets WHERE id = :id",
       { id: { value: arguments.id, cfsqltype: "cf_sql_integer" } },
@@ -346,10 +340,7 @@ component displayname="TicketService" style="document" {
     };
   }
 
-  remote array function getAllTickets()
-    returntype="array"
-    output="false"
-  {
+  remote array function getAllTickets() output="false" {
     var q = queryExecute(
       "SELECT id, title, status, priority FROM hd_tickets ORDER BY id",
       {},
