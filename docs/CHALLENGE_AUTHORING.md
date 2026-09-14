@@ -93,11 +93,45 @@ tasks:
 
 ---
 
-## 2. Lesson `unit-1.md` — embedding the challenge card
+## 2. Lesson `unit-1.md` — structure and challenge card
 
-At the very end of `unit-1.md`, add the `::card` block:
+### Frontmatter
+
+```yaml
+---
+kind: unit
+
+title: Your Lesson Title
+
+name: your-lesson-name-unit-1
+---
+```
+
+**Critical observations — missing or wrong fields cause silent failures:**
+
+| Field | Required | Notes |
+|---|---|---|
+| `kind: unit` | ✅ | Must be exactly `unit` — not `lesson`, not `chapter` |
+| `title:` | ✅ | Human-readable title shown at the top of the lesson |
+| `name:` | ✅ | Unique identifier — convention is `<lesson-slug>-unit-1` |
+
+**There is no `tagz:`, no `playground:`, no `tasks:` in `unit-1.md`** — those all live in `index.md`.
+
+### Body content
+
+The body is everything after the closing `---`. It contains all the readable
+lesson content: prose, code blocks, images, hint boxes, simple-task blocks.
+
+### ::card block — always at the very end
+
+The `::card` block embeds the challenge card. It must be the **last thing** in
+the file, after the final `::simple-task` and after any closing prose:
 
 ```markdown
+## Now Prove It
+
+The challenge below asks you to...
+
 ::card
 ---
 :challenge: challenges.<platform-slug>
@@ -105,15 +139,19 @@ At the very end of `unit-1.md`, add the `::card` block:
 ::
 ```
 
-Example:
+**The slug in `::card` must exactly match:**
+- The slug in `challenges:` in the lesson `index.md`
+- The slug the platform assigned when you ran `labctl content create`
 
-```markdown
-::card
----
-:challenge: challenges.multimedia-2ed52176
----
-::
-```
+**Common mistakes:**
+
+| Mistake | Result |
+|---|---|
+| Wrong slug in `:challenge:` | "Couldn't load the challenge" |
+| `::card` not at the end of the file | Challenge card may not render |
+| Using `kind: lesson` instead of `kind: unit` | Unit content not rendered by platform |
+| `name:` missing from frontmatter | Platform cannot register the unit |
+| Using `tags:` instead of `tagz:` | Tags silently ignored (note: `tagz` with a z) |
 
 ---
 
