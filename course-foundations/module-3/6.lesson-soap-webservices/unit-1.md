@@ -237,6 +237,69 @@ When integrating with a third-party SOAP service, always read the `<wsdl:portTyp
 
 ::
 
+::details-box
+---
+:summary: Can you create a WSDL from scratch — and should you?
+---
+
+**Yes, but you almost never should.** WSDL is verbose, strict XML with interdependent sections — a single typo in a namespace or a mismatched message name breaks the entire contract. Every major platform generates it automatically:
+
+- **ColdFusion** — append `?wsdl` to any CFC with `remote` functions
+- **Java (JAX-WS)** — `wsgen` generates WSDL from annotated classes
+- **.NET (WCF)** — generates WSDL from `[ServiceContract]` interfaces
+
+**The only valid reason to write WSDL by hand** is **contract-first design** — defining the interface before any implementation exists so multiple teams (Java backend, CF consumer, .NET client) can build against a shared contract simultaneously. Even then, use a tool like SoapUI or Apache CXF that validates as you type.
+
+**Code-first vs contract-first:**
+
+| Approach | When to use | Risk |
+|---|---|---|
+| **Code-first** (CF generates WSDL) | Internal services, quick integrations | WSDL changes silently when you rename a function |
+| **Contract-first** (WSDL written first) | Multi-team enterprise integration, public APIs | More upfront work, but the contract is stable |
+
+For ColdFusion and most CF projects — **code-first is the right default**. Let CF generate it.
+
+::
+
+::details-box
+---
+:summary: WSDL security risks and how to harden your SOAP services
+---
+
+A public `?wsdl` URL is an **attack map** — it tells anyone every operation name, parameter name, and data type your service exposes. Key risks:
+
+| Risk | What it means |
+|---|---|
+| **Service enumeration** | Attackers see your entire API surface — every function and its parameter types |
+| **XXE (XML External Entity)** | Malicious `<!DOCTYPE>` in a SOAP envelope tricks the XML parser into reading local files (`/etc/passwd`) or making internal HTTP requests |
+| **WSDL injection** | A cached or proxied WSDL is tampered with to redirect operations to a malicious endpoint |
+| **Verbose SOAP Faults** | Default error responses include Java stack traces, class names, and server paths |
+| **Unauthenticated WSDL** | The contract is publicly accessible even when operations require auth — exposing your API design to anyone |
+| **Accidental remote exposure** | Any CFC with `access="remote"` in wwwroot becomes a SOAP endpoint — a forgotten annotation exposes internal logic |
+
+**Hardening checklist for CF SOAP services:**
+
+```
+✅ Restrict ?wsdl to internal IPs only — via CF Admin or web server (nginx/Apache) rules
+✅ Require authentication before serving operations — use Application.cfc onRequestStart
+✅ Only mark functions access="remote" that genuinely need to be public
+✅ Never return raw exception detail in SOAP Fault — catch errors and return a generic message
+✅ Use HTTPS — SOAP envelopes carry all data as plaintext XML over HTTP
+✅ Disable XXE in the CF JVM — add -Djavax.xml.parsers.SAXParserFactory to jvm.config
+```
+
+**Tools to validate and test SOAP services:**
+
+| Tool | What it does |
+|---|---|
+| **SoapUI** | Industry standard — imports WSDL, fires test requests, inspects raw envelopes |
+| **Postman** | Imports WSDL and generates a full test collection |
+| **Burp Suite** | Intercepts and modifies SOAP envelopes in transit — has a built-in WSDL parser |
+| **WSFuzzer** | Fuzzes SOAP operations with malformed inputs to find parser and injection bugs |
+| **Apache CXF `wsdlvalidator`** | CLI tool — validates WSDL against WS-I Basic Profile |
+
+::
+
 ---
 
 ::hint-box
