@@ -115,7 +115,6 @@ component displayname="TicketService" style="document" {
 
   remote struct function getTicketById(required numeric id)
     returntype = "struct"
-    access     = "remote"
     output     = "false"
   {
     var q = queryExecute(
@@ -331,7 +330,6 @@ component displayname="TicketService" style="document" {
 
   remote struct function getTicketById(required numeric id)
     returntype="struct"
-    access="remote"
     output="false"
   {
     var q = queryExecute(
@@ -350,7 +348,6 @@ component displayname="TicketService" style="document" {
 
   remote array function getAllTickets()
     returntype="array"
-    access="remote"
     output="false"
   {
     var q = queryExecute(
