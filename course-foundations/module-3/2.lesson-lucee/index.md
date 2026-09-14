@@ -23,6 +23,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  lucee_5db89516: {}
+
 tasks:
   verify_lucee_running:
     machine: dev-machine
@@ -41,6 +44,11 @@ tasks:
     needs:
       - verify_lucee_running
     run: |
+      FILE="/home/laborant/app/lucee_info.cfm"
+      if [ ! -f "${FILE}" ]; then
+        echo "lucee_info.cfm not found at ${FILE}"
+        exit 1
+      fi
       BODY=$(curl -s http://localhost:8888/lucee_info.cfm)
       if ! echo "${BODY}" | grep -qi "lucee"; then
         echo "lucee_info.cfm does not output Lucee version info"
@@ -59,16 +67,18 @@ tasks:
         echo "Lucee datasource verification failed"
         exit 1
       fi
+      if ! echo "${BODY}" | grep -qi "OK\|found\|ticket"; then
+        echo "verify_ds.cfm did not return expected success output"
+        exit 1
+      fi
       echo "Lucee datasource is configured correctly"
-
 
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_lucee_datasource
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  lucee_5db89516: {}
 
 ---
