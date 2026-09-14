@@ -5,12 +5,23 @@ show "Couldn't load the challenge" on the platform.
 
 ---
 
-## Two files are involved
+## Three independent files across two directories
 
-| File | Kind | What it does |
-|---|---|---|
-| `course-foundations/module-X/Y.lesson-name/index.md` | `kind: lesson` | Links the challenge slug and defines verification tasks |
-| `challenges/<name>/index.md` | `kind: challenge` | The standalone challenge content students see |
+```
+challenges/
+  <name>/
+    index.md                    ← kind: challenge  (standalone, independent of any lesson)
+
+course-foundations/
+  module-X/
+    Y.lesson-name/
+      index.md                  ← kind: lesson     (references the challenge slug)
+      unit-1.md                 ← kind: unit       (embeds the ::card at the bottom)
+```
+
+The `challenges/` directory is completely independent from `course-foundations/`.
+The challenge exists on its own — it is linked into a lesson by slug reference,
+not by file proximity.
 
 ---
 
