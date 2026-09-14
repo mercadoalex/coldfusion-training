@@ -448,7 +448,7 @@ Open `/soap_consumer.cfm` in the **ColdFusion 2025** browser tab — you should 
 
 ::image-box
 ---
-:src: __static__/browser-soap-consumer-v1.png
+:src: __static__/browser-soap-consumer-v2.png
 :alt: Browser showing soap_consumer.cfm — a blue info box shows the result of getTicketById(1) with ID, title, status and priority, followed by a table listing all tickets returned by the getAllTickets SOAP call
 :max-width: 860px
 ---
