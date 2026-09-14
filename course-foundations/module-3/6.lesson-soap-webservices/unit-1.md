@@ -148,6 +148,92 @@ And consume it from any SOAP client — including another ColdFusion application
 </cfscript>
 ```
 
+::details-box
+---
+:summary: WSDL deep dive — what the contract file actually contains
+---
+
+**WSDL** (Web Services Description Language) is an XML document that fully describes a SOAP web service — every operation, every parameter, every data type, and every endpoint URL. It is the machine-readable contract that allows any SOAP client (Java, .NET, Python, ColdFusion) to auto-generate a proxy without you writing a single line of binding code.
+
+**The five key sections of a WSDL document:**
+
+| Section | XML element | What it defines |
+|---|---|---|
+| **Types** | `<types>` | XML Schema (XSD) definitions of all input/output data structures |
+| **Messages** | `<message>` | Named sets of typed parameters — one per operation input/output |
+| **Port Type** | `<portType>` | The interface — lists all available operations and their messages |
+| **Binding** | `<binding>` | How operations are transmitted — SOAP encoding style, HTTP verb |
+| **Service** | `<service>` | The actual endpoint URL where the service is reachable |
+
+**A minimal WSDL for `getTicketById` looks like this:**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+  name="TicketService"
+  targetNamespace="http://localhost:8500/TicketService.cfc"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!-- 1. Types — data structure definitions -->
+  <wsdl:types>
+    <xsd:schema>
+      <xsd:element name="getTicketByIdRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+
+  <!-- 2. Messages — named parameter sets -->
+  <wsdl:message name="getTicketByIdRequest">
+    <wsdl:part name="parameters" element="tns:getTicketByIdRequest"/>
+  </wsdl:message>
+  <wsdl:message name="getTicketByIdResponse">
+    <wsdl:part name="return" type="xsd:anyType"/>
+  </wsdl:message>
+
+  <!-- 3. Port Type — the interface (list of operations) -->
+  <wsdl:portType name="TicketServicePortType">
+    <wsdl:operation name="getTicketById">
+      <wsdl:input  message="tns:getTicketByIdRequest"/>
+      <wsdl:output message="tns:getTicketByIdResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <!-- 4. Binding — SOAP transport details -->
+  <wsdl:binding name="TicketServiceBinding" type="tns:TicketServicePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getTicketById">
+      <soap:operation soapAction="getTicketById"/>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <!-- 5. Service — endpoint URL -->
+  <wsdl:service name="TicketService">
+    <wsdl:port name="TicketServicePort" binding="tns:TicketServiceBinding">
+      <soap:address location="http://localhost:8500/TicketService.cfc"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>
+```
+
+**WSDL 1.1 vs WSDL 2.0:**
+ColdFusion generates **WSDL 1.1** — the version used by virtually all enterprise SOAP systems. WSDL 2.0 was published in 2007 but never widely adopted. If you see a WSDL in the wild, it is almost certainly 1.1.
+
+**How ColdFusion generates it:**
+When you append `?wsdl` to a CFC URL, ColdFusion inspects all `remote` functions using Java reflection, maps CFML types to XSD types (`numeric` → `xsd:int`, `string` → `xsd:string`, `struct` → `xsd:anyType`), and assembles the five sections above automatically. You never write WSDL by hand — ColdFusion owns it.
+
+**Practical tip — reading a WSDL:**
+When integrating with a third-party SOAP service, always read the `<wsdl:portType>` section first — it lists every available operation. Then check `<wsdl:types>` to understand the input/output structures. The `<wsdl:service>` section gives you the endpoint URL to pass to `createObject("webservice", ...)`.
+
+::
+
 ---
 
 ## Activity 1 — Create a SOAP consumer page
