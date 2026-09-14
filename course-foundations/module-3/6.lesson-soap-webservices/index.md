@@ -24,6 +24,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  soap_webservices_8f4e8ae9: {}
+
 tasks:
   verify_ws_consumer:
     machine: dev-machine
@@ -34,42 +37,40 @@ tasks:
         echo "soap_consumer.cfm not found"
         exit 1
       fi
-      echo "soap_consumer.cfm exists"
-
-  verify_cfinvoke_used:
-    machine: dev-machine
-    user: laborant
-    needs:
-      - verify_ws_consumer
-    run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm"
       if ! grep -qi "cfinvoke\|createObject.*webservice" "${FILE}" 2>/dev/null; then
-        echo "No cfinvoke or createObject webservice call found"
+        echo "No cfinvoke or createObject webservice call found in soap_consumer.cfm"
         exit 1
       fi
-      echo "Web service invocation found"
+      echo "soap_consumer.cfm exists with web service invocation"
 
   verify_exposed_service:
     machine: dev-machine
     user: laborant
     needs:
-      - verify_cfinvoke_used
+      - verify_ws_consumer
     run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc"
+      if [ ! -f "${FILE}" ]; then
+        echo "TicketService.cfc not found"
+        exit 1
+      fi
+      if ! grep -qi "access.*remote\|remote.*function" "${FILE}" 2>/dev/null; then
+        echo "No remote function found in TicketService.cfc"
+        exit 1
+      fi
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/TicketService.cfc?wsdl")
       if [ "${STATUS}" != "200" ]; then
         echo "TicketService.cfc WSDL not accessible (got ${STATUS})"
         exit 1
       fi
-      echo "SOAP WSDL is accessible"
-
+      echo "SOAP WSDL is accessible at TicketService.cfc?wsdl"
 
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_exposed_service
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  soap_webservices_8f4e8ae9: {}
 
 ---
