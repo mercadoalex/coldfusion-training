@@ -8,9 +8,6 @@ description: |
   application that combines CFML syntax, variables and scopes, the application
   lifecycle, OOP with CFCs, HTML5 integration, and multimedia handling.
 
-createdAt: 2026-09-03
-updatedAt: 2026-09-03
-
 categories:
 - programming
 
@@ -20,6 +17,11 @@ tagz:
 - oop
 - html5
 - multimedia
+
+difficulty: medium
+
+createdAt: 2026-09-03
+updatedAt: 2026-09-03
 
 playground:
   name: cf-alex-edcdf975
