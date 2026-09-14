@@ -239,6 +239,26 @@ When integrating with a third-party SOAP service, always read the `<wsdl:portTyp
 
 ---
 
+::hint-box
+---
+:summary: Which engine are we using in this lesson — Adobe CF or Lucee?
+---
+
+**This lesson uses Adobe ColdFusion 2025 (port 8500).** SOAP web service support (`createObject("webservice", ...)`, auto-generated WSDL, `<cfinvoke webservice=...>`) is a mature, well-tested feature of Adobe CF and is the recommended engine for SOAP work.
+
+Lucee 7 also supports SOAP but its implementation is less complete — some edge cases in WSDL generation and complex type mapping behave differently. For enterprise SOAP integration, Adobe CF is the safer choice.
+
+**Quick reference — which port is which:**
+
+| Engine | Port | Use for |
+|---|---|---|
+| Adobe ColdFusion 2025 | **8500** | This lesson — SOAP services |
+| Lucee 7 / CommandBox | **8888** | Previous lesson — CFConfig, CLI admin |
+
+All files in this lesson go into `/opt/coldfusion2025/cfusion/wwwroot/` and are accessed via the **ColdFusion 2025** browser tab.
+
+::
+
 ## Activity 1 — Create a SOAP consumer page
 
 **What you are building:** `soap_consumer.cfm` — a page that calls a public SOAP web service and displays the result. We use a **local** SOAP call (CF calling itself via `TicketService.cfc`) so the exercise works without internet access.
