@@ -291,6 +291,39 @@ curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm
 
 You should see **HTTP 200**. Then open the **Lucee Dev Server** browser tab to see the running application.
 
+Once you can see the Lucee Dev Server page, click the **Lucee Admin Console ↗** button on that page — it opens the Lucee Server Administrator in a new browser tab. The default password is `training`.
+
+You can also navigate directly to:
+
+```
+http://localhost:8888/lucee/admin/server.cfm
+```
+
+::hint-box
+---
+:summary: Lucee Dev Server tab shows a blank page or error?
+---
+
+The service may still be starting — it can take up to 60 seconds on first boot while it unpacks the engine. Check the current status:
+
+```bash
+systemctl status lucee-server.service
+```
+
+If the status shows **failed** or **inactive**, check the logs and restart:
+
+```bash
+sudo journalctl -u lucee-server.service --no-pager -n 50
+sudo systemctl restart lucee-server.service
+```
+
+Wait 30–60 seconds, then re-run the `curl` check. Common causes:
+- **Java not found** — the JRE at `/opt/coldfusion2025/jre/bin` must be on PATH (the service sets this automatically)
+- **Engine download** — if the local engine cache was not pre-baked, CommandBox downloads Lucee on first start (~30 MB, needs internet)
+- **Port conflict** — run `ss -tlnp | grep 8888` to confirm nothing else is on port 8888
+
+::
+
 ::hint-box
 ---
 :summary: Why does box server list show nothing?

@@ -15,17 +15,22 @@ Environment="JAVA_HOME=/opt/coldfusion2025/jre"
 Environment="BOX_HOME=/opt/commandbox"
 Environment="COMMANDBOX_HOME=/opt/commandbox"
 Environment="PATH=/opt/coldfusion2025/jre/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+# Suppress CommandBox's attempt to open a browser window (no display in a microVM)
+Environment="BOX_SERVER_OPENBROWSER=false"
 WorkingDirectory=/home/laborant/app
 
 # Use the absolute path to box (/usr/local/bin/box installed via Ortus APT repo)
+# --console keeps the process in the foreground so systemd can track it.
+# First start downloads the Lucee engine if the cache is missing — allow 3 min.
 ExecStart=/usr/local/bin/box server start --console
 ExecStop=/usr/local/bin/box server stop
 
-TimeoutStartSec=120
+# Allow up to 3 minutes for first start (engine download / unzip on slow links)
+TimeoutStartSec=180
 TimeoutStopSec=30
 
 Restart=on-failure
-RestartSec=15
+RestartSec=20
 
 StandardOutput=journal
 StandardError=journal

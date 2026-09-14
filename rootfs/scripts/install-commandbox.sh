@@ -73,7 +73,10 @@ cat > "${APP_DIR}/server.json" <<EOF
     "heapSize": "256m",
     "minHeapSize": "128m"
   },
-  "openbrowser": false
+  "openbrowser": false,
+  "cfconfig": {
+    "adminPassword": "training"
+  }
 }
 EOF
 
@@ -85,17 +88,24 @@ EOF
 # Cache path: /opt/commandbox/engine/cfml/server/lucee_<version>/
 # The service runs as laborant with COMMANDBOX_HOME=/opt/commandbox so the
 # engine cache must live there — not under /root/.CommandBox (build-time user).
+#
+# IMPORTANT: CommandBox's ForgeBox provider resolves the cached artifact by the
+# slug it downloads from ForgeBox. For Lucee the slug is "lucee" and CommandBox
+# stores the zip as "lucee-light-<version>+0.zip" inside the cache directory.
+# Using any other filename causes a cache miss and forces a live download.
 LUCEE_ZIP="/tmp/cf-downloads/lucee-engine-${LUCEE_VERSION}.zip"
 CB_ENGINE_CACHE="${CB_HOME}/engine/cfml/server/lucee_${LUCEE_VERSION}"
+# ForgeBox artifact name CommandBox expects inside the cache directory:
+CB_ENGINE_FILENAME="lucee-light-${LUCEE_VERSION}+0.zip"
 
 if [ -f "${LUCEE_ZIP}" ]; then
   echo "[BOX] Pre-baking Lucee ${LUCEE_VERSION} engine cache from local ZIP..."
   mkdir -p "${CB_ENGINE_CACHE}"
-  cp "${LUCEE_ZIP}" "${CB_ENGINE_CACHE}/cf-engine-${LUCEE_VERSION}.zip"
-  echo "[BOX] Lucee engine cached at ${CB_ENGINE_CACHE}"
+  cp "${LUCEE_ZIP}" "${CB_ENGINE_CACHE}/${CB_ENGINE_FILENAME}"
+  echo "[BOX] Lucee engine cached at ${CB_ENGINE_CACHE}/${CB_ENGINE_FILENAME}"
 else
   echo "[BOX] NOTE: lucee-engine-${LUCEE_VERSION}.zip not found in downloads/."
-  echo "[BOX] Lucee will download on first box server start inside the VM (~30s)."
+  echo "[BOX] Lucee will download on first box server start inside the VM (~60s)."
 fi
 
 # ─── PATH entry for all users ────────────────────────────────────────────────
