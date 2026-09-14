@@ -55,11 +55,12 @@
   </ul>
 </div>
 
-<hr>
-<div style="margin-bottom:1.5rem">
-  <a href="/lucee/admin/server.cfm" style="display:inline-block;padding:.6rem 1.4rem;background:#1d4ed8;color:#fff;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">Lucee Admin Console</a>
+<div class="card">
+  <h3>🔧 Administration</h3>
+  <a href="/lucee/admin/server.cfm" style="display:inline-block;margin-top:.25rem;padding:.55rem 1.2rem;background:#1d4ed8;color:#fff;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">Lucee Admin Console</a>
 </div>
 
+<hr>
 <h3 style="color:#38bdf8;margin-bottom:.75rem">Quick CFML Reference</h3>
 <cfscript>
   tags = [
