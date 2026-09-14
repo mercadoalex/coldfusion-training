@@ -56,6 +56,9 @@ _SOAP and REST both use HTTP — the key differences are contract strictness, pa
 
 ColdFusion reads the WSDL and generates a **proxy object** automatically. Every method call on the proxy is serialised into a SOAP envelope and dispatched over HTTP — you never write XML manually:
 
+> **What does "serialised" mean?**
+> Think of it like packing a suitcase. Your ColdFusion variables — strings, numbers, structs — exist in memory in a form only your server understands. *Serialising* means converting them into a standardised text format (XML, in SOAP's case) that any other system on any platform can read and unpack. The remote server receives that XML, unpacks it back into its own variables, runs the function, then serialises its response back to you the same way. You write normal ColdFusion; the serialisation/deserialisation happens invisibly in between.
+
 ```cfml
 <cfscript>
   // Create proxy from WSDL URL — CF parses the contract automatically
