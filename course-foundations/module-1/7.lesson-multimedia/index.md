@@ -26,7 +26,7 @@ playground:
   name: cf-alex-edcdf975
 
 challenges:
-  multimedia-c7c70611: {}
+  multimedia-upload-7a076398: {}
 
 tasks:
   verify_media_page:
