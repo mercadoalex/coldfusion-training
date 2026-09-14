@@ -56,6 +56,12 @@
 </div>
 
 <hr>
+<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem">
+  <a href="/lucee/admin/server.cfm" style="display:inline-block;padding:.6rem 1.2rem;background:#1d4ed8;color:#fff;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">Lucee Admin</a>
+  <a href="/lucee_info.cfm" style="display:inline-block;padding:.6rem 1.2rem;background:#1e293b;border:1px solid #475569;color:#94a3b8;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">Server Info</a>
+  <a href="/verify_ds.cfm" style="display:inline-block;padding:.6rem 1.2rem;background:#1e293b;border:1px solid #475569;color:#94a3b8;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">DB Test</a>
+</div>
+
 <h3 style="color:#38bdf8;margin-bottom:.75rem">Quick CFML Reference</h3>
 <cfscript>
   tags = [
