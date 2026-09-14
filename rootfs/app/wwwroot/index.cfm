@@ -131,6 +131,7 @@
 
     <div class="links">
       <a class="btn btn-primary" href="/CFIDE/administrator/">CF Admin</a>
+      <a class="btn btn-primary" href="/lucee/admin/server.cfm">Lucee Admin</a>
       <a class="btn btn-secondary" href="/status.cfm">Server Status</a>
       <a class="btn btn-secondary" href="/api-test.cfm">API Test</a>
       <a class="btn btn-secondary" href="/db-test.cfm">DB Test</a>
