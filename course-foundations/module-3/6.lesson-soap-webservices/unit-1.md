@@ -302,11 +302,7 @@ A public `?wsdl` URL is an **attack map** — it tells anyone every operation na
 
 ---
 
-::highlight-box
----
-:summary: Which engine are we using in this lesson — Adobe CF or Lucee?
----
-
+::highlight
 **This lesson uses Adobe ColdFusion 2025 (port 8500).** SOAP web service support (`createObject("webservice", ...)`, auto-generated WSDL, `<cfinvoke webservice=...>`) is a mature, well-tested feature of Adobe CF and is the recommended engine for SOAP work.
 
 Lucee 7 also supports SOAP but its implementation is less complete — some edge cases in WSDL generation and complex type mapping behave differently. For enterprise SOAP integration, Adobe CF is the safer choice.
@@ -319,7 +315,6 @@ Lucee 7 also supports SOAP but its implementation is less complete — some edge
 | Lucee 7 / CommandBox | **8888** | Previous lesson — CFConfig, CLI admin |
 
 All files in this lesson go into `/opt/coldfusion2025/cfusion/wwwroot/` and are accessed via the **ColdFusion 2025** browser tab.
-
 ::
 
 ## Activity 1 — Create a SOAP consumer page
@@ -524,7 +519,7 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 Lesson complete. On to the next one!
 ::
 
-::remark-box
+::remark
 Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
 
 📧 Alex — mercadoalex[at]gmail.com
