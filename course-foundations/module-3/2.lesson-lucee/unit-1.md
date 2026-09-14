@@ -24,7 +24,7 @@ _Lucee and Adobe CF share the same CFML language core — the differences are in
 | Feature | Lucee 7 | Adobe CF 2025 |
 |---|---|---|
 | **License** | Open source (LGPL) — free forever | Commercial — requires paid license |
-| **Admin URL** | `/lucee/admin/` | `/CFIDE/administrator/` |
+| **Admin** | CLI via `box cfconfig` — no web UI in Lucee 7 | Web UI at `/CFIDE/administrator/` |
 | **Config format** | JSON (`.CFConfig.json`) | XML (`neo-*.xml`) |
 | **Cold start speed** | Fast (~5–10 s) | Moderate (~30 s) |
 | **PDF generation** | Via extension | Native (`<cfdocument>`) |
@@ -88,19 +88,34 @@ In this lab you have both — port 8500 for Adobe CF, port 8888 for Lucee. The c
 
 ---
 
-## Lucee admin console
+## Lucee administration
 
-Browse to the **Lucee Dev Server** tab (port 8888) and navigate to `/lucee/admin/server.cfm` — or go directly to `http://localhost:8888/lucee/admin/` — to access the Lucee Server Administrator. Default password: `training`.
+::hint-box
+---
+:summary: No web admin UI in Lucee 7 — use the CLI instead
+---
 
-Key sections in the admin:
+Lucee 7 **removed the web-based admin console** (`/lucee/admin/server.cfm`) from its default distribution. This was a deliberate decision — the web UI is a security risk (an admin panel exposed on every server), and modern infrastructure practice treats server config as code, not as something clicked through a browser.
 
-| Section | What you do there |
-|---|---|
-| **Services → Datasource** | Add, edit, verify datasource connections |
-| **Services → Mail** | Configure SMTP server for `<cfmail>` |
-| **Settings → Performance** | Tune template cache size and request timeouts |
-| **Extensions** | Install PDF, S3, image, and other optional extensions |
-| **Debug & Log → Logs** | View server, application, and exception logs |
+**The correct way to administer Lucee 7 is via the CommandBox CLI:**
+
+```bash
+# Show all current server settings
+box cfconfig show
+
+# Set a specific value
+box cfconfig set adminPassword=training
+
+# Export current config to a portable JSON file
+box cfconfig export to=.CFConfig.json
+
+# Apply config from file (use on every environment, in CI/CD)
+box cfconfig import from=.CFConfig.json
+```
+
+Commit `.CFConfig.json` to git alongside your application code — any developer or pipeline runs `box cfconfig import` and gets an identical server configuration. This is the same "infrastructure as code" principle that Terraform applies to cloud resources, applied to your CFML engine.
+
+::
 
 ---
 
@@ -275,14 +290,21 @@ The response should contain **OK** or a ticket count — no errors or exceptions
 
 ::hint-box
 ---
-:summary: Getting a datasource error on Lucee? The datasource may not be configured yet.
+:summary: Getting a datasource error on Lucee? Add it via cfconfig.
 ---
 
-Lucee and Adobe CF each have their own datasource registry — a datasource defined in the Adobe CF admin is not automatically available in Lucee. If `verify_ds.cfm` throws a datasource error on port 8888, you need to add `training_db` in the Lucee admin.
+Lucee and Adobe CF each have their own datasource registry — a datasource defined in the Adobe CF admin is not automatically available in Lucee. If `verify_ds.cfm` throws a datasource error on port 8888, add the datasource via the CLI:
 
-Open the **Lucee Dev Server** tab, go to `/lucee/admin/server.cfm`, click **Services → Datasource**, and add a new H2 datasource named `training_db` pointing to `/opt/coldfusion2025/cfusion/db/training_db`.
+```bash
+box cfconfig set datasources.training_db.type=H2 \
+  datasources.training_db.database=/opt/coldfusion2025/cfusion/db/training_db \
+  datasources.training_db.username=sa \
+  datasources.training_db.password=""
+```
 
-Alternatively, if `Application.cfc` defines the datasource inline using `this.datasource` and a JDBC URL, Lucee will pick it up automatically without any admin configuration.
+Then restart the server: `sudo systemctl restart lucee-server.service`
+
+Alternatively, define the datasource inline in `Application.cfc` using `this.datasource` and a JDBC URL — Lucee will pick it up automatically without any CLI configuration.
 
 ::
 

@@ -56,12 +56,14 @@
 </div>
 
 <div class="card">
-  <h3>🔧 Administration</h3>
-  <a href="lucee/admin/server.cfm" target="_blank" rel="noopener noreferrer"
-     style="display:inline-block;margin-top:.25rem;padding:.55rem 1.2rem;background:#1d4ed8;color:#fff;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">
-    Lucee Admin Console ↗
-  </a>
-  <p style="margin:.6rem 0 0;color:#64748b;font-size:.8rem">Opens in a new tab — default password: <code>training</code></p>
+  <h3>🔧 Administration (CLI)</h3>
+  <p style="margin:0 0 .75rem;color:#94a3b8;font-size:.875rem">Lucee 7 is administered via the CommandBox CLI — no web UI. Run these in the <strong>Terminal</strong> tab:</p>
+  <ul>
+    <li><code>box cfconfig show</code> — show all current server settings</li>
+    <li><code>box cfconfig set adminPassword=training</code> — change admin password</li>
+    <li><code>box cfconfig export to=.CFConfig.json</code> — export config to file</li>
+    <li><code>box cfconfig import from=.CFConfig.json</code> — apply config from file</li>
+  </ul>
 </div>
 
 <hr>
