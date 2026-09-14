@@ -5,26 +5,92 @@ show "Couldn't load the challenge" on the platform.
 
 ---
 
-## 1. Directory structure
+## Two files are involved
 
-```
-challenges/
-  <challenge-name>/
-    index.md        ← single file, contains EVERYTHING
-```
-
-There is no `unit-1.md` for challenges. One file only.
+| File | Kind | What it does |
+|---|---|---|
+| `course-foundations/module-X/Y.lesson-name/index.md` | `kind: lesson` | Links the challenge slug and defines verification tasks |
+| `challenges/<name>/index.md` | `kind: challenge` | The standalone challenge content students see |
 
 ---
 
-## 2. `index.md` structure
+## 1. Lesson `index.md` — how to reference a challenge
 
-The file has two sections separated by the closing `---`:
+The lesson `index.md` is `kind: lesson`. The challenge slug goes under
+`challenges:` **before** `tasks:`:
+
+```yaml
+---
+kind: lesson
+
+title: Multimedia Content Integration
+name: multimedia-content-integration
+slug: multimedia-content-integration
+
+createdAt: 2026-09-03
+updatedAt: 2026-09-03
+
+categories:
+- programming
+
+tagz:
+- coldfusion
+
+playground:
+  name: cf-alex-edcdf975
+
+challenges:
+  multimedia-2ed52176: {}
+
+tasks:
+  verify_something:
+    machine: dev-machine
+    user: laborant
+    run: |
+      echo "ok"
+---
+```
+
+**Rules:**
+- `challenges:` comes BEFORE `tasks:`
+- Value is always `{}` — no extra config needed
+- The slug must exactly match what the platform assigned when you ran `labctl content create`
+
+---
+
+## 2. Lesson `unit-1.md` — embedding the challenge card
+
+At the very end of `unit-1.md`, add the `::card` block:
+
+```markdown
+::card
+---
+:challenge: challenges.<platform-slug>
+---
+::
+```
+
+Example:
+
+```markdown
+::card
+---
+:challenge: challenges.multimedia-2ed52176
+---
+::
+```
+
+---
+
+## 3. Challenge `index.md` — the standalone challenge file
+
+Lives in `challenges/<name>/index.md`. This is `kind: challenge` and is a
+completely separate file from the lesson. It has two sections:
 
 ```
-[frontmatter]
+[frontmatter with kind: challenge]
 ---
-[body content]
+[body content with ::simple-task blocks]
 ```
 
 ### Frontmatter
@@ -51,14 +117,13 @@ createdAt: 2026-09-03
 updatedAt: 2026-09-03
 
 playground:
-  name: cf-alex-edcdf975   # exact playground name from labctl playground list
+  name: cf-alex-edcdf975
 
 tasks:
   task_name_1:
     machine: dev-machine
     user: laborant
     run: |
-      # bash script that exits 0 on success, 1 on failure
       echo "ok"
 
   task_name_2:
@@ -72,27 +137,19 @@ tasks:
 ```
 
 **Critical rules:**
-- NO `name:` field in the frontmatter — the platform assigns the name/slug at
-  creation time. Adding `name:` causes issues.
-- `playground.name` must exactly match the playground slug from
-  `labctl playground list`
-- Task names must be valid identifiers (lowercase, underscores, no hyphens)
-- `needs:` creates a dependency chain — a task only runs after its dependency passes
+- NO `name:` field — the platform assigns the slug at creation time
+- `playground.name` must exactly match `labctl playground list`
+- Task names: lowercase, underscores only, no hyphens
 
 ### Body content
 
-The body is the student-facing challenge page. It **must** contain
-`::simple-task` blocks wired to each task in the frontmatter — without them
-the platform shows "Couldn't load the challenge".
+**Every task in the frontmatter MUST have a matching `::simple-task` in the
+body** — without this the platform shows "Couldn't load the challenge":
 
 ```markdown
-## Your challenge title
+## Challenge title
 
-Explanation of what the student needs to do.
-
-### Step 1 — Do something
-
-Instructions here.
+Instructions for the student.
 
 ::simple-task
 ---
@@ -119,37 +176,40 @@ Task 2 complete. ✓
 ::
 ```
 
-**Every task in the frontmatter must have a matching `::simple-task` in the body.**
-
 ---
 
-## 3. Creating and pushing a challenge
+## 4. Full workflow — creating a new challenge
 
-### Step 1 — Create on the platform (first time only)
+### Step 1 — Create the challenge on the platform (first time only)
 
 ```bash
 labctl content create challenge <local-name> -d challenges/<local-name> --no-open -q
 ```
 
-This prints the platform-assigned slug, e.g. `my-challenge-a1b2c3d4`.
-**Save this slug** — you need it everywhere.
+Prints the platform-assigned slug, e.g. `my-challenge-a1b2c3d4`. **Save it.**
 
-### Step 2 — Push content
+### Step 2 — Write the challenge content
+
+Edit `challenges/<local-name>/index.md` with the correct frontmatter and body.
+
+### Step 3 — Push the challenge
 
 ```bash
 labctl content push -f challenge <platform-slug> -d challenges/<local-name>
 ```
 
-### Step 3 — Wire the challenge into the lesson
+### Step 4 — Update the lesson `index.md`
 
-In the lesson `index.md`, add under the frontmatter:
+Add the slug under `challenges:` before `tasks:`:
 
 ```yaml
 challenges:
   <platform-slug>: {}
 ```
 
-In the lesson `unit-1.md`, add at the very end:
+### Step 5 — Update the lesson `unit-1.md`
+
+Add at the very end:
 
 ```markdown
 ::card
@@ -159,32 +219,13 @@ In the lesson `unit-1.md`, add at the very end:
 ::
 ```
 
-### Step 4 — Push the course
+### Step 6 — Push the course
 
 ```bash
-labctl content push -f course <course-slug> -d course-foundations
+labctl content push -f course ColdFusion-2025-Foundations-5151cba6 -d course-foundations
 ```
 
-**Both the challenge AND the course must be pushed** — pushing only one is not enough.
-
----
-
-## 4. Linking from a lesson — `::card` syntax
-
-The `::card` block in `unit-1.md` is what embeds the challenge card at the
-bottom of the lesson. The exact syntax is:
-
-```markdown
-::card
----
-:challenge: challenges.<platform-slug>
----
-::
-```
-
-- Use `challenges.` prefix for challenges
-- Use `tutorials.` prefix for tutorials
-- The slug must exactly match what the platform assigned
+**Both the challenge AND the course must be pushed every time.**
 
 ---
 
@@ -192,41 +233,30 @@ bottom of the lesson. The exact syntax is:
 
 | Error | Cause | Fix |
 |---|---|---|
-| "Couldn't load the challenge" | No `::simple-task` blocks in body | Add a `::simple-task` for every task |
-| "Couldn't load the challenge" | Wrong slug in `::card` | Check slug with `labctl content list` |
-| Challenge loads but tasks don't run | `needs:` chain broken | Verify task names match exactly |
-| Challenge not visible in lesson | Course not pushed after index.md change | Run `labctl content push -f course ...` |
+| "Couldn't load the challenge" | No `::simple-task` blocks in challenge body | Add a `::simple-task` for every task in frontmatter |
+| "Couldn't load the challenge" | Wrong slug in `::card` or `challenges:` | Check with `labctl content list` |
+| Challenge not visible in lesson | Course not pushed after lesson `index.md` change | Run `labctl content push -f course ...` |
 | `labctl: Couldn't get content: not found` | Pushing before creating | Run `labctl content create` first |
+| Challenge loads but tasks don't run | `needs:` chain broken | Verify task names match exactly in frontmatter and `::simple-task` |
 
 ---
 
-## 6. Checking existing slugs
+## 6. Checking slugs
 
 ```bash
-# List all your challenges
-labctl content list | grep -A3 "kind: challenge"
+# List all content (shows published items)
+labctl content list
 
-# List all tutorials
-labctl content list | grep -A3 "pageUrl.*tutorials"
-
-# Pull what the platform actually has for a slug
+# Pull what the platform has for a specific slug (works for drafts too)
 labctl content pull challenge <slug> -d /tmp/check-pull
 ```
 
----
-
-## 7. Full working example
-
-See `challenges/multimedia/index.md` — this is a tested, working challenge
-linked from `course-foundations/module-1/7.lesson-multimedia/`.
-
-Platform slug: `multimedia-2ed52176`
-Lesson index: `course-foundations/module-1/7.lesson-multimedia/index.md`
-Lesson unit: `course-foundations/module-1/7.lesson-multimedia/unit-1.md`
+Note: `labctl content list` only shows **published** content. Draft/author-only
+challenges won't appear but can still be pulled and are accessible to the author.
 
 ---
 
-## 8. Slugs reference
+## 7. Slugs reference
 
 ### Challenges
 
@@ -234,9 +264,15 @@ Lesson unit: `course-foundations/module-1/7.lesson-multimedia/unit-1.md`
 |---|---|
 | `challenges/multimedia` | `multimedia-2ed52176` |
 
-### Course
+### Courses
 
 | Course | Platform slug |
 |---|---|
 | ColdFusion 2025: Foundations | `ColdFusion-2025-Foundations-5151cba6` |
 | ColdFusion 2025: Production & AI | `ColdFusion-2025-Production-and-AI-6124d4b3` |
+
+### Playground
+
+| Name | Slug |
+|---|---|
+| Foundations (Course 1) | `cf-alex-edcdf975` |
