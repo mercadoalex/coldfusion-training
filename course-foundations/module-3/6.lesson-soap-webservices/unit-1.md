@@ -302,7 +302,7 @@ A public `?wsdl` URL is an **attack map** — it tells anyone every operation na
 
 ---
 
-::hint-box
+::highlight-box
 ---
 :summary: Which engine are we using in this lesson — Adobe CF or Lucee?
 ---
@@ -522,4 +522,10 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
 Lesson complete. On to the next one!
+::
+
+::remark-box
+Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
+
+📧 Alex — mercadoalex[at]gmail.com
 ::
