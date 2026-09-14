@@ -27,14 +27,17 @@ not by file proximity.
 
 ## 1. Lesson `index.md` — how to reference a challenge
 
-The lesson `index.md` is `kind: lesson`. The challenge slug goes under
-`challenges:` **before** `tasks:`:
+The lesson `index.md` is `kind: lesson`. The complete structure — based on a
+real working example:
 
 ```yaml
 ---
 kind: lesson
 
 title: Multimedia Content Integration
+description: |
+  Embed and manage video, audio and other multimedia in ColdFusion applications.
+
 name: multimedia-content-integration
 slug: multimedia-content-integration
 
@@ -46,6 +49,10 @@ categories:
 
 tagz:
 - coldfusion
+- html5
+- multimedia
+
+# cover: __static__/cover.png
 
 playground:
   name: cf-alex-edcdf975
@@ -54,18 +61,35 @@ challenges:
   multimedia-2ed52176: {}
 
 tasks:
-  verify_something:
+  verify_media_page:
     machine: dev-machine
     user: laborant
     run: |
-      echo "ok"
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "media_demo.cfm not found (got ${STATUS})"
+        exit 1
+      fi
+      echo "media_demo.cfm is accessible"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_media_page
+    run: |
+      echo "Lesson complete — well done!"
 ---
 ```
 
 **Rules:**
+- `kind: lesson` — never `kind: challenge`
 - `challenges:` comes BEFORE `tasks:`
-- Value is always `{}` — no extra config needed
-- The slug must exactly match what the platform assigned when you ran `labctl content create`
+- The challenge slug value is always `{}` — no extra config
+- The slug must exactly match what the platform assigned (`labctl content create` prints it)
+- `# cover: __static__/cover.png` is optional — comment it out if no cover image exists
+- Tasks are bash scripts — exit 0 = pass, exit 1 = fail
+- `needs:` creates a dependency chain — task only runs after its dependency passes
 
 ---
 
