@@ -32,6 +32,32 @@ _Lucee and Adobe CF share the same CFML language core — the differences are in
 | **`systemOutput()`** | Built-in | Use `<cflog>` instead |
 | **Managed by** | Lucee Association Switzerland | Adobe Inc. |
 
+::hint-box
+---
+:summary: What is a cold start — and why is Lucee faster at it?
+---
+
+A **cold start** is what happens the very first time a CFML engine boots from zero — loading the JVM, initialising the engine internals, compiling Application.cfc, and making the first request ready to serve. Everything after that is a **warm start** — the engine is already running and requests are handled quickly.
+
+**Why cold start speed matters:**
+In traditional always-on servers, cold start happens once and you forget about it. It matters a lot in modern deployments:
+- **Containers (Docker/Kubernetes)** — new container instances spin up on demand; a slow cold start means slow scale-out
+- **Serverless** — functions start fresh per request in some architectures; a 30-second cold start is unacceptable
+- **Local development** — developers restart the server dozens of times a day; 5 seconds vs 30 seconds adds up fast
+
+**Why Lucee is faster than Adobe CF:**
+
+| Reason | Detail |
+|---|---|
+| **Lighter engine core** | Lucee loads fewer built-in subsystems at startup — no PDF engine, no Flash gateway, no legacy CORBA layer |
+| **On-demand loading** | Lucee loads most optional features only when first used, not at startup |
+| **Smaller footprint** | Lucee's core JAR is significantly smaller than Adobe CF's — less bytecode to initialise |
+| **No setup wizard check** | Adobe CF checks for first-run wizard completion on every boot; Lucee skips this entirely |
+
+In this playground, Lucee typically starts in **5–8 seconds**. Adobe CF 2025 takes **25–35 seconds**. You can observe this by restarting each service and timing how long until HTTP responses return.
+
+::
+
 ::details-box
 ---
 :summary: Lucee vs Adobe CF — which should you use?
