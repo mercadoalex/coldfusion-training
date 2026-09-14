@@ -319,6 +319,23 @@ All files in this lesson go into `/opt/coldfusion2025/cfusion/wwwroot/` and are 
 
 **File to create:** `/opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm`
 
+::hint-box
+---
+:summary: Make sure the database is seeded before running this activity
+---
+
+The `TicketService.cfc` queries the `hd_tickets` table in `training_db`. If the database has not been seeded yet, the SOAP call will return a database error.
+
+Seed the database now — open the **ColdFusion 2025** tab and visit:
+
+```
+http://localhost:8500/seed-db.cfm
+```
+
+You should see a success message confirming the tables and sample data were created. It is safe to run multiple times — it skips rows that already exist.
+
+::
+
 In the **Terminal** tab, first create the `TicketService.cfc` that will be consumed:
 
 ```bash
