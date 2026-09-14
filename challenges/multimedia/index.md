@@ -166,4 +166,74 @@ Create an HTML5 page (`<!DOCTYPE html>`) that:
 curl -s http://localhost:8500/unit1challenge/index.cfm | head -30
 ```
 
-All six checks must pass green to complete the challenge.
+::simple-task
+---
+:tasks: tasks
+:name: verify_app_cfc
+---
+#active
+Waiting for `Application.cfc` with `this.name` set in `unit1challenge/`...
+
+#completed
+`Application.cfc` exists with `this.name`. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_portfolio_cfc
+---
+#active
+Waiting for `PortfolioService.cfc` with at least 2 functions...
+
+#completed
+`PortfolioService.cfc` exists with the required functions. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_index_page
+---
+#active
+Waiting for `index.cfm` to return HTTP 200 with an HTML5 doctype...
+
+#completed
+`index.cfm` is accessible and has an HTML5 doctype. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_dynamic_output
+---
+#active
+Checking that `index.cfm` uses `PortfolioService` for dynamic output...
+
+#completed
+`index.cfm` uses dynamic CFML output. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_html5_media
+---
+#active
+Checking for an HTML5 media element or form input type in `index.cfm`...
+
+#completed
+HTML5 media or form input type found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_session_or_application_scope
+---
+#active
+Checking that `Application.cfc` uses session or application scope...
+
+#completed
+Application lifecycle scope usage confirmed. All six checks passed — challenge complete! ✓
+::
