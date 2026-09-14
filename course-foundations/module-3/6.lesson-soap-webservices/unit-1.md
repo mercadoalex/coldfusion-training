@@ -46,6 +46,8 @@ _SOAP and REST both use HTTP — the key differences are contract strictness, pa
 
 **The practical rule:** if you are integrating with a system built before 2010, expect SOAP. If you are building something new, use REST. ColdFusion handles both equally well.
 
+**What about gRPC?** ColdFusion has no native gRPC support. gRPC uses HTTP/2 and binary Protocol Buffers — outside CF's built-in web service layer. If you need to call a gRPC service from ColdFusion, put a REST gateway in front of it (gRPC-Gateway, Envoy) and call that via `cfhttp`. For this course, gRPC is out of scope.
+
 ::
 
 ---
