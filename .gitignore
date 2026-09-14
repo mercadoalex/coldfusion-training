@@ -15,3 +15,7 @@ rootfs/examinerctl
 
 # documentation just for me
 docs/
+# One-off fix scripts
+add_lesson_complete.py
+fix_index_task_placement.py
+fix_stray_playground_task.py
