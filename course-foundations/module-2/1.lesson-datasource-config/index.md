@@ -23,6 +23,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  datasource-verify-fe85448d: {}
+
 tasks:
   verify_no_error:
     machine: dev-machine

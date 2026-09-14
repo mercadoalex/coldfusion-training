@@ -656,3 +656,9 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 Lesson complete. On to the next one!
 ::
 
+
+::card
+---
+:challenge: challenges.caching-10837ff1
+---
+::

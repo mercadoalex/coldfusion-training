@@ -24,7 +24,7 @@ playground:
   name: cf-alex-edcdf975
 
 challenges:
-  caching_10837ff1: {}
+  caching-10837ff1: {}
 
 tasks:
   verify_query_cache:

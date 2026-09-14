@@ -75,3 +75,39 @@ Hit it twice — the second request must return cleanly.
 curl -s http://localhost:8500/cache_demo.cfm
 curl -s http://localhost:8500/cache_demo.cfm
 ```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cache_page
+---
+#active
+Waiting for `cache_demo.cfm` to return HTTP 200...
+
+#completed
+`cache_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_caching_used
+---
+#active
+Checking for a caching directive in `cache_demo.cfm`...
+
+#completed
+Caching directive found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_no_error_on_repeat
+---
+#active
+Confirming no error on repeated requests...
+
+#completed
+No error on repeated requests — challenge complete! ✓
+::

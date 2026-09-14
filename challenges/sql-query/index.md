@@ -72,3 +72,39 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/tickets.cfm` that:
 ```bash
 curl -s http://localhost:8500/tickets.cfm | grep -i "ticket\|title"
 ```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_tickets_page
+---
+#active
+Waiting for `tickets.cfm` to return HTTP 200...
+
+#completed
+`tickets.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_shows_data
+---
+#active
+Checking that `tickets.cfm` displays ticket data...
+
+#completed
+Ticket data is displayed. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_queryparam
+---
+#active
+Checking that `cfqueryparam` is used...
+
+#completed
+`cfqueryparam` found — SQL injection protection in place! ✓
+::

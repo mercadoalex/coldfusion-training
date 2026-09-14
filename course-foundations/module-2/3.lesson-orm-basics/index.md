@@ -23,6 +23,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  orm-entity-ebb44fb8: {}
+
 tasks:
   verify_orm_enabled:
     machine: dev-machine

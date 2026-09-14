@@ -72,3 +72,39 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm
 ```
 
 Open the **ColdFusion** browser tab to see the rendered chart.
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_chart_page
+---
+#active
+Waiting for `chart_demo.cfm` to return HTTP 200...
+
+#completed
+`chart_demo.cfm` is accessible. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfchart_tag
+---
+#active
+Checking for `cfchart` in `chart_demo.cfm`...
+
+#completed
+`cfchart` tag found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_query_data
+---
+#active
+Checking that the chart uses live query data...
+
+#completed
+Chart powered by query data — challenge complete! ✓
+::

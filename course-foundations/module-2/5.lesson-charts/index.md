@@ -25,7 +25,7 @@ playground:
   name: cf-alex-edcdf975
 
 challenges:
-  charts_0e333dfe: {}
+  charts-0e333dfe: {}
 
 tasks:
   verify_bar_chart:

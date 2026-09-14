@@ -71,3 +71,39 @@ tasks:
 ```bash
 curl -s http://localhost:8500/orm_test.cfm | grep -vi "error\|exception"
 ```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_orm_enabled
+---
+#active
+Checking that ORM is enabled in `Application.cfc`...
+
+#completed
+ORM enabled in `Application.cfc`. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_entity_cfc
+---
+#active
+Looking for a persistent ORM entity CFC...
+
+#completed
+Persistent ORM entity found. ✓
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_orm_test_page
+---
+#active
+Checking that `orm_test.cfm` runs without errors...
+
+#completed
+ORM test page runs cleanly — challenge complete! ✓
+::

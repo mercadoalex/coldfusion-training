@@ -24,6 +24,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  sql-query-e89dcfe4: {}
+
 tasks:
   verify_query_page:
     machine: dev-machine

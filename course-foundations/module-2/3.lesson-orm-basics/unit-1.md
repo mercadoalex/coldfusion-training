@@ -484,3 +484,9 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 #completed
 Lesson complete. On to the next one!
 ::
+
+::card
+---
+:challenge: challenges.orm-entity-ebb44fb8
+---
+::
