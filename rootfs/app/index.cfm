@@ -57,7 +57,7 @@
 
 <div class="card">
   <h3>🔧 Administration</h3>
-  <a href="/lucee/admin/server.cfm" target="_blank" rel="noopener noreferrer"
+  <a href="lucee/admin/server.cfm" target="_blank" rel="noopener noreferrer"
      style="display:inline-block;margin-top:.25rem;padding:.55rem 1.2rem;background:#1d4ed8;color:#fff;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none">
     Lucee Admin Console ↗
   </a>
