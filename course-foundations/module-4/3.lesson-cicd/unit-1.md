@@ -6,7 +6,11 @@ title: CI/CD for CFML Applications
 name: cicd-cfml-applications-unit-1
 ---
 
-## The CI/CD pipeline
+## What is CI/CD?
+
+**CI (Continuous Integration)** means every code change is automatically tested before it is merged. **CD (Continuous Delivery)** means every passing build is automatically packaged and ready to deploy — or deployed automatically.
+
+For a ColdFusion application the pipeline looks like this:
 
 ::image-box
 ---
@@ -14,23 +18,49 @@ name: cicd-cfml-applications-unit-1
 :alt: Linear pipeline diagram showing five stages connected by rightward arrows — stage 1 "Git push" (dev laptop icon), stage 2 "GitHub Actions triggered" (GitHub logo), stage 3 "box install + box testbox run" (CommandBox logo, green checkmark), stage 4 "docker build -t cfml-app" (Docker whale logo), stage 5 "docker run deployed" (server rack icon) — a red X on stage 3 shows that failing tests stop the pipeline and no image is built
 :max-width: 900px
 ---
-_The CFML CI/CD pipeline: tests gate the build — a failing TestBox run stops the Docker image from being created._
+_Tests gate the build — a failing TestBox run stops the Docker image from being created._
 ::
-
-The goal: push code → tests run automatically → a Docker image is built → the image is deployed. No manual SSH required.
 
 ```
 Git push
   └─► GitHub Actions
         ├─► box install
-        ├─► box testbox run
+        ├─► box testbox run      ← failing tests stop here
         └─► docker build -t cfml-app .
               └─► docker run -p 8888:8888 cfml-app
 ```
 
 ---
 
-## 1. Dockerfile
+## 1. box.json — package your project
+
+`box.json` is the CommandBox project manifest. It declares your app name, version, and ForgeBox dependencies — similar to `package.json` in Node or `composer.json` in PHP.
+
+```json
+{
+  "name": "helpdesk-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "testbox": "^5.0.0"
+  }
+}
+```
+
+`box install` reads this file and installs all declared packages into a `modules/` directory.
+
+::hint-box
+---
+:summary: 💡 Why does box.json matter for CI/CD?
+---
+
+In a CI pipeline the build agent starts with a clean environment — nothing is pre-installed. `box install` is the command that rebuilds your dependency tree from scratch using `box.json` as the source of truth. Without it, the pipeline has no way to know what packages your app needs.
+
+This is the same reason Node projects commit `package.json` and PHP projects commit `composer.json` — the manifest is what makes the build reproducible.
+::
+
+---
+
+## 2. Dockerfile — package your app as a container
 
 ::image-box
 ---
@@ -40,9 +70,6 @@ Git push
 ---
 _The CommandBox Dockerfile is minimal — the base image handles the runtime, you just copy code and install packages._
 ::
-
-
-Use the official CommandBox image as the base:
 
 ```dockerfile
 FROM ortussolutions/commandbox:latest
@@ -57,33 +84,26 @@ CMD ["box", "server", "start", "--console"]
 ```
 
 This image:
-1. Copies your CFML project into `/app`
-2. Installs ForgeBox dependencies
-3. Starts the Lucee server on port 8888 in the foreground
+1. Uses the official CommandBox base (Java + Lucee bundled)
+2. Copies your CFML project into `/app`
+3. Installs only production ForgeBox dependencies
+4. Starts the Lucee server on port 8888 in the foreground
 
+::hint-box
+---
+:summary: 💡 Why --production?
 ---
 
-## 2. Build and run locally
-
-```bash
-docker build -t cfml-app .
-docker run -p 8888:8888 cfml-app
-```
-
-Test it:
-
-```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm
-```
-
-The task checks that a Docker image named `cfml` exists: `docker images | grep cfml`.
+`box install --production` skips dev-only packages (like TestBox). Your running container does not need a test framework — keeping it out reduces image size and attack surface. Tests run in the CI pipeline, not in the deployed container.
+::
 
 ---
 
 ## 3. GitHub Actions workflow
 
+Push this file to `.github/workflows/ci.yml` and GitHub will run it automatically on every push and pull request:
+
 ```yaml
-# .github/workflows/ci.yml
 name: CI
 on: [push, pull_request]
 
@@ -105,15 +125,55 @@ jobs:
 
       - name: Run tests
         run: box testbox run
+
+      - name: Build Docker image
+        run: docker build -t cfml-app .
 ```
 
-Push this file to `.github/workflows/ci.yml` and GitHub will run it on every push.
+::hint-box
+---
+:summary: 💡 What happens when a test fails?
+---
+
+GitHub Actions runs each step in sequence. If `box testbox run` exits with a non-zero code (which TestBox does when tests fail), GitHub Actions stops immediately — the `docker build` step never runs. This is the gate that prevents broken code from being packaged and deployed.
+
+You can see the exact failing test in the Actions log on GitHub — click the red ✗ next to the run.
+::
 
 ---
 
-## 4. box.json — declare dependencies
+## 4. CFConfig — inject config at runtime
 
-```json
+Never hard-code datasource credentials in your image. Use CFConfig to inject them at container start-time via environment variables:
+
+```bash
+# In your Dockerfile or entrypoint script
+box cfconfig set datasourceUsername=$DB_USER \
+               datasourcePassword=$DB_PASSWORD \
+               datasourceDatabase=training
+```
+
+In GitHub Actions, store secrets under **Settings → Secrets and variables → Actions** and reference them as `${{ secrets.DB_PASSWORD }}`.
+
+::hint-box
+---
+:summary: 💡 Why not just put credentials in the Dockerfile?
+---
+
+A Docker image is a portable artefact — it gets pushed to a registry where anyone with access can pull it and inspect every layer. Credentials baked into the image are exposed to anyone who can pull it, and they end up in your git history too.
+
+Environment variables injected at runtime stay out of the image entirely. The container gets the secret only when it starts, and only in memory.
+::
+
+---
+
+## Activity 1 — Create box.json
+
+Create a `box.json` file in `/home/laborant/app/` to package the project with CommandBox:
+
+```bash
+mkdir -p /home/laborant/app
+tee /home/laborant/app/box.json << 'EOF'
 {
   "name": "helpdesk-app",
   "version": "1.0.0",
@@ -121,28 +181,14 @@ Push this file to `.github/workflows/ci.yml` and GitHub will run it on every pus
     "testbox": "^5.0.0"
   }
 }
+EOF
 ```
 
-`box install` reads this file and installs all declared packages.
-
----
-
-## 5. CFConfig for environment config
-
-Use CFConfig to inject datasource settings at container start-time (no hard-coded credentials in your image):
+Verify it exists:
 
 ```bash
-# In your Dockerfile or entrypoint
-box cfconfig set datasourceUsername=training_db_user \
-               datasourcePassword=$DB_PASSWORD \
-               datasourceDatabase=training
+cat /home/laborant/app/box.json
 ```
-
----
-
-## Exercises
-
-1. Create `box.json` in `/home/laborant/app/` or `/opt/coldfusion2025/cfusion/wwwroot/`.
 
 ::simple-task
 ---
@@ -150,13 +196,37 @@ box cfconfig set datasourceUsername=training_db_user \
 :name: verify_box_json
 ---
 #active
-Create `box.json` in the app directory to package the project with CommandBox.
+Create `box.json` in `/home/laborant/app/` to package the project with CommandBox.
 
 #completed
 `box.json` found. ✓
 ::
 
-2. Create a `Dockerfile` in the same directory using the CommandBox base image.
+---
+
+## Activity 2 — Create the Dockerfile
+
+Create a `Dockerfile` in the same directory using the CommandBox base image:
+
+```bash
+tee /home/laborant/app/Dockerfile << 'EOF'
+FROM ortussolutions/commandbox:latest
+
+COPY . /app
+WORKDIR /app
+
+RUN box install --production
+
+EXPOSE 8888
+CMD ["box", "server", "start", "--console"]
+EOF
+```
+
+Verify it exists:
+
+```bash
+cat /home/laborant/app/Dockerfile
+```
 
 ::simple-task
 ---
@@ -164,19 +234,35 @@ Create `box.json` in the app directory to package the project with CommandBox.
 :name: verify_dockerfile
 ---
 #active
-Create a `Dockerfile` in the same directory using the CommandBox base image.
+Create a `Dockerfile` in `/home/laborant/app/` using the CommandBox base image.
 
 #completed
 `Dockerfile` found. ✓
 ::
 
-3. Build a Docker image tagged `cfml-app`:
+---
+
+## Activity 3 — Build the Docker image
+
+Build the Docker image tagged `cfml-app`:
 
 ```bash
 docker build -t cfml-app /home/laborant/app/
-# or
-docker build -t cfml-app /opt/coldfusion2025/cfusion/wwwroot/
 ```
+
+Confirm the image was created:
+
+```bash
+docker images | grep cfml
+```
+
+::hint-box
+---
+:summary: 🐢 Build taking a long time? That is normal on first run.
+---
+
+Docker pulls the `ortussolutions/commandbox:latest` base image on the first build — that is roughly 500 MB. Subsequent builds reuse the cached layers and are much faster. The `RUN box install --production` step is also cached after the first run as long as `box.json` does not change.
+::
 
 ::simple-task
 ---
@@ -184,17 +270,11 @@ docker build -t cfml-app /opt/coldfusion2025/cfusion/wwwroot/
 :name: verify_docker_build
 ---
 #active
-Build the Docker image: `docker build -t cfml-app .` — a `cfml` image must appear in `docker images`.
+Build the Docker image: `docker build -t cfml-app /home/laborant/app/` — a `cfml` image must appear in `docker images`.
 
 #completed
-Docker image exists. ✓
+Docker image built successfully. ✓
 ::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -206,14 +286,14 @@ When all the checks above are green, this lesson is complete. Your progress is s
 :name: verify_lesson_complete
 ---
 #active
-All done? Hit **Check** to mark this lesson complete and unlock the next one.
+Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
-Lesson complete. On to the next one!
+Lesson complete — on to Production Readiness! 🚀
 ::
 
-::card
----
-:challenge: challenges.cicd_pipeline_6f98584e
----
+::remark-box
+Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
+
+📧 Alex — mercadoalex[at]gmail.com
 ::

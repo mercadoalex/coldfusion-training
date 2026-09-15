@@ -58,19 +58,17 @@ tasks:
       - verify_dockerfile
     run: |
       if ! docker images 2>/dev/null | grep -q "cfml"; then
-        echo "No cfml Docker image built yet — run: docker build -t cfml-app ."
+        echo "No cfml Docker image built yet — run: docker build -t cfml-app /home/laborant/app/"
         exit 1
       fi
       echo "cfml Docker image exists"
 
-
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_docker_build
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  cicd_pipeline_6f98584e: {}
 
 ---
