@@ -8,6 +8,8 @@ description: |
   entity mapped to hd_tickets, and create orm_test.cfm that loads entities
   without throwing an error.
 
+difficulty: medium
+
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
 

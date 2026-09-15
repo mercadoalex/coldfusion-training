@@ -8,6 +8,8 @@ description: |
   cacheGet/cachePut, or cfcache. The page must return HTTP 200 on the first
   and second request without throwing errors.
 
+difficulty: medium
+
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
 

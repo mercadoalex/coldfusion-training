@@ -8,6 +8,8 @@ description: |
   cfqueryparam (or queryExecute named bindings) for every parameterised value.
   The page must return HTTP 200 and show ticket data.
 
+difficulty: medium
+
 createdAt: 2026-09-03
 updatedAt: 2026-09-03
 

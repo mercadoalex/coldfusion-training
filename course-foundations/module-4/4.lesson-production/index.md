@@ -24,6 +24,9 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
+challenges:
+  health-endpoint-a895d35e: {}
+
 tasks:
   verify_health_endpoint:
     machine: dev-machine
@@ -63,14 +66,12 @@ tasks:
       fi
       echo "Health endpoint returns correct HTTP status ${HTTP_CODE}"
 
-
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_health_http_code
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  health_endpoint_a895d35e: {}
 
 ---
