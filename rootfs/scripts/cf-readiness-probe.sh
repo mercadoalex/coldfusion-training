@@ -43,5 +43,16 @@ wait_for_port "Lucee/CommandBox" "${LUCEE_PORT}" || \
 
 log "All services ready. Playground is open."
 
+# ── Auto-seed the training_db ─────────────────────────────────────────────────
+# Hit seed-db.cfm once so tables and data exist before students run any queries.
+# Safe to call repeatedly — the CFM skips inserts if data is already present.
+log "Seeding training_db..."
+SEED_RESULT=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8500/seed-db.cfm 2>/dev/null || echo "failed")
+if [ "${SEED_RESULT}" = "200" ]; then
+  log "training_db seeded OK."
+else
+  log "WARNING: seed-db.cfm returned ${SEED_RESULT} — DB may not be populated."
+fi
+
 # Write a ready-flag file that init tasks can test
 touch /run/cf-training-ready
