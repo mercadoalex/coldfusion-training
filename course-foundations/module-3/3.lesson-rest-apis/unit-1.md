@@ -211,6 +211,27 @@ ColdFusion exposes the HTTP verb via `cgi.REQUEST_METHOD`. A single file can han
 </cfscript>
 ```
 
+::hint-box
+---
+:summary: 💡 Why is it called cgi.REQUEST_METHOD?
+---
+
+The `cgi` scope is not a ColdFusion invention — it is the **Common Gateway Interface** (CGI), a standard from 1993 that defined how web servers pass request information to server-side programs. Every web server still populates these variables for every request, and ColdFusion exposes them all in the `cgi` scope.
+
+The most useful ones for API development:
+
+| Variable | Contains |
+|---|---|
+| `cgi.REQUEST_METHOD` | The HTTP verb — `GET`, `POST`, `DELETE`, etc. |
+| `cgi.QUERY_STRING` | Everything after the `?` in the URL |
+| `cgi.CONTENT_TYPE` | The `Content-Type` header of the request body |
+| `cgi.REMOTE_ADDR` | The client's IP address |
+| `cgi.HTTP_HOST` | The `Host` header sent by the client |
+| `cgi.SERVER_NAME` | The hostname of the server |
+
+A Perl CGI script from 1995 read the same variable as `$ENV{REQUEST_METHOD}`. The names haven't changed in 30 years because the HTTP spec hasn't changed. When you write `cgi.REQUEST_METHOD` in CFML you are reading the exact same live request metadata — nothing legacy about it.
+::
+
 ---
 
 ## 5. CFC Service pattern
