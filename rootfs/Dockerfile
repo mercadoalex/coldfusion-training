@@ -175,7 +175,9 @@ COPY rootfs/scripts/cf-server.service          /etc/systemd/system/cf-server.ser
 COPY rootfs/scripts/lucee-server.service       /etc/systemd/system/lucee-server.service
 COPY rootfs/scripts/cf-readiness-probe.service /etc/systemd/system/cf-readiness-probe.service
 COPY rootfs/scripts/cf-readiness-probe.sh      /usr/local/bin/cf-readiness-probe
-RUN chmod +x /usr/local/bin/cf-readiness-probe && \
+COPY rootfs/scripts/lucee-inject-h2.sh         /usr/local/bin/lucee-inject-h2
+RUN chmod +x /usr/local/bin/cf-readiness-probe \
+             /usr/local/bin/lucee-inject-h2 && \
     systemctl enable cf-server.service && \
     systemctl enable lucee-server.service && \
     systemctl enable cf-readiness-probe.service

@@ -19,6 +19,11 @@ Environment="PATH=/opt/coldfusion2025/jre/bin:/usr/local/sbin:/usr/local/bin:/us
 Environment="BOX_SERVER_OPENBROWSER=false"
 WorkingDirectory=/home/laborant/app
 
+# Copy the H2 JDBC driver from the CF installation into Lucee's lib dir on every
+# start. The Lucee server home is unpacked by CommandBox on first start and may
+# not exist yet — this runs as root via a helper script so it can create dirs.
+ExecStartPre=/usr/local/bin/lucee-inject-h2
+
 # Use the absolute path to box (/usr/local/bin/box installed via Ortus APT repo)
 # --console keeps the process in the foreground so systemd can track it.
 # First start downloads the Lucee engine if the cache is missing — allow 3 min.
