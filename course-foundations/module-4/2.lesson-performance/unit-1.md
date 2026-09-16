@@ -20,6 +20,10 @@ Performance tuning is the process of measuring, understanding, and adjusting the
 
 ## 1. JVM heap settings
 
+> **Who does this?** Heap configuration is a **server administrator task**. It requires editing a file on the server and restarting ColdFusion. Developers need to understand what the heap is — so they can write memory-aware code — but they do not typically change these values. In a team environment, this work belongs to the sysadmin or DevOps engineer who manages the CF server.
+
+We start here because the heap is the single most impactful runtime setting for ColdFusion. Get it wrong and no amount of code optimisation will fix your application's performance under load.
+
 ### What is the heap, and why does it matter?
 
 ColdFusion is a Java application — it runs inside a Java Virtual Machine (JVM). The **heap** is the region of memory the JVM allocates for everything your application creates at runtime: every query result, every struct, every component instance, every cached template. It is not disk space and it is not the server's total RAM — it is a private memory arena the JVM manages on CF's behalf.
@@ -28,7 +32,7 @@ When a request arrives, ColdFusion allocates objects on the heap to process it. 
 
 Why does this matter? Because the heap ceiling is a hard stop. Once it is reached, every new request that needs memory will cause the JVM to run a full GC cycle — pausing **all threads** until memory is reclaimed. Under sustained load, this means users experience sudden, periodic slowdowns or timeouts that have nothing to do with your CFML code and everything to do with a misconfigured runtime.
 
-**Who owns this?** Heap configuration lives in `jvm.config`, a server-level file that requires a ColdFusion restart to take effect. This is a **server administrator task**, not a developer task. Developers need to understand what the heap is so they can write memory-aware code — avoiding large in-memory data structures, closing query result sets promptly, and so on — but the actual flag values are set by whoever manages the CF server, typically a sysadmin or DevOps engineer in production.
+The heap flags live in `jvm.config` — a server-level file under CF's `bin/` directory. Any change to it requires a full ColdFusion restart to take effect.
 
 ---
 
