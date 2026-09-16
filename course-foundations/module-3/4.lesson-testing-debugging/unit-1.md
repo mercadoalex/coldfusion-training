@@ -145,7 +145,7 @@ The current stable release is **TestBox 6.x**, which requires CommandBox 6+ and 
 
 ::image-box
 ---
-:src: __static__/testbox-bdd-spec-structure-v1.png
+:src: __static__/testbox-bdd-spec-structure-v2.png
 :alt: Annotated CFML code snippet of a TestBox BDD spec — the component extends testbox.system.BaseSpec line is labelled Extends BaseSpec; the describe TicketService block is labelled Test suite groups related tests; the it should return all tickets block is labelled Individual test case one behaviour; the expect result toBeArray line is labelled Assertion checks the result — each label is connected to its code line by a dashed callout line
 :max-width: 860px
 ---
