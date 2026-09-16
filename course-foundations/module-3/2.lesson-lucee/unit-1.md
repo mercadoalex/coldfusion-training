@@ -460,7 +460,17 @@ component {
 EOF
 ```
 
-Lucee picks up `Application.cfc` on the next request — no restart needed.
+Because we previously had an `Application.cfc` without `onApplicationStart`, Lucee already has the application initialized and won't re-run it automatically. Force a clean start:
+
+```bash
+sudo systemctl restart lucee-server.service && sleep 8
+```
+
+Confirm Lucee is back up before continuing:
+
+```bash
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm
+```
 
 ---
 
