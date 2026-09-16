@@ -179,6 +179,15 @@ box install testbox
 
 This downloads TestBox into `~/app/testbox/` and makes the test runner available at `http://localhost:8888/testbox/`.
 
+::image-box
+---
+:src: __static__/install-testbox-v1.png
+:alt: Terminal output of box install testbox running in the ~/app directory — CommandBox initialises its libraries then installs forgebox:testbox followed by four dependencies: cbstreams, cbproxies, cbMockData, and globber — each showing a green checkmark on success
+:max-width: 860px
+---
+_`box install testbox` pulls TestBox and its dependencies from ForgeBox. The "Initializing libraries" message only appears on the first run — subsequent installs are faster._
+::
+
 ::hint-box
 ---
 :summary: 💡 Why does TestBox run on port 8888 and not 8500?
