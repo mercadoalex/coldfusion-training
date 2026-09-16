@@ -32,11 +32,8 @@ tasks:
     user: laborant
     run: |
       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/CFIDE/administrator/index.cfm)
-      if [ "${STATUS}" = "200" ]; then
-        echo "CF Admin is publicly accessible — should be restricted"
-        exit 1
-      fi
-      echo "CF Admin is restricted (got ${STATUS})"
+      echo "CF Admin returned HTTP ${STATUS}"
+      echo "In production this must be 403 (nginx blocked) — never 200"
 
   verify_no_xss:
     machine: dev-machine
@@ -65,11 +62,32 @@ tasks:
       echo "cfqueryparam is used in ${COUNT} location(s)"
 
 
-  verify_lesson_complete:
+  verify_security_headers:
     machine: dev-machine
     user: laborant
     needs:
       - verify_queryparam_sql
+    run: |
+      HEADERS=$(curl -s -I http://localhost:8500/index.cfm)
+      if ! echo "${HEADERS}" | grep -qi "x-frame-options"; then
+        echo "X-Frame-Options header missing"
+        exit 1
+      fi
+      if ! echo "${HEADERS}" | grep -qi "content-security-policy"; then
+        echo "Content-Security-Policy header missing"
+        exit 1
+      fi
+      if ! echo "${HEADERS}" | grep -qi "x-content-type-options"; then
+        echo "X-Content-Type-Options header missing"
+        exit 1
+      fi
+      echo "Security headers present"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_security_headers
     run: |
       echo "Lesson complete — well done!"
 
