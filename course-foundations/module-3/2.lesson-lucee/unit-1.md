@@ -387,17 +387,41 @@ Lucee datasource is configured correctly. ✓
 
 ## Activity 4 — Build a ticket submission form on Lucee
 
-**What you are doing:** Pull everything together into a working CFML application running on Lucee. You will create two files: an updated `Application.cfc` that seeds the in-memory schema on startup, and `lucee_tickets.cfm` — a page that lists all tickets and lets the student submit a new one via a form. The session expires after 2 minutes to demonstrate Lucee's session handling.
+This activity brings together everything from the lesson: the in-memory datasource, `Application.cfc` lifecycle, session management, a JOIN query, and a safe POST form. Read each section before running it — there are no surprises in the code, just patterns you have already seen.
 
-**Step 1 — Update `Application.cfc` to seed the schema on startup:**
+The finished page will:
+- list all tickets with status and priority colour-coded badges
+- accept a new ticket via a form (Title, Category, Priority, Requester, Assignee)
+- display a session countdown banner — the session expires after 2 minutes
+
+---
+
+### Part A — `Application.cfc`: datasource + schema + session
+
+Three things are happening in this file. Read them before you paste:
+
+**① Session management** — two lines enable the `session` scope and set a 2-minute timeout:
+```cfml
+this.sessionManagement = true;
+this.sessionTimeout    = createTimeSpan(0, 0, 2, 0);
+```
+
+**② Inline datasource** — the same in-memory H2 config from Activity 3, carried forward so the whole app shares it:
+```cfml
+this.datasources["training_db"] = { class: "org.h2.Driver", connectionString: "jdbc:h2:mem:..." };
+```
+
+**③ `onApplicationStart()`** — runs once when Lucee first boots the application. It creates the two tables and inserts three seed users. The `IF NOT EXISTS` guard and the `COUNT(*)` check make it safe to call repeatedly — nothing breaks if the tables already exist.
+
+Now create the file:
 
 ```bash
 sudo tee /home/laborant/app/Application.cfc << 'EOF'
 component {
-  this.name            = "HelpdeskApp";
-  this.datasource      = "training_db";
+  this.name              = "HelpdeskApp";
+  this.datasource        = "training_db";
   this.sessionManagement = true;
-  this.sessionTimeout  = createTimeSpan(0, 0, 2, 0);
+  this.sessionTimeout    = createTimeSpan(0, 0, 2, 0);
 
   this.datasources["training_db"] = {
     class:            "org.h2.Driver",
@@ -409,22 +433,22 @@ component {
   public void function onApplicationStart() {
     queryExecute("
       CREATE TABLE IF NOT EXISTS hd_users (
-        id       INT PRIMARY KEY,
-        name     VARCHAR(100)
+        id   INT PRIMARY KEY,
+        name VARCHAR(100)
       )", {}, {datasource: "training_db"});
 
     queryExecute("
       CREATE TABLE IF NOT EXISTS hd_tickets (
         id           INT AUTO_INCREMENT PRIMARY KEY,
         title        VARCHAR(200),
-        status       VARCHAR(20)  DEFAULT 'open',
-        priority     VARCHAR(20)  DEFAULT 'medium',
+        status       VARCHAR(20) DEFAULT 'open',
+        priority     VARCHAR(20) DEFAULT 'medium',
         category     VARCHAR(50),
         requester_id INT,
         assignee_id  INT
       )", {}, {datasource: "training_db"});
 
-    // Seed users if empty
+    // Seed users only if the table is empty
     var u = queryExecute("SELECT COUNT(*) AS total FROM hd_users", {}, {datasource: "training_db"});
     if (u.total == 0) {
       queryExecute("INSERT INTO hd_users VALUES (1, 'Alice')", {}, {datasource: "training_db"});
@@ -436,7 +460,36 @@ component {
 EOF
 ```
 
-**Step 2 — Create `lucee_tickets.cfm`:**
+Lucee picks up `Application.cfc` on the next request — no restart needed.
+
+---
+
+### Part B — `lucee_tickets.cfm`: three logical sections
+
+The page has three distinct CFML sections. Read what each one does before pasting the full file.
+
+**① Session countdown** — on every request, the code calculates how many seconds remain in the session and stores the start time in `session.startedAt` if it is not already there. The banner colour changes from yellow to urgent when under 30 seconds:
+```cfml
+sessionAge  = dateDiff("s", session.startedAt, now());
+sessionLeft = 120 - sessionAge;
+```
+
+**② POST handler** — if the request method is `POST` and the `title` field is not blank, a `queryExecute` INSERT runs with named bind parameters (`:title`, `:priority`, etc.). Every value goes through `cfsqltype` — no raw form data ever touches the SQL string:
+```cfml
+if (cgi.request_method == "POST" && len(trim(form.title ?: ""))) {
+  queryExecute("INSERT INTO hd_tickets ...", { title: { value: ..., cfsqltype: "cf_sql_varchar" }, ... });
+}
+```
+
+**③ JOIN query** — the ticket list uses a `LEFT JOIN` to resolve `requester_id` and `assignee_id` to names, so the table shows "Alice" instead of `1`:
+```cfml
+SELECT t.*, r.name AS requester, a.name AS assignee
+FROM   hd_tickets t
+LEFT JOIN hd_users r ON r.id = t.requester_id
+LEFT JOIN hd_users a ON a.id = t.assignee_id
+```
+
+Now create the full file:
 
 ```bash
 sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
@@ -477,32 +530,32 @@ sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
 </head>
 <body>
 <cfscript>
-  // ── session expiry warning ─────────────────────────────────────────────────
-  sessionStart  = session.keyExists("startedAt") ? session.startedAt : now();
+  // ── ① session countdown ────────────────────────────────────────────────────
+  sessionStart = session.keyExists("startedAt") ? session.startedAt : now();
   if (!session.keyExists("startedAt")) session.startedAt = sessionStart;
-  sessionAge    = dateDiff("s", sessionStart, now());
-  sessionLeft   = 120 - sessionAge;
+  sessionAge   = dateDiff("s", sessionStart, now());
+  sessionLeft  = 120 - sessionAge;
 
-  // ── handle form POST ───────────────────────────────────────────────────────
+  // ── ② POST handler — insert new ticket ────────────────────────────────────
   submitted = false;
   if (cgi.request_method == "POST" && len(trim(form.title ?: ""))) {
     queryExecute("
       INSERT INTO hd_tickets (title, status, priority, category, requester_id, assignee_id)
       VALUES (:title, :status, :priority, :category, :req, :asgn)",
       {
-        title:    { value: trim(form.title),    cfsqltype: "cf_sql_varchar" },
-        status:   { value: "open",              cfsqltype: "cf_sql_varchar" },
-        priority: { value: form.priority ?: "medium", cfsqltype: "cf_sql_varchar" },
-        category: { value: form.category ?: "General", cfsqltype: "cf_sql_varchar" },
-        req:      { value: val(form.requester_id ?: 1), cfsqltype: "cf_sql_integer" },
-        asgn:     { value: val(form.assignee_id  ?: 1), cfsqltype: "cf_sql_integer" }
+        title:    { value: trim(form.title),             cfsqltype: "cf_sql_varchar" },
+        status:   { value: "open",                       cfsqltype: "cf_sql_varchar" },
+        priority: { value: form.priority ?: "medium",    cfsqltype: "cf_sql_varchar" },
+        category: { value: form.category ?: "General",   cfsqltype: "cf_sql_varchar" },
+        req:      { value: val(form.requester_id ?: 1),  cfsqltype: "cf_sql_integer" },
+        asgn:     { value: val(form.assignee_id  ?: 1),  cfsqltype: "cf_sql_integer" }
       },
       { datasource: "training_db" }
     );
     submitted = true;
   }
 
-  // ── load tickets and users ─────────────────────────────────────────────────
+  // ── ③ JOIN query — resolve IDs to names ───────────────────────────────────
   tickets = queryExecute("
     SELECT t.id, t.title, t.status, t.priority, t.category,
            r.name AS requester, a.name AS assignee
@@ -526,16 +579,12 @@ sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
   <cfelse>
     <div class="warn">⏱ Session active — expires in <strong>#int(sessionLeft / 60)#m #sessionLeft mod 60#s</strong>. Sessions in this app are set to 2 minutes.</div>
   </cfif>
-
   <cfif submitted>
     <div class="ok">✅ Ticket submitted successfully.</div>
   </cfif>
 </cfoutput>
 
-<!--- ── ticket list ──────────────────────────────────────────────────────── --->
-<cfoutput>
-<p><strong>#tickets.recordCount#</strong> ticket(s) in the system.</p>
-</cfoutput>
+<cfoutput><p><strong>#tickets.recordCount#</strong> ticket(s) in the system.</p></cfoutput>
 
 <table>
   <tr>
@@ -555,7 +604,6 @@ sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
   </cfoutput>
 </table>
 
-<!--- ── submission form ──────────────────────────────────────────────────── --->
 <form method="post" action="lucee_tickets.cfm">
   <fieldset>
     <legend>Submit a New Ticket</legend>
@@ -567,11 +615,8 @@ sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
       <div>
         <label for="category">Category</label>
         <select id="category" name="category">
-          <option>General</option>
-          <option>Hardware</option>
-          <option>Software</option>
-          <option>Network</option>
-          <option>Training</option>
+          <option>General</option><option>Hardware</option>
+          <option>Software</option><option>Network</option><option>Training</option>
         </select>
       </div>
       <div>
@@ -585,42 +630,54 @@ sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
       <div>
         <label for="requester_id">Requester</label>
         <select id="requester_id" name="requester_id">
-          <cfoutput query="users">
-            <option value="#id#">#encodeForHTML(name)#</option>
-          </cfoutput>
+          <cfoutput query="users"><option value="#id#">#encodeForHTML(name)#</option></cfoutput>
         </select>
       </div>
       <div>
         <label for="assignee_id">Assignee</label>
         <select id="assignee_id" name="assignee_id">
-          <cfoutput query="users">
-            <option value="#id#">#encodeForHTML(name)#</option>
-          </cfoutput>
+          <cfoutput query="users"><option value="#id#">#encodeForHTML(name)#</option></cfoutput>
         </select>
       </div>
     </div>
     <button type="submit">Submit Ticket</button>
   </fieldset>
 </form>
-
 </body>
 </html>
 EOF
 ```
 
-**Step 3 — Verify both files are accessible:**
+---
+
+### Part C — Verify and observe
+
+Run the check:
 
 ```bash
-curl -s -o /dev/null -w "Application.cfc: HTTP %{http_code}\n" http://localhost:8888/lucee_tickets.cfm
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/lucee_tickets.cfm
 curl -s http://localhost:8888/lucee_tickets.cfm | grep -i "Help Desk"
 ```
 
-You should see `HTTP 200` and the page title in the response.
+You should see `HTTP 200` and `Help Desk` in the response.
+
+**Things to notice in the curl output:**
+- The session countdown appears in the HTML — look for `Session active`
+- The ticket table is empty on the first request (no rows yet) — that is correct, the form starts empty
+- Submit a ticket via `curl -X POST` to see the INSERT path:
+
+```bash
+curl -s -X POST http://localhost:8888/lucee_tickets.cfm \
+  -d "title=Test+ticket&priority=high&category=Hardware&requester_id=1&assignee_id=2" \
+  | grep -i "submitted\|row count\|ticket"
+```
 
 ::hint-box
 ---
 :summary: 💡 What is session management — and why does it expire?
 ---
+
+> Sessions were covered in **Module 1, Lesson 4 — Application Lifecycle**. If you need a refresher on `onSessionStart`, `onSessionEnd`, and the `session` scope lifetime, head back there before continuing.
 
 A **session** is server-side storage tied to a specific browser visitor. ColdFusion and Lucee identify the visitor using a cookie (`CFID` / `CFTOKEN` or `JSESSIONID`) set on the first request. Every subsequent request from that browser sends the cookie back, and the server looks up the matching session struct in memory.
 
