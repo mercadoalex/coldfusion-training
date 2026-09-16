@@ -65,20 +65,51 @@ Useful `cfdump` attributes:
 `cflog` writes structured entries to a named log file in CF's log directory — visible in the terminal without touching the browser.
 
 ```cfml
-<cflog file="myapp" text="Processing ticket #url.id#" type="information">
-<cflog file="myapp" text="Ticket not found: #url.id#" type="warning">
-<cflog file="myapp" text="DB error: #cfcatch.message#" type="error">
+<cflog file="training" text="Processing ticket #url.id#" type="information">
+<cflog file="training" text="Ticket not found: #url.id#" type="warning">
+<cflog file="training" text="DB error: #cfcatch.message#" type="error">
 ```
 
 Log types: `information`, `warning`, `error`, `fatal`.
 
-Tail the log live in the terminal:
+The `file` attribute sets the log filename — CF creates the file automatically on the **first write**. It will not exist until at least one `cflog` call has executed. Once it does, you can tail it live:
 
 ```bash
-tail -f /opt/coldfusion2025/cfusion/logs/myapp.log
+# First trigger a write by loading a page that has a cflog call,
+# then tail the file:
+tail -f /opt/coldfusion2025/cfusion/logs/training.log
 ```
 
 The log format includes a timestamp, thread ID, severity, and your message — structured and grep-friendly.
+
+::hint-box
+---
+:summary: ⚠️ "No such file or directory" — why tail fails before the first write
+---
+
+If you run `tail -f` before any `cflog` call has executed, you will see:
+
+```
+tail: cannot open '.../training.log' for reading: No such file or directory
+tail: no files remaining
+```
+
+This is expected — **ColdFusion does not create the log file until the first entry is written**. The file does not exist on disk until a CFML page containing a `cflog` call is actually requested.
+
+The correct sequence is:
+
+1. Add `cflog` to a `.cfm` file
+2. Request that page in the browser (or via `curl`) — this triggers the first write
+3. **Then** run `tail -f` — the file now exists
+
+If you want to open the tail first and wait, use `-F` instead of `-f`:
+
+```bash
+tail -F /opt/coldfusion2025/cfusion/logs/training.log
+```
+
+`-F` retries if the file does not exist yet — it will start streaming as soon as CF creates it.
+::
 
 ::hint-box
 ---
