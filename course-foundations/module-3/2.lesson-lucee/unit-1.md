@@ -280,24 +280,22 @@ Lucee version info is accessible. ✓
 
 ---
 
-## Activity 3 — Register the datasource on Lucee and verify it
+## Activity 3 — Register a datasource on Lucee and verify it
 
-**What you are doing:** Lucee and Adobe CF each have their own datasource registry. The cleanest way to make `training_db` available on Lucee — without touching server config files or restarting — is to declare it in `Application.cfc` using `this.datasources`. Lucee reads this on every request, so no restart is needed.
+**What you are doing:** Lucee and Adobe CF each have their own datasource registry. The H2 database that Adobe CF uses is locked to that process — Lucee cannot open the same file simultaneously. Instead, you will declare an independent in-memory H2 datasource directly in `Application.cfc` using `this.datasources`. Lucee reads this on every request with no restart needed, and the test file creates its own table to verify the connection works end-to-end.
 
 **Step 1 — Add the datasource to `Application.cfc`:**
 
 ```bash
 sudo tee /home/laborant/app/Application.cfc << 'EOF'
 component {
-  this.name        = "HelpdeskApp";
-  this.datasource  = "training_db";
-  this.datasources = {
-    "training_db": {
-      type:     "H2",
-      database: "/opt/coldfusion2025/cfusion/db/training_db",
-      username: "sa",
-      password: ""
-    }
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.datasources["training_db"] = {
+    class:            "org.h2.Driver",
+    connectionString: "jdbc:h2:mem:training_db;DB_CLOSE_DELAY=-1",
+    username:         "sa",
+    password:         ""
   };
 }
 EOF
@@ -309,6 +307,8 @@ EOF
 sudo tee /home/laborant/app/lucee_ds_check.cfm << 'EOF'
 <cfscript>
   try {
+    queryExecute("CREATE TABLE IF NOT EXISTS hd_tickets (id INT PRIMARY KEY, title VARCHAR(100))", {}, {datasource: "training_db"});
+    queryExecute("MERGE INTO hd_tickets KEY(id) VALUES (1, 'Test ticket')", {}, {datasource: "training_db"});
     q = queryExecute("SELECT COUNT(*) AS total FROM hd_tickets", {}, {datasource: "training_db"});
     writeOutput("OK — hd_tickets row count: " & q.total);
   } catch (any e) {
@@ -323,17 +323,19 @@ curl -s http://localhost:8888/lucee_ds_check.cfm
 You should see:
 
 ```
-OK — hd_tickets row count: 10
+OK — hd_tickets row count: 1
 ```
 
 ::hint-box
 ---
-:summary: 💡 Why does this work without a restart?
+:summary: 💡 Why an in-memory database — and why not share Adobe CF's H2 file?
 ---
 
-`Application.cfc` is evaluated on every request — Lucee reads `this.datasources` before executing any page in the application. The datasource exists for the lifetime of that request and any subsequent request in the same application scope. No server-level config file needs to change, and no restart is required.
+H2 in embedded mode uses an exclusive file lock — only one JVM process can open the database file at a time. Adobe CF holds that lock while it is running, so Lucee cannot connect to the same file.
 
-This is also the recommended pattern for **portable applications**: the datasource definition travels with the code, so any Lucee instance that runs the app automatically has the connection — no manual admin setup on each server.
+`jdbc:h2:mem:training_db` creates a private in-memory database inside Lucee's JVM. It is not shared with Adobe CF and it resets on server restart — but it is enough to prove that Lucee's JDBC stack, datasource config, and query execution all work correctly.
+
+In a real Lucee-only deployment you would point this at a proper database (PostgreSQL, MySQL) that both engines can reach over TCP — no file locking issues.
 
 ::
 
@@ -343,7 +345,7 @@ This is also the recommended pattern for **portable applications**: the datasour
 :name: verify_lucee_datasource
 ---
 #active
-Complete all three steps above. The final `curl` response must start with **OK**.
+Complete both steps above. The final `curl` response must start with **OK**.
 
 #completed
 Lucee datasource is configured correctly. ✓
