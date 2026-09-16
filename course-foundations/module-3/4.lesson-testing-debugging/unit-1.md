@@ -6,7 +6,7 @@ title: Testing & Debugging CFML
 name: testing-debugging-cfml-unit-1
 ---
 
-## Why testing and debugging matter
+## Debugging and testing — two tools every CF developer needs
 
 Writing code that works once in a happy path is easy. Writing code that keeps working as requirements change, that fails clearly when something is wrong, and that you can fix quickly when it breaks — that requires two disciplines: **debugging** and **testing**.
 
