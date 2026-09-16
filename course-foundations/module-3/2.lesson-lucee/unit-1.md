@@ -682,13 +682,39 @@ curl -s -X POST http://localhost:8888/lucee_tickets.cfm \
   | grep -i "submitted\|row count\|ticket"
 ```
 
+**Add a link to the Lucee landing page:**
+
+So you can reach `lucee_tickets.cfm` with one click, add a link to `index.cfm`:
+
+```bash
+sudo tee /home/laborant/app/index.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lucee Dev Server</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 3rem auto; color: #1f2328; }
+    h1   { font-size: 1.3rem; margin-bottom: .5rem; }
+    p    { color: #57606a; font-size: .9rem; margin-bottom: 1.5rem; }
+    a    { display: inline-block; background: #3b82d4; color: #fff; padding: .5rem 1.25rem;
+           border-radius: 4px; text-decoration: none; font-size: .9rem; }
+    a:hover { background: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>Lucee Dev Server — port 8888</h1>
+  <p>Running on Lucee <cfoutput>#server.lucee.version#</cfoutput></p>
+  <a href="/lucee_tickets.cfm">Open Ticket Manager →</a>
+</body>
+</html>
+EOF
+```
+
 **Open the page in the browser:**
 
-The lab environment exposes each port as a unique public URL — `localhost:8888` is not directly clickable from your local browser. To get the full URL:
-
-1. In the lab panel, find the **Lucee Dev Server** link
-2. **Right-click it → Open Link in New Tab** — this opens the Lucee root in a full browser window with the lab's public domain (something like `https://xxxxxx.node-eu-xxxx.iximiuz.com/`)
-3. In the address bar, append `/lucee_tickets.cfm` and press Enter
+1. In the lab panel, **right-click the Lucee Dev Server link → Open Link in New Tab**
+2. The landing page loads — click **Open Ticket Manager →**
 
 You will see the full styled page: the session countdown banner, the ticket table with colour-coded status and priority badges, and the submission form. Fill in the form and submit — the page reloads with the new ticket at the top of the list.
 
