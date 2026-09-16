@@ -41,12 +41,16 @@ tasks:
     needs:
       - verify_admin_restricted
     run: |
-      BODY=$(curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>")
-      if echo "${BODY}" | grep -q "<script>alert(1)</script>"; then
-        echo "XSS vulnerability detected — input is not encoded"
+      BODY=$(curl -s "http://localhost:8500/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E")
+      if ! curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/input_demo.cfm" | grep -q "200"; then
+        echo "input_demo.cfm not found or not returning 200"
         exit 1
       fi
-      echo "Input is properly HTML-encoded — no XSS"
+      if echo "${BODY}" | grep -qi "<script>"; then
+        echo "XSS vulnerability detected — raw script tag in output"
+        exit 1
+      fi
+      echo "Input is properly handled — no raw script tag in output"
 
   verify_queryparam_sql:
     machine: dev-machine
@@ -54,12 +58,13 @@ tasks:
     needs:
       - verify_no_xss
     run: |
-      COUNT=$(grep -r "cfqueryparam\|queryParam" /opt/coldfusion2025/cfusion/wwwroot/ 2>/dev/null | wc -l)
+      COUNT=$(grep -rl "cfqueryparam" /opt/coldfusion2025/cfusion/wwwroot/ \
+        --exclude-dir=CFIDE --exclude-dir=WEB-INF 2>/dev/null | wc -l)
       if [ "${COUNT}" -lt 1 ]; then
-        echo "No cfqueryparam usage found — SQL injection risk"
+        echo "No cfqueryparam usage found in student files — SQL injection risk"
         exit 1
       fi
-      echo "cfqueryparam is used in ${COUNT} location(s)"
+      echo "cfqueryparam found in ${COUNT} file(s)"
 
 
   verify_security_headers:

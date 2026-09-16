@@ -6,54 +6,83 @@ title: Performance Tuning & JVM Configuration
 name: performance-tuning-jvm-unit-1
 ---
 
-## JVM heap settings
+## Why performance tuning matters
+
+A ColdFusion application that works correctly in development can behave very differently under production load. The same page that responds in 80 ms with one user can take 4 seconds with 50 concurrent users — not because the code is wrong, but because the JVM heap is too small, the database connection pool is exhausted, or templates are being recompiled on every request.
+
+Performance tuning is the process of measuring, understanding, and adjusting the runtime environment so your application uses available resources efficiently. In this lesson you will tune the three most impactful settings for a ColdFusion server:
+
+1. **JVM heap size** — how much memory CF can use
+2. **Template cache** — how CF avoids recompiling pages on every request
+3. **Response time baseline** — measuring what "fast enough" looks like
+
+---
+
+## 1. JVM heap settings
+
+### What is the heap, and why does it matter?
+
+ColdFusion is a Java application — it runs inside a Java Virtual Machine (JVM). The **heap** is the region of memory the JVM allocates for everything your application creates at runtime: every query result, every struct, every component instance, every cached template. It is not disk space and it is not the server's total RAM — it is a private memory arena the JVM manages on CF's behalf.
+
+When a request arrives, ColdFusion allocates objects on the heap to process it. When the request finishes, those objects become eligible for garbage collection (GC). The JVM's garbage collector periodically sweeps the heap to reclaim that memory so it can be reused. The heap size flags you set in `jvm.config` control two things: the **floor** (how much is pre-allocated at startup) and the **ceiling** (how large the heap is allowed to grow).
+
+Why does this matter? Because the heap ceiling is a hard stop. Once it is reached, every new request that needs memory will cause the JVM to run a full GC cycle — pausing **all threads** until memory is reclaimed. Under sustained load, this means users experience sudden, periodic slowdowns or timeouts that have nothing to do with your CFML code and everything to do with a misconfigured runtime.
+
+**Who owns this?** Heap configuration lives in `jvm.config`, a server-level file that requires a ColdFusion restart to take effect. This is a **server administrator task**, not a developer task. Developers need to understand what the heap is so they can write memory-aware code — avoiding large in-memory data structures, closing query result sets promptly, and so on — but the actual flag values are set by whoever manages the CF server, typically a sysadmin or DevOps engineer in production.
+
+---
 
 ::image-box
 ---
 :src: __static__/jvm-heap-configuration-v1.png
-:alt: Annotated jvm.config file snippet — the line "java.args=-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200" has four callout labels: -Xms512m labelled "Initial heap (minimum)", -Xmx1024m labelled "Maximum heap", -XX:+UseG1GC labelled "Garbage First GC (low latency)", -XX:MaxGCPauseMillis=200 labelled "Target GC pause ≤ 200 ms" — each label is a blue arrow pointing to its flag
+:alt: Annotated jvm.config file snippet — the line "java.args=-Xms256m -Xmx512m -XX:+UseParallelGC" has three callout labels: -Xms256m labelled "Initial heap (minimum)", -Xmx512m labelled "Maximum heap", -XX:+UseParallelGC labelled "Garbage collector (throughput-focused)" — each label is a blue arrow pointing to its flag
 :max-width: 860px
 ---
 _`jvm.config` is the single file that controls all JVM tuning for Adobe ColdFusion — restart required after any change._
 ::
 
-ColdFusion runs on the JVM. The heap size directly controls how much memory CF can use before triggering garbage collection pauses.
+ColdFusion runs on the JVM. The heap size directly controls how much memory CF can use before triggering garbage collection (GC) pauses. When the heap fills up, the JVM pauses all threads to reclaim memory — users experience this as a sudden slowdown or timeout.
 
-Edit `/opt/coldfusion2025/cfusion/bin/jvm.config`:
+The heap flags live inside the `java.args` line of `jvm.config`. If you run the `grep` command from Activity 1 on the lab VM, the relevant portion of that line looks like this:
 
-```bash
-java.args=-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
 ```
+-Xms256m -Xmx512m -XX:+UseParallelGC
+```
+
+> **Note:** The full `java.args` line is long — it includes a wall of `--add-exports` and `--add-opens` flags that grant the JVM access to internal Java APIs ColdFusion depends on. Those are Adobe-managed boilerplate; do not touch them. The heap flags (`-Xms`, `-Xmx`) and the GC flag (`-XX:+Use...GC`) are the only values you would ever tune.
 
 | Flag | Meaning |
 |---|---|
-| `-Xms512m` | Initial (minimum) heap — 512 MB |
-| `-Xmx1024m` | Maximum heap — 1 GB |
-| `-XX:+UseG1GC` | Use Garbage First GC (best for low-latency) |
-| `-XX:MaxGCPauseMillis=200` | Target GC pause ≤ 200 ms |
+| `-Xms256m` | Initial (minimum) heap — 256 MB pre-allocated at startup |
+| `-Xmx512m` | Maximum heap — JVM cannot grow beyond 512 MB |
+| `-XX:+UseParallelGC` | Parallel GC — throughput-focused, suited for batch workloads |
 
-After editing, restart ColdFusion:
+**About the GC choice:** The lab VM ships with `UseParallelGC`, which prioritises raw throughput. For web applications — where low response latency matters more than throughput — `UseG1GC` (Garbage First) is a better fit. G1GC keeps individual GC pauses short and predictable instead of running occasional large pauses. On a production server you would change this flag:
 
-```bash
-sudo systemctl restart cf-server
+```
+-XX:+UseParallelGC   →   -XX:+UseG1GC -XX:MaxGCPauseMillis=200
 ```
 
+The lab VM does not have enough RAM to justify the change here, but it is the standard recommendation for any production ColdFusion deployment.
+
+::hint-box
+---
+:summary: 💡 What happens if the heap is too small?
 ---
 
-## Connection pool tuning
+When the heap is exhausted the JVM throws `java.lang.OutOfMemoryError` and ColdFusion crashes. Before that point, GC runs increasingly frequently — each run pauses all request threads. Users see intermittent slowdowns that are hard to trace without looking at the logs.
 
-Database connection pools let ColdFusion reuse JDBC connections instead of opening a new one for every request.
+Signs the heap is too small:
+- `OutOfMemoryError` in `exception.log`
+- RSS memory climbing steadily with no release
+- Periodic request timeouts under normal load with no obvious cause
 
-1. CF Admin → **Data & Services → Data Sources → training_db → Advanced Settings**
-2. Set **Max Connections**: `50`
-3. Set **Connection Timeout**: `120` seconds
-4. Set **Max Wait Time**: `5000` ms
-
-In high-traffic environments, undersized pools cause requests to queue waiting for a connection, which appears as slow page loads.
+Rule of thumb: set `-Xmx` to no more than **50–60% of total server RAM** to leave room for the OS, nginx, and other processes.
+::
 
 ---
 
-## Template cache
+## 2. Template cache
 
 ::image-box
 ---
@@ -64,18 +93,40 @@ In high-traffic environments, undersized pools cause requests to queue waiting f
 _ColdFusion's template cache eliminates recompilation on repeated requests — the JVM runs bytecode, not source._
 ::
 
-ColdFusion compiles `.cfm`/`.cfc` files to Java bytecode on first request and caches the bytecode. Once warm, repeated requests run from cache with no recompilation.
+ColdFusion compiles `.cfm` and `.cfc` files to Java bytecode on the first request and caches the result. Subsequent requests run the cached bytecode directly — no disk read, no compilation.
 
-Increase the template cache size if you have many templates:
+**Cold request (first hit):** disk read → compile → cache bytecode → execute → respond
 
-1. CF Admin → **Server Settings → Caching**
-2. **Maximum Number of Cached Templates**: increase to `1024` or more
+**Warm request (cached):** read from cache → execute → respond — typically 10–100× faster
 
+The default template cache size is 1024 entries. If your application has more templates than the cache can hold, older entries get evicted and recompiled on next access. Increase it in:
+
+**CF Admin → Server Settings → Caching → Maximum Number of Cached Templates**
+
+::hint-box
+---
+:summary: 💡 Connection pool tuning — for when you go to production
 ---
 
-## Enable GZIP (nginx front-end)
+Database connection pools let ColdFusion reuse JDBC connections instead of opening a new one per request. In high-traffic environments an undersized pool causes requests to queue waiting for a connection — this shows up as slow page loads even when the query itself is fast.
 
-If you run nginx as a reverse proxy in front of CF, enable GZIP compression:
+To tune in CF Admin → **Data & Services → Data Sources → training_db → Advanced Settings**:
+
+| Setting | Recommended starting value |
+|---|---|
+| Max Connections | 50 |
+| Connection Timeout | 120 seconds |
+| Max Wait Time | 5000 ms |
+
+These defaults are fine for the lab VM. On a production server handling hundreds of concurrent requests, tune based on observed pool utilisation from the CF Server Monitor.
+::
+
+::hint-box
+---
+:summary: 💡 GZIP compression — if you run nginx in front of CF
+---
+
+GZIP compression at the nginx layer reduces HTML/JSON response size by 60–80% — significant bandwidth savings for content-heavy pages.
 
 ```nginx
 gzip on;
@@ -83,21 +134,25 @@ gzip_types text/html application/json application/javascript text/css;
 gzip_min_length 1024;
 ```
 
-GZIP typically reduces HTML/JSON response size by 60–80%.
+This is a nginx configuration — not a ColdFusion setting. There is no nginx in this lab, but this is the standard setup for any production CF deployment behind a reverse proxy.
+::
 
 ---
 
-## Measuring response time
+## 3. Measuring response time
+
+Before tuning anything, establish a baseline. Use `curl`'s built-in timing output:
 
 ```bash
-# Time a single request
-time curl -s http://localhost:8500/index.cfm > /dev/null
-
-# Or use curl's timing output
-curl -s -w "\nTotal: %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
+# Single request — shows HTTP status and total time
+curl -s -w "\nHTTP %{http_code} — Total: %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
 ```
 
-The task checks that the response is under **2000 ms**.
+Run it three times and note the pattern:
+- **First request** — slower (template compilation)
+- **Second and third** — faster (bytecode cache warm)
+
+A healthy idle CF server on this lab VM should respond in **under 500 ms** on cached requests.
 
 ---
 
@@ -118,15 +173,22 @@ grep -i "xms\|xmx\|GC" /opt/coldfusion2025/cfusion/bin/jvm.config
 :summary: 💡 Can I change the heap size in this lab?
 ---
 
-Yes — but restart is required and the lab VM has limited RAM (~512 MB RSS in use). Do not set `-Xmx` higher than `512m` in this environment or ColdFusion will fail to restart.
+Yes — but a restart is required. The lab VM ships with `-Xmx512m`, which is already at the safe ceiling for this environment (~512 MB RSS in use by ColdFusion at idle). Do not raise `-Xmx` beyond `512m` here or ColdFusion will fail to restart due to OOM.
 
 On a production server with 8–16 GB RAM, a typical setting is:
 
-```bash
+```
 java.args=-Xms512m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
 ```
 
-Edit the file with: `sudo nano /opt/coldfusion2025/cfusion/bin/jvm.config`
+To restart ColdFusion in this lab (CommandBox managed — not systemd):
+
+```bash
+# Stop and start via CommandBox
+box server stop && box server start --console &
+```
+
+Wait 30–60 seconds for CF to come back up before making any requests.
 ::
 
 ::simple-task
@@ -157,13 +219,17 @@ JVM heap (`-Xmx`) is configured. ✓
 
 ## Activity 2 — Measure response time
 
-Measure how long ColdFusion takes to respond to a request — it must be under 2000 ms:
+Measure how long ColdFusion takes to respond — run it three times and observe the cache effect:
 
 ```bash
-curl -s -w "\nHTTP %{http_code} — Total: %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
+for i in 1 2 3; do
+  curl -s -w "Request $i — HTTP %{http_code} — %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
+done
 ```
 
-Run it a few times — the first request is always slower (template compilation). Subsequent requests run from the bytecode cache and should be significantly faster.
+Request 1 will be slower than requests 2 and 3. That difference is the template compilation cost — it only happens once per template per server restart.
+
+The task checks that at least one response is under **2000 ms**.
 
 ::hint-box
 ---
@@ -172,7 +238,16 @@ Run it a few times — the first request is always slower (template compilation)
 
 ColdFusion compiles `.cfm` files to Java bytecode on the **first request** — this takes extra time. The bytecode is then cached so subsequent requests skip the compilation step entirely and run much faster.
 
-This is the **template cache** in action. In production you warm the cache at deploy time (by hitting all your key pages) so real users never see the compilation delay.
+::image-box
+---
+:src: __static__/cf-curl-response-times-v1.png
+:alt: Terminal output of four curl requests to localhost:8500 — Request 1 shows 1.423518s in orange, Requests 2 through 4 show 0.087s, 0.082s, and 0.079s in green — illustrating the cold-to-warm cache drop
+:max-width: 700px
+---
+_Request 1 is ~17× slower — that is the template compilation cost. Requests 2–4 run from bytecode cache._
+::
+
+This is the **template cache** in action. In production you warm the cache at deploy time (by hitting all your key pages before sending real traffic) so users never see the compilation delay.
 
 You can increase the cache size in CF Admin → **Server Settings → Caching → Maximum Number of Cached Templates**.
 ::

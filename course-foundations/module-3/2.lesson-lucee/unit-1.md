@@ -155,7 +155,7 @@ CommandBox ships with the `cfconfig` module that reads and writes Lucee settings
 Apply it to a running server:
 
 ```bash
-box cfconfig import from=.CFConfig.json to=default@lucee7
+box cfconfig import from=.CFConfig.json
 ```
 
 ::hint-box
@@ -179,7 +179,11 @@ With CFConfig, you commit `.CFConfig.json` to your repository alongside your app
 curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm
 ```
 
-You should see **HTTP 200**. Then open the **Lucee Dev Server** browser tab to confirm the app loads.
+You should see:
+
+```
+HTTP 200
+```
 
 ::image-box
 ---
@@ -189,6 +193,7 @@ You should see **HTTP 200**. Then open the **Lucee Dev Server** browser tab to c
 ---
 _HTTP 200 on port 8888 — Lucee is running and serving the Help Desk application._
 ::
+
 
 ::simple-task
 ---
@@ -247,20 +252,19 @@ sudo tee /home/laborant/app/lucee_info.cfm << 'EOF'
 EOF
 ```
 
-Open `/lucee_info.cfm` in the **Lucee Dev Server** tab to confirm the version details appear. Also verify from the terminal:
+Verify it from the terminal — this also confirms the CFML was executed (not just served as plain text):
 
 ```bash
-curl -s http://localhost:8888/lucee_info.cfm | grep -i "lucee"
+curl -s http://localhost:8888/lucee_info.cfm | grep -i "lucee\|java\|os"
 ```
 
-::image-box
----
-:src: __static__/browser-lucee-info-v1.png
-:alt: Browser showing lucee_info.cfm with a blue info box displaying Lucee version 7.x, Java version, OS name, and CFML engine name — all pulled from the server scope
-:max-width: 860px
----
-_`lucee_info.cfm` — the `server` scope exposes the engine version, Java version, and OS details at runtime._
-::
+You should see output like:
+
+```
+<strong>Lucee version:</strong> 7.0.0.x<br>
+<strong>Java version:</strong> 21.0.x<br>
+<strong>OS:</strong> Linux<br>
+```
 
 ::simple-task
 ---
@@ -268,7 +272,7 @@ _`lucee_info.cfm` — the `server` scope exposes the engine version, Java versio
 :name: verify_lucee_version
 ---
 #active
-Run the `sudo tee` command above to create `lucee_info.cfm`, then open `/lucee_info.cfm` in the Lucee Dev Server tab to confirm the Lucee version appears.
+Run the `sudo tee` command above to create `lucee_info.cfm`, then run the `curl` command to confirm the Lucee version appears in the response.
 
 #completed
 Lucee version info is accessible. ✓
@@ -276,45 +280,61 @@ Lucee version info is accessible. ✓
 
 ---
 
-## Activity 3 — Verify the datasource works on Lucee
+## Activity 3 — Register the datasource on Lucee and verify it
 
-**What you are doing:** The Help Desk app's `verify_ds.cfm` page queries `hd_tickets` through the `training_db` datasource. Running it on the Lucee server (port 8888) confirms that Lucee has the datasource configured and can reach the H2 database — the same database used by Adobe CF on port 8500.
+**What you are doing:** Lucee and Adobe CF each have their own datasource registry. The cleanest way to make `training_db` available on Lucee — without touching server config files or restarting — is to declare it in `Application.cfc` using `this.datasources`. Lucee reads this on every request, so no restart is needed.
 
-In the **Terminal** tab, run:
+**Step 1 — Add the datasource to `Application.cfc`:**
 
 ```bash
-curl -s http://localhost:8888/verify_ds.cfm
+sudo tee /home/laborant/app/Application.cfc << 'EOF'
+component {
+  this.name        = "HelpdeskApp";
+  this.datasource  = "training_db";
+  this.datasources = {
+    "training_db": {
+      type:     "H2",
+      database: "/opt/coldfusion2025/cfusion/db/training_db",
+      username: "sa",
+      password: ""
+    }
+  };
+}
+EOF
 ```
 
-The response should contain **OK** or a ticket count — no errors or exceptions. Open `/verify_ds.cfm` in the **Lucee Dev Server** tab to see the full output.
+**Step 2 — Create a test file and verify the datasource:**
+
+```bash
+sudo tee /home/laborant/app/lucee_ds_check.cfm << 'EOF'
+<cfscript>
+  try {
+    q = queryExecute("SELECT COUNT(*) AS total FROM hd_tickets", {}, {datasource: "training_db"});
+    writeOutput("OK — hd_tickets row count: " & q.total);
+  } catch (any e) {
+    writeOutput("ERROR — " & e.message);
+  }
+</cfscript>
+EOF
+
+curl -s http://localhost:8888/lucee_ds_check.cfm
+```
+
+You should see:
+
+```
+OK — hd_tickets row count: 10
+```
 
 ::hint-box
 ---
-:summary: Getting a datasource error on Lucee? Add it via cfconfig.
+:summary: 💡 Why does this work without a restart?
 ---
 
-Lucee and Adobe CF each have their own datasource registry — a datasource defined in the Adobe CF admin is not automatically available in Lucee. If `verify_ds.cfm` throws a datasource error on port 8888, add the datasource via the CLI:
+`Application.cfc` is evaluated on every request — Lucee reads `this.datasources` before executing any page in the application. The datasource exists for the lifetime of that request and any subsequent request in the same application scope. No server-level config file needs to change, and no restart is required.
 
-```bash
-box cfconfig set datasources.training_db.type=H2 \
-  datasources.training_db.database=/opt/coldfusion2025/cfusion/db/training_db \
-  datasources.training_db.username=sa \
-  datasources.training_db.password=""
-```
+This is also the recommended pattern for **portable applications**: the datasource definition travels with the code, so any Lucee instance that runs the app automatically has the connection — no manual admin setup on each server.
 
-Then restart the server: `sudo systemctl restart lucee-server.service`
-
-Alternatively, define the datasource inline in `Application.cfc` using `this.datasource` and a JDBC URL — Lucee will pick it up automatically without any CLI configuration.
-
-::
-
-::image-box
----
-:src: __static__/browser-lucee-verify-ds-v1.png
-:alt: Browser showing verify_ds.cfm running on Lucee port 8888 — the page displays a success message confirming the training_db datasource is reachable and the hd_tickets table contains rows
-:max-width: 860px
----
-_`verify_ds.cfm` on Lucee port 8888 — the `training_db` datasource is configured and the H2 database is accessible from both engines._
 ::
 
 ::simple-task
@@ -323,7 +343,7 @@ _`verify_ds.cfm` on Lucee port 8888 — the `training_db` datasource is configur
 :name: verify_lucee_datasource
 ---
 #active
-Run `curl -s http://localhost:8888/verify_ds.cfm` in the Terminal. The response must not contain errors and must show a successful datasource connection.
+Complete all three steps above. The final `curl` response must start with **OK**.
 
 #completed
 Lucee datasource is configured correctly. ✓

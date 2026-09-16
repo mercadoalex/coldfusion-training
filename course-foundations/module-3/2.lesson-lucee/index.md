@@ -62,13 +62,18 @@ tasks:
     needs:
       - verify_lucee_version
     run: |
-      BODY=$(curl -s http://localhost:8888/verify_ds.cfm)
-      if echo "${BODY}" | grep -qi "error\|exception"; then
-        echo "Lucee datasource verification failed"
+      FILE="/home/laborant/app/lucee_ds_check.cfm"
+      if [ ! -f "${FILE}" ]; then
+        echo "lucee_ds_check.cfm not found — complete Activity 3 Step 1 first"
         exit 1
       fi
-      if ! echo "${BODY}" | grep -qi "OK\|found\|ticket"; then
-        echo "verify_ds.cfm did not return expected success output"
+      BODY=$(curl -s http://localhost:8888/lucee_ds_check.cfm)
+      if echo "${BODY}" | grep -qi "error"; then
+        echo "Datasource check failed: ${BODY}"
+        exit 1
+      fi
+      if ! echo "${BODY}" | grep -qi "OK"; then
+        echo "lucee_ds_check.cfm did not return expected OK response. Got: ${BODY}"
         exit 1
       fi
       echo "Lucee datasource is configured correctly"
