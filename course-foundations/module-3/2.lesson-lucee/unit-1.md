@@ -684,13 +684,15 @@ curl -s -X POST http://localhost:8888/lucee_tickets.cfm \
 
 **Open the page in the browser:**
 
-Switch to the **Lucee Dev Server** tab in the lab — it is already pointed at port 8888. Navigate to:
+The lab environment exposes each port as a unique public URL — `localhost:8888` is not directly clickable from your local browser. To get the full URL:
 
-```
-/lucee_tickets.cfm
-```
+1. In the lab panel, find the **Lucee Dev Server** link
+2. **Right-click it → Open Link in New Tab** — this opens the Lucee root in a full browser window with the lab's public domain (something like `https://xxxxxx.node-eu-xxxx.iximiuz.com/`)
+3. In the address bar, append `/lucee_tickets.cfm` and press Enter
 
 You will see the full styled page: the session countdown banner, the ticket table with colour-coded status and priority badges, and the submission form. Fill in the form and submit — the page reloads with the new ticket at the top of the list.
+
+> **Note:** the session countdown is tied to your browser session, not the `curl` session. Reload the page a few times to watch the timer count down.
 
 ::hint-box
 ---
