@@ -416,6 +416,15 @@ The finished page will:
 - accept a new ticket via a form (Title, Category, Priority, Requester, Assignee)
 - display a session countdown banner — the session expires after 2 minutes
 
+::image-box
+---
+:src: __static__/lucee-activity4-architecture-v1.png
+:alt: Architecture diagram for Activity 4 — three columns: left column shows Application.cfc with this.name, this.datasource, this.sessionManagement, this.sessionTimeout, this.datasources inline JDBC config, and onApplicationStart creating hd_users and hd_tickets tables and seeding 3 users; centre column shows lucee_tickets.cfm with four numbered sections: session countdown using dateDiff, POST handler with queryExecute INSERT and cfqueryparam binds, SELECT plus LEFT JOIN resolving IDs to names, and cfoutput rendering the table and form; right column shows session scope with session.startedAt and 2-minute idle timeout, and Browser with GET and POST request flow; arrows connect Application.cfc to lucee_tickets.cfm labelled datasource plus session config on startup, lucee_tickets.cfm to session scope labelled read/write session.*, lucee_tickets.cfm to Browser labelled HTML response and GET/POST, and lucee_tickets.cfm down to H2 in-memory DB labelled INSERT/SELECT
+:max-width: 900px
+---
+_`Application.cfc` runs once on startup to configure the datasource, session, and schema — `lucee_tickets.cfm` handles every request from there._
+::
+
 ---
 
 ### Part A — `Application.cfc`: datasource + schema + session
