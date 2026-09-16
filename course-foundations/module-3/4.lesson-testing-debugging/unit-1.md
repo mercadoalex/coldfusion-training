@@ -238,6 +238,37 @@ EOF
 _Anatomy of a TestBox spec: each part of the file has a specific role — understand the structure before running the suite._
 ::
 
+::hint-box
+---
+:summary: 💡 TestBox and every other testing framework — the same pattern
+---
+TestBox follows the same BDD/TDD patterns as every major testing framework across languages:
+
+**BDD style** — `describe` / `it` / `expect`
+
+| Framework | Language |
+|---|---|
+| **TestBox** | CFML |
+| **Jest / Vitest / Jasmine** | JavaScript |
+| **RSpec** | Ruby |
+| **pytest** (with plugins) | Python |
+
+The syntax is nearly identical — if you've used Jest, TestBox will feel immediately familiar.
+
+**TDD style** — annotation-based
+
+| Framework | Language |
+|---|---|
+| **TestBox** `@Test` | CFML |
+| **JUnit** `@Test` | Java |
+| **NUnit / xUnit** `[Test]` / `[Fact]` | C# |
+| **PHPUnit** `@test` | PHP |
+
+**Key concepts that carry over directly:** test suite → `describe()`, test case → `it()`, assertion → `expect()`, mocking → `createMock()` / `createStub()`, and JUnit XML reporters so results plug straight into GitHub Actions or Jenkins.
+
+The one CFML-specific detail: instead of a CLI command like `jest` or `pytest`, you hit a URL (`TextRunner.cfm`) — because the test engine runs inside the application server. Everything else is standard.
+::
+
 ### Run the tests
 
 Hit the TextRunner directly with `curl` — no interactive CLI, no hanging:
