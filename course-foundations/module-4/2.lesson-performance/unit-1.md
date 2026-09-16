@@ -101,13 +101,33 @@ The task checks that the response is under **2000 ms**.
 
 ---
 
-## Exercises
+## Activity 1 — Inspect jvm.config
 
-1. Confirm `jvm.config` exists and contains `-Xmx`:
+ColdFusion's JVM settings live in a single file. Check that it exists and see its current heap settings:
 
 ```bash
-grep -i "xmx" /opt/coldfusion2025/cfusion/bin/jvm.config
+# Confirm the file exists
+ls /opt/coldfusion2025/cfusion/bin/jvm.config
+
+# Show the current heap flags
+grep -i "xms\|xmx\|GC" /opt/coldfusion2025/cfusion/bin/jvm.config
 ```
+
+::hint-box
+---
+:summary: 💡 Can I change the heap size in this lab?
+---
+
+Yes — but restart is required and the lab VM has limited RAM (~512 MB RSS in use). Do not set `-Xmx` higher than `512m` in this environment or ColdFusion will fail to restart.
+
+On a production server with 8–16 GB RAM, a typical setting is:
+
+```bash
+java.args=-Xms512m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
+```
+
+Edit the file with: `sudo nano /opt/coldfusion2025/cfusion/bin/jvm.config`
+::
 
 ::simple-task
 ---
@@ -115,7 +135,7 @@ grep -i "xmx" /opt/coldfusion2025/cfusion/bin/jvm.config
 :name: verify_jvm_config
 ---
 #active
-`/opt/coldfusion2025/cfusion/bin/jvm.config` must exist.
+Confirm `/opt/coldfusion2025/cfusion/bin/jvm.config` exists.
 
 #completed
 `jvm.config` found. ✓
@@ -133,11 +153,29 @@ grep -i "xmx" /opt/coldfusion2025/cfusion/bin/jvm.config
 JVM heap (`-Xmx`) is configured. ✓
 ::
 
-2. Measure the CF response time — it must be under 2000 ms:
+---
+
+## Activity 2 — Measure response time
+
+Measure how long ColdFusion takes to respond to a request — it must be under 2000 ms:
 
 ```bash
-curl -s -w "\nHTTP %{http_code} — %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
+curl -s -w "\nHTTP %{http_code} — Total: %{time_total}s\n" -o /dev/null http://localhost:8500/index.cfm
 ```
+
+Run it a few times — the first request is always slower (template compilation). Subsequent requests run from the bytecode cache and should be significantly faster.
+
+::hint-box
+---
+:summary: 💡 Why is the first request always slower?
+---
+
+ColdFusion compiles `.cfm` files to Java bytecode on the **first request** — this takes extra time. The bytecode is then cached so subsequent requests skip the compilation step entirely and run much faster.
+
+This is the **template cache** in action. In production you warm the cache at deploy time (by hitting all your key pages) so real users never see the compilation delay.
+
+You can increase the cache size in CF Admin → **Server Settings → Caching → Maximum Number of Cached Templates**.
+::
 
 ::simple-task
 ---
@@ -153,12 +191,6 @@ Response time is within the 2000 ms threshold. ✓
 
 ---
 
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
-
----
-
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
@@ -167,14 +199,14 @@ When all the checks above are green, this lesson is complete. Your progress is s
 :name: verify_lesson_complete
 ---
 #active
-All done? Hit **Check** to mark this lesson complete and unlock the next one.
+Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
-Lesson complete. On to the next one!
+Lesson complete — on to CI/CD! 🚀
 ::
 
-::card
----
-:challenge: challenges.performance_9b4234b3
----
+::remark-box
+Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
+
+📧 Alex — mercadoalex[at]gmail.com
 ::

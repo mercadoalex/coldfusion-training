@@ -68,10 +68,9 @@ tasks:
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_queryparam_sql
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  security_c2586cd1: {}
 
 ---

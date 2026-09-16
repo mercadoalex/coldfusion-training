@@ -69,10 +69,9 @@ tasks:
   verify_lesson_complete:
     machine: dev-machine
     user: laborant
+    needs:
+      - verify_response_time
     run: |
       echo "Lesson complete — well done!"
-
-challenges:
-  performance_9b4234b3: {}
 
 ---

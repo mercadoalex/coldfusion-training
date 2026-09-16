@@ -124,13 +124,65 @@ curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
 
 ---
 
-## Exercises
+## Activity 1 — Restrict the CF Admin
 
-1. Create `input_demo.cfm` that takes `url.name` and outputs it with `encodeForHTML()`:
+In production the CF Admin (`/CFIDE/administrator/`) should never be publicly reachable. In this lab it is intentionally open for learning — the task verifies it returns a non-200 response, which a hardened setup would produce.
+
+Check the current status:
+
+```bash
+curl -s -o /dev/null -w "CF Admin status: %{http_code}\n" http://localhost:8500/CFIDE/administrator/index.cfm
+```
+
+::hint-box
+---
+:summary: 💡 How to restrict CF Admin in a real nginx setup
+---
+
+In production, add this block to your nginx config to block all external access to CF Admin:
+
+```nginx
+location /CFIDE/administrator {
+  allow 127.0.0.1;
+  deny  all;
+}
+```
+
+Only requests from localhost (your application server itself) are allowed. Everything else gets a 403.
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_admin_restricted
+---
+#active
+Check that `/CFIDE/administrator/index.cfm` returns a non-200 response.
+
+#completed
+CF Admin is restricted. ✓
+::
+
+---
+
+## Activity 2 — Prevent XSS with encodeForHTML()
+
+Create `/opt/coldfusion2025/cfusion/wwwroot/input_demo.cfm` that safely encodes user input:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/input_demo.cfm << 'EOF'
+<cfscript>
+  name = structKeyExists(url, "name") ? encodeForHTML(url.name) : "Guest";
+  writeOutput("Hello, " & name & "!");
+</cfscript>
+EOF
+```
+
+Test it — the `<script>` tag must come back as HTML entities, not as a live script:
 
 ```bash
 curl -s "http://localhost:8500/input_demo.cfm?name=<script>alert(1)</script>"
-# Should output encoded entity — NOT the raw script tag
+# Expected: Hello, &lt;script&gt;alert(1)&lt;/script&gt;!
 ```
 
 ::simple-task
@@ -145,7 +197,30 @@ Create `input_demo.cfm` — passing `?name=<script>alert(1)</script>` must NOT o
 Input is properly HTML-encoded — no XSS. ✓
 ::
 
-2. Confirm `cfqueryparam` is used in `tickets.cfm`.
+---
+
+## Activity 3 — Use cfqueryparam in every query
+
+Open `tickets.cfm` (created in the SQL lesson) and confirm every parameterised value uses `cfqueryparam`. The task scans the entire web root for at least one usage:
+
+```bash
+grep -r "cfqueryparam\|queryParam" /opt/coldfusion2025/cfusion/wwwroot/
+```
+
+If `tickets.cfm` does not exist yet, create a minimal version:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/tickets.cfm << 'EOF'
+<cfscript>
+  result = queryExecute(
+    "SELECT id, title, status FROM hd_tickets WHERE id > :minId",
+    { minId: { value: 0, cfsqltype: "cf_sql_integer" } },
+    { datasource: "training_db" }
+  );
+  writeOutput(result.recordCount & " ticket(s) found");
+</cfscript>
+EOF
+```
 
 ::simple-task
 ---
@@ -153,31 +228,11 @@ Input is properly HTML-encoded — no XSS. ✓
 :name: verify_queryparam_sql
 ---
 #active
-Use `cfqueryparam` at least once somewhere in the web root.
+Use `cfqueryparam` or named bindings in at least one query in the web root.
 
 #completed
 `cfqueryparam` is used — SQL injection protection in place. ✓
 ::
-
-3. Restrict the CF Admin — the task verifies it returns a non-200 response from outside.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_admin_restricted
----
-#active
-The CF Admin at `/CFIDE/administrator/index.cfm` must return a non-200 response.
-
-#completed
-CF Admin is restricted. ✓
-::
-
----
-
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
 
 ---
 
@@ -189,14 +244,14 @@ When all the checks above are green, this lesson is complete. Your progress is s
 :name: verify_lesson_complete
 ---
 #active
-All done? Hit **Check** to mark this lesson complete and unlock the next one.
+Hit **Check** to mark this lesson complete and unlock the next one.
 
 #completed
-Lesson complete. On to the next one!
+Lesson complete — on to Performance Tuning! 🚀
 ::
 
-::card
----
-:challenge: challenges.security_c2586cd1
----
+::remark-box
+Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
+
+📧 Alex — mercadoalex[at]gmail.com
 ::
