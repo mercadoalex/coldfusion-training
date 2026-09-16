@@ -115,7 +115,7 @@ make push REGISTRY=ghcr.io/<you>
 ```bash
 make update-playground REGISTRY=ghcr.io/<you>
 # — or edit playground/playground.yaml manually:
-#   rootfs: oci://ghcr.io/<you>/cf-training:v1
+#   rootfs: oci://ghcr.io/mercadoalex/cf-training:fundamentals
 ```
 
 ### 6. Publish on iximiuz Labs
@@ -206,7 +206,7 @@ Add a second machine to `playground.yaml`:
 ```yaml
 machines:
   - name: cf-server
-    rootfs: oci://ghcr.io/<you>/cf-training:v1
+    rootfs: oci://ghcr.io/mercadoalex/cf-training:fundamentals
     ...
   - name: db-server
     rootfs: oci://ghcr.io/iximiuz/labs/rootfs:ubuntu-24-04

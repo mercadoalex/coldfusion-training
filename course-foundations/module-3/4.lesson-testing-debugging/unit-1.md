@@ -229,6 +229,15 @@ component extends="testbox.system.BaseSpec" {
 EOF
 ```
 
+::image-box
+---
+:src: __static__/testbox-spec-anatomy-v1.png
+:alt: Annotated TestBox BDD spec file — the component declaration, run function, describe block, it block, and expect assertions are each labelled with callout lines explaining their role in the spec structure
+:max-width: 860px
+---
+_Anatomy of a TestBox spec: each part of the file has a specific role — understand the structure before running the suite._
+::
+
 ### Run the tests
 
 Hit the TextRunner directly with `curl` — no interactive CLI, no hanging:
@@ -436,6 +445,33 @@ curl -s "http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=t
 ```
 
 All tests must pass — zero failures, zero errors.
+
+::hint-box
+---
+:summary: ⚠️ "Page TextRunner.cfm not found" — TestBox installed in the wrong directory
+---
+This error means Lucee cannot find `~/app/testbox/` — either TestBox was never installed, or it was installed from the wrong directory and ended up somewhere other than `~/app/`.
+
+**Verify where testbox actually landed:**
+
+```bash
+ls ~/app/testbox/system/runners/TextRunner.cfm
+```
+
+If that path does not exist, check where `box install` put it:
+
+```bash
+find ~ -name "TextRunner.cfm" 2>/dev/null
+```
+
+If you find it under a path other than `~/app/testbox/`, the install ran from the wrong directory. Fix it by installing from the correct location:
+
+```bash
+cd ~/app && box install testbox
+```
+
+The `cd ~/app` is required — `box install` places packages relative to the current working directory. Installing from `~` or anywhere else puts `testbox/` in the wrong place and the Lucee server (which is rooted at `~/app/`) will not find it.
+::
 
 ::hint-box
 ---
