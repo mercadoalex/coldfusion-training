@@ -49,6 +49,35 @@ To open the API console, right-click the **ColdFusion** tab in the lab panel and
 _`api-test.cfm` — a browser-based console showing all four endpoints. Click any card to expand it and send a live request._
 ::
 
+::details-box
+---
+:summary: 📖 HTTP methods — GET, POST, DELETE (and the rest)
+---
+
+REST APIs use the HTTP **method** (also called a verb) to express *what* the client wants to do to a resource. You've seen all four in the console — here's what each one means:
+
+| Method | Meaning | Safe? | Idempotent? |
+|---|---|---|---|
+| `GET` | Read — fetch a resource or a list | ✅ yes | ✅ yes |
+| `POST` | Create — submit new data to the server | ❌ no | ❌ no |
+| `PUT` | Replace — overwrite an existing resource entirely | ❌ no | ✅ yes |
+| `PATCH` | Update — modify part of an existing resource | ❌ no | ✅ yes* |
+| `DELETE` | Remove — close or destroy a resource | ❌ no | ✅ yes |
+
+**Safe** means the request does not change server state — you can call it as many times as you like with no side effects. `GET` is safe; `POST` is not (each call creates a new ticket).
+
+**Idempotent** means calling the request twice produces the same result as calling it once. `DELETE` is idempotent — deleting something that is already deleted is still "deleted". `POST` is not — two `POST` calls create two tickets.
+
+In this lesson the API uses three methods:
+
+- **`GET /api/tickets.cfm`** — returns the full list of tickets; no body, no side effects
+- **`GET /api/tickets.cfm?id=1`** — returns one ticket by id
+- **`POST /api/tickets.cfm`** — creates a new ticket; requires a JSON body
+- **`DELETE /api/tickets.cfm?id=1`** — closes ticket #1; no body required
+
+`PUT` and `PATCH` are not implemented here — the ticket model only needs create and close, not partial updates. On a full production API you would add them to support editing ticket fields.
+::
+
 ---
 
 ## 1. The simplest JSON endpoint
