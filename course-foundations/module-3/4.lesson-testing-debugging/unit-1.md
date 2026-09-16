@@ -171,22 +171,24 @@ Tests: 2  |  Passed: 2  |  Failed: 0  |  Errors: 0  |  Skipped: 0
 
 ::details-box
 ---
-:summary: 📖 BDD vs TDD — what's the difference?
+:summary: 📖 TDD, BDD, and SDD — testing approaches compared
 ---
 
-Both are testing approaches, but they frame tests differently:
+Three approaches to testing — all valid, each framing the work differently:
 
-**TDD (Test-Driven Development)** — write the test first, watch it fail, then write the code to make it pass. The test is written from a technical perspective: "assert that `getAll()` returns an array."
+**TDD (Test-Driven Development)** — write the test first, watch it fail, then write the code to make it pass. Tests are written from a technical perspective: "assert that `getAll()` returns an array." The test drives the implementation — you cannot write code without a failing test to justify it.
 
-**BDD (Behaviour-Driven Development)** — write tests that describe expected *behaviour* in plain language. The test reads like a specification: "it should return all tickets as an array." TestBox supports both styles, but the `describe`/`it`/`expect` syntax you see here is BDD.
-
-The practical difference is readability. A BDD spec failure message says:
+**BDD (Behaviour-Driven Development)** — write tests that describe expected *behaviour* in plain language. The test reads like a specification: "it should return all tickets as an array." TestBox's `describe`/`it`/`expect` syntax is BDD. The goal is readability — a failing test message tells a developer (and a product manager) exactly what stopped working:
 
 ```
 TicketService > should return all tickets as an array — FAILED
 ```
 
-That tells a developer (and a product manager) exactly what stopped working, without reading the assertion code.
+**SDD (Specification-Driven Development)** — the direction the industry is moving toward, especially with AI-assisted development. In SDD the specification *is* the source of truth — you write a formal, machine-readable spec first (an OpenAPI document, a structured requirements file, or a prompt), and both the code *and* the tests are generated or verified against it. The spec becomes the contract between product, development, and QA.
+
+The key shift: in TDD/BDD a human writes the test by hand. In SDD the spec drives everything — tests, stubs, documentation, and validation can all be derived from a single authoritative document. Tools like OpenSpec (which powers this course's own content pipeline) are early examples of this pattern applied to documentation and code.
+
+> SDD is not a replacement for TDD or BDD — it is a layer above them. The generated tests still run as TDD or BDD tests. The difference is *where the specification lives* and *who (or what) writes the tests*.
 
 **Common TestBox matchers:**
 
