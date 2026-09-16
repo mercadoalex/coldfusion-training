@@ -40,6 +40,15 @@ Two files are pre-deployed on the ColdFusion server:
 
 To open the API console, right-click the **ColdFusion** tab in the lab panel and open it in a new browser tab, then navigate to `/api-test.cfm`.
 
+::image-box
+---
+:src: __static__/cf-api-test-console-v1.png
+:alt: Help Desk API Console running in the browser — dark-themed page titled Help Desk API Console with subtitle Live REST endpoint /api/tickets.cfm · Powered by Adobe ColdFusion 2025 — four endpoint cards are visible: GET /api/tickets.cfm with a Send button and equivalent curl command, GET /api/tickets.cfm?id={id}, POST /api/tickets.cfm, and DELETE /api/tickets.cfm?id={id}
+:max-width: 860px
+---
+_`api-test.cfm` — a browser-based console showing all four endpoints. Click any card to expand it and send a live request._
+::
+
 ---
 
 ## 1. The simplest JSON endpoint
