@@ -54,7 +54,7 @@ _`api-test.cfm` — a browser-based console showing all four endpoints. Click an
 
 ::details-box
 ---
-:summary: 📖 HTTP methods — GET, POST, DELETE (and the rest)
+:summary: 📖 HTTP methods — GET, POST, DELETE, PUT, PATCH
 ---
 
 REST APIs use the HTTP **method** (also called a verb) to express *what* the client wants to do to a resource. You've seen all four in the console — here's what each one means:
