@@ -195,17 +195,18 @@ With CFConfig, you commit `.CFConfig.json` to your repository alongside your app
 
 ## Activity 1 — Verify Lucee is running on port 8888
 
-**What you are doing:** Confirm the Lucee server is responding. In the **Terminal** tab, run:
+**What you are doing:** Confirm the Lucee server is responding. Lucee can take a few seconds to finish booting after the lab starts — run this wait loop in the **Terminal** tab, which retries until it gets a 200 or times out after 30 seconds:
 
 ```bash
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm
+for i in $(seq 1 10); do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/index.cfm)
+  [ "$STATUS" = "200" ] && echo "HTTP 200 — Lucee is up" && break
+  echo "Waiting... (attempt $i, got HTTP $STATUS)"
+  sleep 3
+done
 ```
 
-You should see:
-
-```
-HTTP 200
-```
+You should see `HTTP 200 — Lucee is up` within a few seconds. If you see `HTTP 000` on the first attempt that is normal — it just means Lucee is still starting.
 
 ::image-box
 ---
@@ -223,7 +224,7 @@ _HTTP 200 on port 8888 — Lucee is running and serving the Help Desk applicatio
 :name: verify_lucee_running
 ---
 #active
-Run `curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/index.cfm` in the Terminal. Confirm it returns HTTP 200.
+Run the wait loop above in the Terminal. Confirm it returns `HTTP 200 — Lucee is up`.
 
 #completed
 Lucee is running on port 8888. ✓
