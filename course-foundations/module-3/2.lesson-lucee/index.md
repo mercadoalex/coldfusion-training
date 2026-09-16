@@ -78,11 +78,34 @@ tasks:
       fi
       echo "Lucee datasource is configured correctly"
 
-  verify_lesson_complete:
+  verify_lucee_tickets:
     machine: dev-machine
     user: laborant
     needs:
       - verify_lucee_datasource
+    run: |
+      FILE="/home/laborant/app/lucee_tickets.cfm"
+      if [ ! -f "${FILE}" ]; then
+        echo "lucee_tickets.cfm not found — complete Activity 4 Step 2 first"
+        exit 1
+      fi
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/lucee_tickets.cfm)
+      if [ "${STATUS}" != "200" ]; then
+        echo "lucee_tickets.cfm returned HTTP ${STATUS}, expected 200"
+        exit 1
+      fi
+      BODY=$(curl -s http://localhost:8888/lucee_tickets.cfm)
+      if ! echo "${BODY}" | grep -qi "Help Desk"; then
+        echo "lucee_tickets.cfm did not contain expected content"
+        exit 1
+      fi
+      echo "lucee_tickets.cfm is live on Lucee ✓"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_lucee_tickets
     run: |
       echo "Lesson complete — well done!"
 

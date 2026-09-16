@@ -339,6 +339,38 @@ In a real Lucee-only deployment you would point this at a proper database (Postg
 
 ::
 
+::hint-box
+---
+:summary: 💡 What is an in-memory database — and what are the options?
+---
+
+An **in-memory database** stores all its data in RAM instead of on disk. There is no file to read or write — data lives entirely inside the process's memory. This makes reads and writes extremely fast (no I/O), but everything is lost when the process stops. They are used for caching, testing, session state, and any workload where speed matters more than durability.
+
+**Do in-memory databases follow the relational model?**
+
+It depends on the product — there is no single answer:
+
+| Database | Model | Open source? | Notes |
+|---|---|---|---|
+| **H2** | Relational (SQL) | ✅ Open source | What this lab uses in `mem:` mode — full SQL, JDBC, transactions |
+| **SQLite** (in-memory mode) | Relational (SQL) | ✅ Open source | File-based by default; `:memory:` mode runs entirely in RAM |
+| **Redis** | Key-value + data structures | ✅ Open source (BSD) | Not relational — no joins, no SQL; excels at caching, pub/sub, leaderboards |
+| **Memcached** | Key-value only | ✅ Open source | Simpler than Redis — pure cache, no persistence option |
+| **Apache Ignite** | Relational + key-value | ✅ Open source | Supports SQL queries over distributed in-memory data |
+| **VoltDB** | Relational (SQL) | Proprietary (community ed. free) | ACID-compliant, built for high-throughput transactional workloads |
+| **SingleStore** (MemSQL) | Relational (SQL) | Proprietary | Hybrid in-memory/on-disk; targets real-time analytics |
+| **Oracle TimesTen** | Relational (SQL) | Proprietary | Oracle's in-memory relational engine, often used alongside Oracle DB |
+| **SAP HANA** | Relational + columnar | Proprietary | In-memory columnar store; used heavily in enterprise ERP/analytics |
+
+**The key distinction to remember:**
+
+- **Relational in-memory** (H2 mem, VoltDB, TimesTen) — you write SQL, use JOINs, have transactions. The only difference from a regular RDBMS is where the data lives.
+- **Non-relational in-memory** (Redis, Memcached) — no SQL, no joins. You store and retrieve by key, or use specialised data structures (lists, sets, sorted sets). Much faster for simple lookups, but not a replacement for a relational database.
+
+In practice, most production architectures use **both**: a relational database (PostgreSQL, MySQL) for durable structured data, and Redis or Memcached as a caching layer in front of it.
+
+::
+
 ::simple-task
 ---
 :tasks: tasks
@@ -349,6 +381,270 @@ Complete both steps above. The final `curl` response must start with **OK**.
 
 #completed
 Lucee datasource is configured correctly. ✓
+::
+
+---
+
+## Activity 4 — Build a ticket submission form on Lucee
+
+**What you are doing:** Pull everything together into a working CFML application running on Lucee. You will create two files: an updated `Application.cfc` that seeds the in-memory schema on startup, and `lucee_tickets.cfm` — a page that lists all tickets and lets the student submit a new one via a form. The session expires after 2 minutes to demonstrate Lucee's session handling.
+
+**Step 1 — Update `Application.cfc` to seed the schema on startup:**
+
+```bash
+sudo tee /home/laborant/app/Application.cfc << 'EOF'
+component {
+  this.name            = "HelpdeskApp";
+  this.datasource      = "training_db";
+  this.sessionManagement = true;
+  this.sessionTimeout  = createTimeSpan(0, 0, 2, 0);
+
+  this.datasources["training_db"] = {
+    class:            "org.h2.Driver",
+    connectionString: "jdbc:h2:mem:training_db;DB_CLOSE_DELAY=-1",
+    username:         "sa",
+    password:         ""
+  };
+
+  public void function onApplicationStart() {
+    queryExecute("
+      CREATE TABLE IF NOT EXISTS hd_users (
+        id       INT PRIMARY KEY,
+        name     VARCHAR(100)
+      )", {}, {datasource: "training_db"});
+
+    queryExecute("
+      CREATE TABLE IF NOT EXISTS hd_tickets (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        title        VARCHAR(200),
+        status       VARCHAR(20)  DEFAULT 'open',
+        priority     VARCHAR(20)  DEFAULT 'medium',
+        category     VARCHAR(50),
+        requester_id INT,
+        assignee_id  INT
+      )", {}, {datasource: "training_db"});
+
+    // Seed users if empty
+    var u = queryExecute("SELECT COUNT(*) AS total FROM hd_users", {}, {datasource: "training_db"});
+    if (u.total == 0) {
+      queryExecute("INSERT INTO hd_users VALUES (1, 'Alice')", {}, {datasource: "training_db"});
+      queryExecute("INSERT INTO hd_users VALUES (2, 'Bob')",   {}, {datasource: "training_db"});
+      queryExecute("INSERT INTO hd_users VALUES (3, 'Carol')", {}, {datasource: "training_db"});
+    }
+  }
+}
+EOF
+```
+
+**Step 2 — Create `lucee_tickets.cfm`:**
+
+```bash
+sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Help Desk — Lucee</title>
+  <style>
+    body    { font-family: sans-serif; max-width: 900px; margin: 2rem auto; color: #1f2328; }
+    h1      { font-size: 1.4rem; margin-bottom: .25rem; }
+    .sub    { color: #57606a; font-size: .875rem; margin-bottom: 1.5rem; }
+    .warn   { background: #fef9c3; border-left: 4px solid #ca8a04; padding: .75rem 1rem;
+              font-size: .875rem; margin-bottom: 1.5rem; border-radius: 3px; }
+    .ok     { background: #dcfce7; border-left: 4px solid #16a34a; padding: .75rem 1rem;
+              font-size: .875rem; margin-bottom: 1.5rem; border-radius: 3px; }
+    table   { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+    th      { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; font-size: .875rem; }
+    td      { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; font-size: .875rem; }
+    tr:hover td { background: #f7f8fa; }
+    .badge  { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.75rem; font-weight:600; }
+    .open   { background:#dbeafe; color:#1e40af; }
+    .closed { background:#f3f4f6; color:#374151; }
+    .resolved { background:#dcfce7; color:#166534; }
+    .high   { background:#fee2e2; color:#991b1b; }
+    .medium { background:#fef9c3; color:#854d0e; }
+    .low    { background:#f0fdf4; color:#166534; }
+    fieldset { border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    legend   { font-weight: 600; font-size: .9rem; padding: 0 .5rem; color: #3b82d4; }
+    .grid    { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem 1.5rem; }
+    label    { display:block; font-size:.8rem; font-weight:600; color:#57606a; margin-bottom:3px; }
+    input, select { width:100%; padding:.4rem .6rem; border:1px solid #d1d5db;
+                    border-radius:4px; font-size:.875rem; box-sizing:border-box; }
+    button  { background:#3b82d4; color:#fff; border:none; padding:.5rem 1.25rem;
+              border-radius:4px; font-size:.875rem; cursor:pointer; margin-top:.75rem; }
+    button:hover { background:#2563eb; }
+  </style>
+</head>
+<body>
+<cfscript>
+  // ── session expiry warning ─────────────────────────────────────────────────
+  sessionStart  = session.keyExists("startedAt") ? session.startedAt : now();
+  if (!session.keyExists("startedAt")) session.startedAt = sessionStart;
+  sessionAge    = dateDiff("s", sessionStart, now());
+  sessionLeft   = 120 - sessionAge;
+
+  // ── handle form POST ───────────────────────────────────────────────────────
+  submitted = false;
+  if (cgi.request_method == "POST" && len(trim(form.title ?: ""))) {
+    queryExecute("
+      INSERT INTO hd_tickets (title, status, priority, category, requester_id, assignee_id)
+      VALUES (:title, :status, :priority, :category, :req, :asgn)",
+      {
+        title:    { value: trim(form.title),    cfsqltype: "cf_sql_varchar" },
+        status:   { value: "open",              cfsqltype: "cf_sql_varchar" },
+        priority: { value: form.priority ?: "medium", cfsqltype: "cf_sql_varchar" },
+        category: { value: form.category ?: "General", cfsqltype: "cf_sql_varchar" },
+        req:      { value: val(form.requester_id ?: 1), cfsqltype: "cf_sql_integer" },
+        asgn:     { value: val(form.assignee_id  ?: 1), cfsqltype: "cf_sql_integer" }
+      },
+      { datasource: "training_db" }
+    );
+    submitted = true;
+  }
+
+  // ── load tickets and users ─────────────────────────────────────────────────
+  tickets = queryExecute("
+    SELECT t.id, t.title, t.status, t.priority, t.category,
+           r.name AS requester, a.name AS assignee
+    FROM   hd_tickets t
+    LEFT JOIN hd_users r ON r.id = t.requester_id
+    LEFT JOIN hd_users a ON a.id = t.assignee_id
+    ORDER  BY t.id DESC",
+    {}, { datasource: "training_db" }
+  );
+
+  users = queryExecute("SELECT id, name FROM hd_users ORDER BY name",
+    {}, { datasource: "training_db" });
+</cfscript>
+
+<h1>Help Desk — Ticket Manager</h1>
+<p class="sub">Running on Lucee #server.lucee.version# &nbsp;·&nbsp; port 8888</p>
+
+<cfoutput>
+  <cfif sessionLeft lte 30>
+    <div class="warn">⚠️ Your session expires in <strong>#max(0, sessionLeft)# seconds</strong>. Any unsaved form data will be lost.</div>
+  <cfelse>
+    <div class="warn">⏱ Session active — expires in <strong>#int(sessionLeft / 60)#m #sessionLeft mod 60#s</strong>. Sessions in this app are set to 2 minutes.</div>
+  </cfif>
+
+  <cfif submitted>
+    <div class="ok">✅ Ticket submitted successfully.</div>
+  </cfif>
+</cfoutput>
+
+<!--- ── ticket list ──────────────────────────────────────────────────────── --->
+<cfoutput>
+<p><strong>#tickets.recordCount#</strong> ticket(s) in the system.</p>
+</cfoutput>
+
+<table>
+  <tr>
+    <th>##</th><th>Title</th><th>Status</th><th>Priority</th>
+    <th>Category</th><th>Requester</th><th>Assignee</th>
+  </tr>
+  <cfoutput query="tickets">
+  <tr>
+    <td>#id#</td>
+    <td>#encodeForHTML(title)#</td>
+    <td><span class="badge #encodeForHTMLAttribute(status)#">#encodeForHTML(status)#</span></td>
+    <td><span class="badge #encodeForHTMLAttribute(priority)#">#encodeForHTML(priority)#</span></td>
+    <td>#encodeForHTML(category)#</td>
+    <td>#encodeForHTML(requester)#</td>
+    <td>#encodeForHTML(assignee)#</td>
+  </tr>
+  </cfoutput>
+</table>
+
+<!--- ── submission form ──────────────────────────────────────────────────── --->
+<form method="post" action="lucee_tickets.cfm">
+  <fieldset>
+    <legend>Submit a New Ticket</legend>
+    <div class="grid">
+      <div>
+        <label for="title">Title *</label>
+        <input type="text" id="title" name="title" required maxlength="200" placeholder="Brief description of the issue">
+      </div>
+      <div>
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option>General</option>
+          <option>Hardware</option>
+          <option>Software</option>
+          <option>Network</option>
+          <option>Training</option>
+        </select>
+      </div>
+      <div>
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div>
+        <label for="requester_id">Requester</label>
+        <select id="requester_id" name="requester_id">
+          <cfoutput query="users">
+            <option value="#id#">#encodeForHTML(name)#</option>
+          </cfoutput>
+        </select>
+      </div>
+      <div>
+        <label for="assignee_id">Assignee</label>
+        <select id="assignee_id" name="assignee_id">
+          <cfoutput query="users">
+            <option value="#id#">#encodeForHTML(name)#</option>
+          </cfoutput>
+        </select>
+      </div>
+    </div>
+    <button type="submit">Submit Ticket</button>
+  </fieldset>
+</form>
+
+</body>
+</html>
+EOF
+```
+
+**Step 3 — Verify both files are accessible:**
+
+```bash
+curl -s -o /dev/null -w "Application.cfc: HTTP %{http_code}\n" http://localhost:8888/lucee_tickets.cfm
+curl -s http://localhost:8888/lucee_tickets.cfm | grep -i "Help Desk"
+```
+
+You should see `HTTP 200` and the page title in the response.
+
+::hint-box
+---
+:summary: 💡 What is session management — and why does it expire?
+---
+
+A **session** is server-side storage tied to a specific browser visitor. ColdFusion and Lucee identify the visitor using a cookie (`CFID` / `CFTOKEN` or `JSESSIONID`) set on the first request. Every subsequent request from that browser sends the cookie back, and the server looks up the matching session struct in memory.
+
+`this.sessionTimeout = createTimeSpan(0, 0, 2, 0)` sets the idle timeout to **2 minutes**. If no request arrives within that window, the session is destroyed and its memory reclaimed. The next request starts a fresh session.
+
+Why does timeout matter?
+- **Memory** — sessions live in JVM heap. Thousands of abandoned sessions with no timeout would eventually exhaust it.
+- **Security** — a short timeout limits the window an attacker has to hijack a stolen session cookie.
+- **State** — anything stored in `session` scope (shopping carts, login state, wizard steps) is gone after expiry. The app must handle this gracefully.
+
+In this activity the warning banner counts down the remaining session time so you can observe the expiry in real time.
+
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_lucee_tickets
+---
+#active
+Create both files and run the `curl` check. `lucee_tickets.cfm` must return HTTP 200 and contain "Help Desk" in the response.
+
+#completed
+`lucee_tickets.cfm` is live on Lucee. ✓
 ::
 
 ---
