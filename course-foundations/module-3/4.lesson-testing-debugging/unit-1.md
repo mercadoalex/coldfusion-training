@@ -151,7 +151,7 @@ TestBox is the standard BDD/TDD testing framework for CFML. It runs on CommandBo
 - **BDD syntax** — `describe`, `it`, `expect` blocks that read like plain English specifications
 - **TDD syntax** — traditional `@Test` annotation style if you prefer
 - **Mocking engine** — `createMock()` and `createStub()` let you isolate a CFC from its dependencies during testing
-- **Multiple runners** — run tests via `curl` against the TextRunner URL, from a browser via the HTML runner, or as part of a CI/CD pipeline
+- **Multiple runners** — run tests via `curl` against the StreamingRunner URL, from a browser via the HTML runner, or as part of a CI/CD pipeline
 - **Rich reporters** — text, JSON, TAP, JUnit XML output formats so results integrate with GitHub Actions, Jenkins, or any CI system
 
 TestBox is installed as a **CommandBox package** (`box install testbox`) — it lives in your project directory alongside your app code, not inside ColdFusion itself. This means the same test suite can run against Adobe CF, Lucee, or any CFML engine without changes.
@@ -266,15 +266,15 @@ The syntax is nearly identical — if you've used Jest, TestBox will feel immedi
 
 **Key concepts that carry over directly:** test suite → `describe()`, test case → `it()`, assertion → `expect()`, mocking → `createMock()` / `createStub()`, and JUnit XML reporters so results plug straight into GitHub Actions or Jenkins.
 
-The one CFML-specific detail: instead of a CLI command like `jest` or `pytest`, you hit a URL (`TextRunner.cfm`) — because the test engine runs inside the application server. Everything else is standard.
+The one CFML-specific detail: instead of a CLI command like `jest` or `pytest`, you hit a URL (`StreamingRunner.cfm`) — because the test engine runs inside the application server. Everything else is standard.
 ::
 
 ### Run the tests
 
-Hit the TextRunner directly with `curl` — no interactive CLI, no hanging:
+Hit the StreamingRunner directly with `curl` — no interactive CLI, no hanging:
 
 ```bash
-curl -s "http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests"
+curl -s "http://localhost:8888/testbox/system/runners/StreamingRunner.cfm?directory=tests"
 ```
 
 A passing suite outputs a plain-text summary ending with:
@@ -472,43 +472,35 @@ TestBox spec file found. ✓
 ## Activity 4 — Run the tests
 
 ```bash
-curl -s "http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests"
+curl -s "http://localhost:8888/testbox/system/runners/StreamingRunner.cfm?directory=tests"
 ```
 
 All tests must pass — zero failures, zero errors.
 
 ::hint-box
 ---
-:summary: ⚠️ "Page TextRunner.cfm not found" — TestBox installed in the wrong directory
+:summary: ⚠️ "Page StreamingRunner.cfm not found" — TestBox installed in the wrong directory
 ---
-This error means Lucee cannot find `~/app/testbox/` — either TestBox was never installed, or it was installed from the wrong directory and ended up somewhere other than `~/app/`.
-
-**Verify where testbox actually landed:**
+This error means Lucee cannot find `~/app/testbox/` — either TestBox was never installed, or it was installed from the wrong directory. Verify the files are in the right place:
 
 ```bash
-ls ~/app/testbox/system/runners/TextRunner.cfm
+ls ~/app/testbox/system/runners/
 ```
 
-If that path does not exist, check where `box install` put it:
-
-```bash
-find ~ -name "TextRunner.cfm" 2>/dev/null
-```
-
-If you find it under a path other than `~/app/testbox/`, the install ran from the wrong directory. Fix it by installing from the correct location:
+You should see `StreamingRunner.cfm` in that listing. If the directory does not exist, re-install from the correct location:
 
 ```bash
 cd ~/app && box install testbox
 ```
 
-The `cd ~/app` is required — `box install` places packages relative to the current working directory. Installing from `~` or anywhere else puts `testbox/` in the wrong place and the Lucee server (which is rooted at `~/app/`) will not find it.
+The `cd ~/app` is required — `box install` places packages relative to the current working directory. Installing from `~` or anywhere else puts `testbox/` somewhere the Lucee server (rooted at `~/app/`) cannot find it.
 ::
 
 ::hint-box
 ---
 :summary: ⚠️ Why curl and not box testbox run?
 ---
-`box testbox run` starts an interactive CommandBox session that can hang indefinitely in a non-TTY terminal. Hitting the TextRunner URL directly with `curl` is equivalent — it calls the same runner, returns the same plain-text output, and never blocks.
+`box testbox run` starts an interactive CommandBox session that can hang indefinitely in a non-TTY terminal. Hitting the StreamingRunner URL directly with `curl` is equivalent — it calls the same runner, returns the same plain-text output, and never blocks.
 ::
 
 ::hint-box
