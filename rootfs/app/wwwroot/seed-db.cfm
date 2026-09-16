@@ -156,38 +156,15 @@
   </cftry>
 
 <cfelse>
-  <cfset arrayAppend(steps, "Data already present — skipped inserts")>
+  <cfset arrayAppend(steps, "Already seeded — data is present, skipped inserts")>
 </cfif>
 
 </cfsilent>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>DB Seed — Help Desk Schema</title>
-  <style>
-    body { font-family: monospace; background: #0f172a; color: #e2e8f0; padding: 2rem; max-width: 700px; }
-    h2 { color: #38bdf8; }
-    .ok  { color: #4ade80; }
-    .err { color: #f87171; }
-    li   { margin: .25rem 0; }
-  </style>
-</head>
-<body>
-<h2>Help Desk Schema — Seed Results</h2>
-<ul>
-  <cfloop array="#steps#" index="s">
-    <li class="ok">✅ <cfoutput>#s#</cfoutput></li>
-  </cfloop>
-  <cfloop array="#errors#" index="e">
-    <li class="err">❌ <cfoutput>#e#</cfoutput></li>
-  </cfloop>
-</ul>
-<cfif arrayLen(errors) EQ 0>
-  <p class="ok"><strong>All done.</strong> Tables: hd_departments, hd_users, hd_tickets, hd_comments</p>
-  <p><a href="/db-test.cfm" style="color:#38bdf8">← Back to DB Test</a></p>
-<cfelse>
-  <p class="err"><strong>#arrayLen(errors)# error(s) occurred.</strong></p>
-</cfif>
-</body>
-</html>
+<cfcontent type="text/plain; charset=utf-8"><cfoutput>
+Help Desk DB Seed
+-----------------
+<cfloop array="#steps#" index="s">OK  #s#
+</cfloop><cfloop array="#errors#" index="e">ERR #e#
+</cfloop>
+<cfif arrayLen(errors) EQ 0>Done. Tables ready: hd_departments, hd_users, hd_tickets, hd_comments<cfelse>#arrayLen(errors)# error(s) — check CF logs for details</cfif>
+</cfoutput>
