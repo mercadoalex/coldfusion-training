@@ -682,27 +682,15 @@ EOF
 
 ---
 
-### Part C — Verify and observe
+### Part C — Verify, open in the browser, and submit a ticket
 
-Run the check:
+Confirm the page is up:
 
 ```bash
 curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8888/lucee_tickets.cfm
-curl -s http://localhost:8888/lucee_tickets.cfm | grep -i "Help Desk"
 ```
 
-You should see `HTTP 200` and `Help Desk` in the response.
-
-**Things to notice in the curl output:**
-- The session countdown appears in the HTML — look for `Session active`
-- The ticket table is empty on the first request (no rows yet) — that is correct, the form starts empty
-- Submit a ticket via `curl -X POST` to see the INSERT path:
-
-```bash
-curl -s -X POST http://localhost:8888/lucee_tickets.cfm \
-  -d "title=Test+ticket&priority=high&category=Hardware&requester_id=1&assignee_id=2" \
-  | grep -i "submitted\|row count\|ticket"
-```
+You should see `HTTP 200`. Now open it in the browser and use the form for real.
 
 **Add a link to the Lucee landing page:**
 
