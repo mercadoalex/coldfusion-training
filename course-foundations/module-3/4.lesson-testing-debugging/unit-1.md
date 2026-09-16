@@ -98,9 +98,25 @@ This is expected — **ColdFusion does not create the log file until the first e
 
 The correct sequence is:
 
-1. Add `cflog` to a `.cfm` file
-2. Request that page in the browser (or via `curl`) — this triggers the first write
-3. **Then** run `tail -f` — the file now exists
+**Step 1 — add a cflog call to a page** (skip if you already have one):
+
+```bash
+sudo tee -a /opt/coldfusion2025/cfusion/wwwroot/debug-demo.cfm << 'EOF'
+<cflog file="training" text="test entry from debug-demo.cfm" type="information">
+EOF
+```
+
+**Step 2 — trigger the first write:**
+
+```bash
+curl -s http://localhost:8500/debug-demo.cfm > /dev/null
+```
+
+**Step 3 — now tail the file:**
+
+```bash
+tail -f /opt/coldfusion2025/cfusion/logs/training.log
+```
 
 If you want to open the tail first and wait, use `-F` instead of `-f`:
 
