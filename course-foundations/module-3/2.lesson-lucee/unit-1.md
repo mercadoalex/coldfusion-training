@@ -682,6 +682,16 @@ curl -s -X POST http://localhost:8888/lucee_tickets.cfm \
   | grep -i "submitted\|row count\|ticket"
 ```
 
+**Open the page in the browser:**
+
+Switch to the **Lucee Dev Server** tab in the lab — it is already pointed at port 8888. Navigate to:
+
+```
+/lucee_tickets.cfm
+```
+
+You will see the full styled page: the session countdown banner, the ticket table with colour-coded status and priority badges, and the submission form. Fill in the form and submit — the page reloads with the new ticket at the top of the list.
+
 ::hint-box
 ---
 :summary: 💡 What is session management — and why does it expire?
