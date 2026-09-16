@@ -6,27 +6,39 @@ title: Building REST APIs with CFML
 name: building-rest-apis-cfml-unit-1
 ---
 
-## Overview
+## What is a REST API, and why does it matter?
+
+A **REST API** (Representational State Transfer) is a way for two systems to talk to each other over HTTP. Instead of returning an HTML page, the server returns structured data — almost always JSON — that a client (a browser, a mobile app, another server) can consume programmatically.
+
+Why does this matter for ColdFusion developers?
+
+- Modern frontends (React, Vue, plain JavaScript) don't load full pages — they fetch JSON and update the UI
+- Mobile apps need data, not markup
+- Microservices and integrations call each other via HTTP APIs
+- ColdFusion sits naturally in this model: it already handles HTTP requests, runs queries, and can serialise any struct or array to JSON with a single function call
+
+In this lesson you will work with a fully functional REST API that is **already deployed** in your environment. The goal is to understand how it's built, explore it with `curl`, and internalise the patterns you'll use in your own projects.
 
 ::image-box
 ---
 :src: __static__/rest-api-request-response-cycle-v1.png
-:alt: HTTP request-response cycle diagram for a CFML REST API — client on the left sends "GET /api/tickets.cfm" with an Accept: application/json header; the ColdFusion server in the middle shows cfheader setting Content-Type, queryExecute fetching from training_db, and serializeJSON serialising the result; the response arrow on the right carries a JSON payload {total:10, tickets:[...]} back to the client
+:alt: HTTP request-response cycle diagram for a CFML REST API — client on the left sends GET /api/tickets.cfm with an Accept application/json header; the ColdFusion server in the middle shows cfheader setting Content-Type, queryExecute fetching from training_db, and serializeJSON serialising the result; the response arrow carries a JSON payload back to the client
 :max-width: 860px
 ---
-_CFML REST endpoints are plain `.cfm` files — set the Content-Type header, run a query, and write serialised JSON._
+_A CFML REST endpoint is a plain `.cfm` file — set the Content-Type header, run a query, serialise the result._
 ::
 
-Your environment has a live Help Desk database (`training_db`) with four tables:
-`hd_departments`, `hd_users`, `hd_tickets`, and `hd_comments`. A fully working
-REST endpoint is already deployed at `/api/tickets.cfm`.
+### What's already running in your lab
 
-Open the **API Console** tab to interact with it visually, then study the code below to understand how it works.
+Two files are pre-deployed on the ColdFusion server:
 
-```
-http://localhost:8500/api-test.cfm    ← interactive API console
-http://localhost:8500/api/tickets.cfm ← raw JSON endpoint
-```
+| File | Location | Purpose |
+|---|---|---|
+| `api/tickets.cfm` | `/opt/coldfusion2025/cfusion/wwwroot/api/tickets.cfm` | REST endpoint — GET list, GET by id, POST create, DELETE close |
+| `TicketService.cfc` | `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc` | CFC service layer used by the endpoint |
+| `api-test.cfm` | `/opt/coldfusion2025/cfusion/wwwroot/api-test.cfm` | Browser-based API console |
+
+To open the API console, right-click the **ColdFusion** tab in the lab panel and open it in a new browser tab, then navigate to `/api-test.cfm`.
 
 ---
 
@@ -54,10 +66,7 @@ A ColdFusion REST endpoint is just a `.cfm` file that:
 </cfscript>
 ```
 
-Test it:
-```bash
-curl -s http://localhost:8500/api/tickets.cfm | python3 -m json.tool
-```
+No framework, no routing config, no annotations. Just headers, a query, and `serializeJSON`.
 
 ---
 
@@ -91,14 +100,13 @@ Never concatenate URL params directly into SQL.
 </cfscript>
 ```
 
-```bash
-curl -s "http://localhost:8500/api/tickets.cfm?id=3" | python3 -m json.tool
-curl -s "http://localhost:8500/api/tickets.cfm?id=999"   # → 404
-```
+The `:id` named binding in `queryExecute` is a `cfqueryparam` equivalent — it escapes the value and prevents SQL injection.
 
 ---
 
 ## 3. Accepting a JSON POST body
+
+POST requests carry their payload in the request body, not the URL. ColdFusion exposes it via `getHttpRequestData().content`:
 
 ```cfml
 <cfscript>
@@ -135,13 +143,6 @@ curl -s "http://localhost:8500/api/tickets.cfm?id=999"   # → 404
 </cfscript>
 ```
 
-```bash
-curl -s -X POST http://localhost:8500/api/tickets.cfm \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Keyboard missing","priority":"low","user_id":2}' \
-  | python3 -m json.tool
-```
-
 ---
 
 ## 4. Routing on HTTP method
@@ -149,14 +150,13 @@ curl -s -X POST http://localhost:8500/api/tickets.cfm \
 ::image-box
 ---
 :src: __static__/cfml-http-method-routing-v1.png
-:alt: Decision tree showing cgi.REQUEST_METHOD at the root — three branches lead to GET (returns ticket list or single ticket), POST (creates new ticket, returns 201 Created), and DELETE (closes ticket, returns 200 OK) — a fourth branch labelled "anything else" leads to a 405 Method Not Allowed response — each leaf shows the HTTP status code and a short description
+:alt: Decision tree showing cgi.REQUEST_METHOD at the root — three branches lead to GET returning ticket list or single ticket, POST creating a new ticket returning 201 Created, and DELETE closing a ticket returning 200 OK — a fourth branch labelled other leads to a 405 Method Not Allowed response
 :max-width: 760px
 ---
-_Route on `cgi.REQUEST_METHOD` to implement GET/POST/DELETE in a single `.cfm` file._
+_Route on `cgi.REQUEST_METHOD` to handle GET, POST, and DELETE in a single `.cfm` file._
 ::
 
-
-ColdFusion exposes the request method via `cgi.REQUEST_METHOD`:
+ColdFusion exposes the HTTP verb via `cgi.REQUEST_METHOD`. A single file can handle all methods:
 
 ```cfml
 <cfscript>
@@ -177,8 +177,7 @@ ColdFusion exposes the request method via `cgi.REQUEST_METHOD`:
 
 ## 5. CFC Service pattern
 
-Large APIs benefit from separating the HTTP layer from the data layer.
-`TicketService.cfc` (already deployed in the webroot) provides a reusable component:
+Large APIs benefit from separating the HTTP layer (request/response handling) from the data layer (queries and business logic). `TicketService.cfc` is already deployed and provides a clean interface:
 
 ```cfml
 <cfscript>
@@ -190,16 +189,30 @@ Large APIs benefit from separating the HTTP layer from the data layer.
 </cfscript>
 ```
 
+The endpoint file stays thin — it validates input, calls the service, and writes the response. The service holds all the SQL. This separation makes both easier to test and maintain.
+
 ---
 
-## 6. Try it — curl exercises
+## Activity 1 — Explore the live API
 
-Create `/opt/coldfusion2025/cfusion/wwwroot/api/tickets.cfm` and test each endpoint:
+The endpoint is already running. Use `curl` to inspect it:
 
 ```bash
 # List all tickets
 curl -s http://localhost:8500/api/tickets.cfm | python3 -m json.tool
+
+# Confirm Content-Type header
+curl -s -I http://localhost:8500/api/tickets.cfm | grep -i content-type
 ```
+
+You should see a JSON response with a `total` count and a `tickets` array. The `Content-Type` header must be `application/json`.
+
+::hint-box
+---
+:summary: 💡 What does python3 -m json.tool do?
+---
+It pretty-prints raw JSON with indentation. Without it, `curl` returns the JSON as a single compact line. Use it any time you want to read the response clearly in the terminal.
+::
 
 ::simple-task
 ---
@@ -249,10 +262,21 @@ The JSON response must contain at least 1 ticket (`total` > 0).
 Response contains tickets. ✓
 ::
 
+---
+
+## Activity 2 — Fetch a single ticket
+
+Add the `?id=` parameter to fetch one specific ticket:
+
 ```bash
-# Get a single ticket
+# Fetch ticket #1
 curl -s "http://localhost:8500/api/tickets.cfm?id=1" | python3 -m json.tool
+
+# Test a 404 — ticket 999 does not exist
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8500/api/tickets.cfm?id=999"
 ```
+
+The first command should return a single ticket object with a `title` field. The second should return HTTP 404 and `{"error":"Ticket not found"}`.
 
 ::simple-task
 ---
@@ -266,13 +290,31 @@ curl -s "http://localhost:8500/api/tickets.cfm?id=1" | python3 -m json.tool
 Single ticket fetch works. ✓
 ::
 
+---
+
+## Activity 3 — Create a ticket via POST
+
+Send a JSON body to create a new ticket:
+
 ```bash
-# Create a new ticket
 curl -s -X POST http://localhost:8500/api/tickets.cfm \
   -H "Content-Type: application/json" \
-  -d '{"title":"Monitor flickering","description":"Display flickers","priority":"high","user_id":3}' \
+  -d '{"title":"Monitor flickering","description":"Display flickers on login","priority":"high","user_id":3}' \
   | python3 -m json.tool
 ```
+
+A successful response returns HTTP 201 and `{"created": true}`. Verify the ticket was actually saved by listing again:
+
+```bash
+curl -s http://localhost:8500/api/tickets.cfm | python3 -m json.tool | grep -A3 "Monitor flickering"
+```
+
+::hint-box
+---
+:summary: 💡 Why 201 and not 200?
+---
+HTTP **201 Created** is the correct status code when a new resource has been successfully created. Using `200 OK` for a POST that creates data is technically incorrect — it makes it harder for clients to distinguish between "I retrieved data" and "I created something new".
+::
 
 ::simple-task
 ---
@@ -302,12 +344,6 @@ POST creates a new ticket. ✓
 
 ---
 
-## Challenge
-
-Put your skills to the test — complete the hands-on challenge for this lesson.
-
----
-
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
@@ -322,8 +358,8 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 Lesson complete. On to the next one!
 ::
 
-::card
----
-:challenge: challenges.student_api_7309bb97
----
+::remark-box
+Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
+
+📧 Alex — mercadoalex[at]gmail.com
 ::

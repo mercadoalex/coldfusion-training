@@ -112,7 +112,4 @@ tasks:
     run: |
       echo "Lesson complete — well done!"
 
-challenges:
-  student_api_7309bb97: {}
-
 ---
