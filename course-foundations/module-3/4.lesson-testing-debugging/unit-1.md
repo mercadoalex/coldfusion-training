@@ -208,6 +208,8 @@ The key shift: in TDD/BDD a human writes the test by hand. In SDD the spec drive
 
 > SDD is not a replacement for TDD or BDD — it is a layer above them. The generated tests still run as TDD or BDD tests. The difference is *where the specification lives* and *who (or what) writes the tests*.
 
+> 🎓 **Advanced Course** — AI-assisted development in ColdFusion is covered in depth in the Advanced Course: using AI to generate CFML from specs, writing prompts that produce testable code, integrating LLM APIs directly into CF applications, and building pipelines where a specification drives both code generation and test validation automatically.
+
 **Common TestBox matchers:**
 
 | Matcher | What it checks |
