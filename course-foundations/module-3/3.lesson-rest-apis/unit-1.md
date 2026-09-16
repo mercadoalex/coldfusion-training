@@ -229,6 +229,57 @@ Large APIs benefit from separating the HTTP layer (request/response handling) fr
 
 The endpoint file stays thin — it validates input, calls the service, and writes the response. The service holds all the SQL. This separation makes both easier to test and maintain.
 
+::details-box
+---
+:summary: 📖 What is the Service pattern — and what other patterns exist?
+---
+
+### Why a Service CFC?
+
+When your API endpoint does everything — parse the request, validate input, run queries, format output — it becomes hard to read and impossible to test in isolation. The **Service pattern** splits that into two distinct responsibilities:
+
+| Layer | File | Responsibility |
+|---|---|---|
+| **HTTP layer** | `api/tickets.cfm` | Parse request, validate input, set headers, write response |
+| **Data layer** | `TicketService.cfc` | All SQL queries, business rules, data transformation |
+
+The benefit is immediate: you can call `TicketService.getAll()` from a scheduled task, a test script, or a different endpoint without touching any HTTP logic. And you can swap the HTTP layer (say, from `.cfm` to a REST handler) without rewriting any queries.
+
+### Is this a common pattern?
+
+Yes — it is the CFML equivalent of what most frameworks call a **Service Layer** or **Repository pattern**. You will see the same idea in:
+
+- **Java / Spring** — `@Service` classes called by `@RestController`
+- **PHP / Laravel** — Service classes called by Controllers
+- **Node.js / Express** — service modules called by route handlers
+- **.NET** — Service / Repository classes called by API Controllers
+
+The names differ but the principle is identical: keep HTTP concerns out of your data logic.
+
+### Other patterns used in ColdFusion APIs
+
+| Pattern | What it does | When to use |
+|---|---|---|
+| **Service layer** (this lesson) | CFC holds all queries and business logic | Any API with more than a few endpoints |
+| **DAO (Data Access Object)** | CFC per table — only raw CRUD, no business logic | Large apps where business logic is separate from data access |
+| **Gateway** | CFC returns sets of data (queries/arrays) for display | Reporting, list pages — read-heavy, no writes |
+| **Bean / Transfer Object** | CFC represents a single entity (one ticket) with getters/setters | Strongly-typed data passing between layers |
+| **Facade** | Single CFC that wraps multiple services behind one interface | Simplifying a complex subsystem for callers |
+
+In the `TicketService.cfc` here, the lines between Service and DAO are intentionally blurred — it is a pragmatic single-CFC approach suited to a training environment and small-to-medium production apps.
+
+### Is this covered in the Advanced Course?
+
+Yes. The Advanced Course goes into:
+
+- **Full MVC with ColdBox** — Model (Service + DAO), View (templates), Controller (handlers) with dependency injection via WireBox
+- **REST handlers** — `coldbox.system.RestHandler` replaces the manual `cgi.REQUEST_METHOD` routing you see here
+- **ORM with Hibernate** — `component persistent="true"` maps CFCs directly to database tables, eliminating manual SQL for CRUD operations
+- **Unit testing with TestBox** — testing Service CFCs in isolation without an HTTP request
+
+For this lesson, the single-CFC Service pattern is the right level of abstraction — it introduces the concept without the overhead of a full framework.
+::
+
 ---
 
 ## Seed the Help Desk database
