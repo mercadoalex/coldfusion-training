@@ -30,7 +30,7 @@ _A CFML REST endpoint is a plain `.cfm` file — set the Content-Type header, ru
 
 ### What's already running in your lab
 
-Two files are pre-deployed on the ColdFusion server:
+Three files are pre-deployed on the ColdFusion server:
 
 | File | Location | Purpose |
 |---|---|---|
