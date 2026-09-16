@@ -231,6 +231,49 @@ The endpoint file stays thin — it validates input, calls the service, and writ
 
 ---
 
+## Seed the Help Desk database
+
+Before hitting the API, make sure the Help Desk schema is populated. Open the **ColdFusion 2025** browser tab and click the **DB Test** button.
+
+::image-box
+---
+:src: __static__/browser-cf-index-db-test-button-v1.png
+:alt: ColdFusion 2025 lab index page showing the DB Test button that links to the database test and seed utility
+:max-width: 860px
+---
+_Click the **DB Test** button to open the seed utility._
+::
+
+1. Click **Run Seed Script**
+
+::image-box
+---
+:src: __static__/browser-db-test-seed-option-v1.png
+:alt: The DB Test page in the lab showing the Run Seed Script button
+:max-width: 860px
+---
+_Click **Run Seed Script** to create and populate the Help Desk schema._
+::
+
+2. A confirmation screen confirms the seed completed successfully
+
+::image-box
+---
+:src: __static__/browser-db-test-seed-confirmed-v1.png
+:alt: Confirmation screen after running the seed script showing the schema was created and rows inserted successfully
+:max-width: 860px
+---
+_All four tables created and sample rows inserted — the database is ready._
+::
+
+Or seed from the terminal if you prefer:
+
+```bash
+curl -s http://localhost:8500/seed-db.cfm
+```
+
+---
+
 ## Activity 1 — Explore the live API
 
 The endpoint is already running. Use `curl` to inspect it:
