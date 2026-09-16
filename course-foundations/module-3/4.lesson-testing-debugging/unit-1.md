@@ -195,6 +195,14 @@ _`box install testbox` pulls TestBox and its dependencies from ForgeBox. The "In
 TestBox is a CommandBox package — it installs into the Lucee app at `~/app/` and runs under the Lucee server on port 8888. The ColdFusion server on port 8500 is a separate runtime. Your test specs can test CFCs that live in the CF wwwroot, but the test runner itself is served by Lucee/CommandBox.
 ::
 
+### Make TicketService available to Lucee
+
+`TicketService.cfc` lives in the CF wwwroot (`/opt/coldfusion2025/cfusion/wwwroot/`), but the test runner runs under **Lucee** at `~/app/`. Copy it across so Lucee can find it:
+
+```bash
+cp /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc ~/app/
+```
+
 ### Write a test spec
 
 Create the tests directory and a spec file:
