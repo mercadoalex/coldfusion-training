@@ -513,13 +513,39 @@ The `cd ~/app` is required — `box install` places packages relative to the cur
 
 ::hint-box
 ---
-:summary: 💡 TicketService is in the CF wwwroot, not ~/app — how does Lucee find it?
+:summary: 💡 TicketService is in the CF wwwroot, not ~/app — copy it first
 ---
-`TicketService.cfc` lives at `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc`. When the test spec calls `new TicketService()`, Lucee resolves it via its mapping configuration. If you see a "component not found" error, copy the CFC into `~/app/` as well:
+`TicketService.cfc` lives at `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc`. Lucee's web root is `~/app/` — it cannot see files in the CF wwwroot. Copy the CFC before running the tests:
 
 ```bash
 cp /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc ~/app/
 ```
+::
+
+::hint-box
+---
+:summary: ⚠️ "Datasource [training_db] doesn't exist" — Lucee has no datasources configured
+---
+`TicketService.cfc` queries a datasource named `training_db`. That datasource is defined in the **ColdFusion Admin** (CF runs on port 8500). Lucee (port 8888) has no datasources configured by default — so when the spec calls `new TicketService()` under Lucee, the query fails immediately.
+
+Fix: create an `Application.cfc` in `~/app/` that declares the same H2 datasource inline:
+
+```bash
+tee ~/app/Application.cfc << 'EOF'
+component {
+  this.name = "cfTrainingApp";
+
+  this.datasources["training_db"] = {
+    type:     "h2",
+    database: "/opt/coldfusion2025/cfusion/db/training",
+    username: "sa",
+    password: ""
+  };
+}
+EOF
+```
+
+This tells Lucee where the H2 database file is (the same file CF uses) so `TicketService.cfc` can query it without any changes to the CFC itself.
 ::
 
 ::simple-task
