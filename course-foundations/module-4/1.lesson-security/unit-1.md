@@ -320,7 +320,7 @@ You should see matches in `TicketService.cfc` — those are the parameterised qu
 If for any reason `TicketService.cfc` is missing, create a minimal file to satisfy the check:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/tickets.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/04-01-tickets.cfm << 'EOF'
 <cfscript>
   result = queryExecute(
     "SELECT id, title, status FROM hd_tickets WHERE id > :minId",

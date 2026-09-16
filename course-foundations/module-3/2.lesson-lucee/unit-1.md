@@ -88,6 +88,28 @@ In this lab you have both — port 8500 for Adobe CF, port 8888 for Lucee. The c
 
 ---
 
+::hint-box
+---
+:summary: 📁 Files created in this lesson
+---
+
+All files in this lesson live in the Lucee webroot: `/home/laborant/app/`
+
+| File | Activity | Purpose |
+|---|---|---|
+| `Application.cfc` | 3 & 4 | App config — datasource, session management, schema seed |
+| `lucee_info.cfm` | 2 | Outputs Lucee version, Java version, OS from `server` scope |
+| `lucee_ds_check.cfm` | 3 | Verifies the in-memory H2 datasource is reachable |
+| `lucee_tickets.cfm` | 4 | Ticket list + submission form (the main exercise page) |
+| `index.cfm` | 4 | Landing page with **Open Ticket Manager →** link |
+
+**To open any file in the browser:**
+Right-click the **Lucee Dev Server** link in the lab panel → **Open Link in New Tab** → append the filename to the URL in the address bar.
+
+::
+
+---
+
 ## Lucee administration
 
 ::hint-box
