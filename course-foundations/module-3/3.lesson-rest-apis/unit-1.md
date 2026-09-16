@@ -323,32 +323,7 @@ Or seed from the terminal if you prefer:
 curl -s http://localhost:8500/seed-db.cfm
 ```
 
-First run output:
-```
-Help Desk DB Seed
------------------
-OK  hd_departments table OK
-OK  hd_users table OK
-OK  hd_tickets table OK
-OK  hd_comments table OK
-OK  Departments seeded
-OK  Users seeded
-OK  Tickets seeded (10 rows)
-OK  Comments seeded (9 rows)
-Done. Tables ready: hd_departments, hd_users, hd_tickets, hd_comments
-```
-
-If you run it again, it skips the inserts and tells you clearly:
-```
-Help Desk DB Seed
------------------
-OK  hd_departments table OK
-OK  hd_users table OK
-OK  hd_tickets table OK
-OK  hd_comments table OK
-OK  Already seeded — data is present, skipped inserts
-Done. Tables ready: hd_departments, hd_users, hd_tickets, hd_comments
-```
+If the data is already present it skips all inserts and tells you — safe to run multiple times.
 
 ---
 
