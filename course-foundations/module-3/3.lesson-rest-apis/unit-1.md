@@ -22,21 +22,24 @@ In this lesson you will work with a fully functional REST API that is **already 
 ::image-box
 ---
 :src: __static__/rest-api-request-response-cycle-v1.png
-:alt: HTTP request-response cycle diagram for a CFML REST API — client on the left sends GET /api/tickets.cfm with an Accept application/json header; the ColdFusion server in the middle shows cfheader setting Content-Type, queryExecute fetching from training_db, and serializeJSON serialising the result; the response arrow carries a JSON payload back to the client
+:alt: Three-column diagram titled CFML REST API Request Response Cycle — left column is a blue CLIENT box labelled curl / browser / mobile app; a right-pointing arrow labelled GET /api/tickets.cfm and Accept application/json points to the middle ColdFusion Server box in green containing three inner cards: cfheader setting Content-Type application/json, queryExecute running SELECT FROM training_db, and serializeJSON converting struct or array to JSON; a right-pointing arrow labelled SQL query points to the right H2 Database box in yellow labelled training_db; a left-pointing arrow from the server back to the client is labelled 200 OK and carries the JSON payload total 10 tickets array
 :max-width: 860px
 ---
-_A CFML REST endpoint is a plain `.cfm` file — set the Content-Type header, run a query, serialise the result._
+_Three layers in every CFML REST request: the client sends HTTP, ColdFusion processes and queries, the H2 database returns rows — serialised back as JSON._
 ::
 
 ### What's already running in your lab
 
 Three files are pre-deployed on the ColdFusion server:
 
-| File | Location | Purpose |
-|---|---|---|
-| `api/tickets.cfm` | `/opt/coldfusion2025/cfusion/wwwroot/api/tickets.cfm` | REST endpoint — GET list, GET by id, POST create, DELETE close |
-| `TicketService.cfc` | `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc` | CFC service layer used by the endpoint |
-| `api-test.cfm` | `/opt/coldfusion2025/cfusion/wwwroot/api-test.cfm` | Browser-based API console |
+::image-box
+---
+:src: __static__/cf-rest-predeployed-files-v1.png
+:alt: Reference card titled Pre-deployed files ColdFusion server — a three-row table with columns File, Server path, and Purpose — row 1 has a green endpoint pill next to api/tickets.cfm at /opt/coldfusion2025/cfusion/wwwroot/api/tickets.cfm described as REST endpoint GET list GET by id POST create DELETE close — row 2 has a blue service pill next to TicketService.cfc at /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc described as CFC service layer all queries and business logic — row 3 has a purple console pill next to api-test.cfm at /opt/coldfusion2025/cfusion/wwwroot/api-test.cfm described as Browser-based API console
+:max-width: 860px
+---
+_All three files are baked into the lab image — nothing to create or install._
+::
 
 To open the API console, right-click the **ColdFusion** tab in the lab panel and open it in a new browser tab, then navigate to `/api-test.cfm`.
 
