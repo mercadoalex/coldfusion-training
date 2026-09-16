@@ -151,7 +151,7 @@ TestBox is the standard BDD/TDD testing framework for CFML. It runs on CommandBo
 - **BDD syntax** — `describe`, `it`, `expect` blocks that read like plain English specifications
 - **TDD syntax** — traditional `@Test` annotation style if you prefer
 - **Mocking engine** — `createMock()` and `createStub()` let you isolate a CFC from its dependencies during testing
-- **Multiple runners** — run tests from the terminal via `box testbox run`, from a browser via the HTML runner, or as part of a CI/CD pipeline
+- **Multiple runners** — run tests via `curl` against the TextRunner URL, from a browser via the HTML runner, or as part of a CI/CD pipeline
 - **Rich reporters** — text, JSON, TAP, JUnit XML output formats so results integrate with GitHub Actions, Jenkins, or any CI system
 
 TestBox is installed as a **CommandBox package** (`box install testbox`) — it lives in your project directory alongside your app code, not inside ColdFusion itself. This means the same test suite can run against Adobe CF, Lucee, or any CFML engine without changes.
@@ -231,16 +231,16 @@ EOF
 
 ### Run the tests
 
+Hit the TextRunner directly with `curl` — no interactive CLI, no hanging:
+
 ```bash
-cd ~/app
-box testbox run runner="http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests"
+curl -s "http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests"
 ```
 
-A passing suite looks like:
+A passing suite outputs a plain-text summary ending with:
 
 ```
-TestBox v6.x.x
-Tests: 2  |  Passed: 2  |  Failed: 0  |  Errors: 0  |  Skipped: 0
+Tests: 2 Passed: 2 Failed: 0 Errors: 0 Skipped: 0
 ```
 
 ::details-box
@@ -432,11 +432,17 @@ TestBox spec file found. ✓
 ## Activity 4 — Run the tests
 
 ```bash
-cd ~/app
-box testbox run runner="http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests"
+curl -s "http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests"
 ```
 
 All tests must pass — zero failures, zero errors.
+
+::hint-box
+---
+:summary: ⚠️ Why curl and not box testbox run?
+---
+`box testbox run` starts an interactive CommandBox session that can hang indefinitely in a non-TTY terminal. Hitting the TextRunner URL directly with `curl` is equivalent — it calls the same runner, returns the same plain-text output, and never blocks.
+::
 
 ::hint-box
 ---
