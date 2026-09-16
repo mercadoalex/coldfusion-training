@@ -242,9 +242,6 @@ In the **Terminal** tab, run:
 
 ```bash
 sudo tee /home/laborant/app/lucee_info.cfm << 'EOF'
-```
-
-```cfml
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -275,9 +272,6 @@ sudo tee /home/laborant/app/lucee_info.cfm << 'EOF'
   </div>
 </body>
 </html>
-```
-
-```bash
 EOF
 ```
 
@@ -317,9 +311,6 @@ Lucee version info is accessible. ✓
 
 ```bash
 sudo tee /home/laborant/app/Application.cfc << 'EOF'
-```
-
-```cfml
 component {
   this.name       = "HelpdeskApp";
   this.datasource = "training_db";
@@ -330,9 +321,6 @@ component {
     password:         ""
   };
 }
-```
-
-```bash
 EOF
 ```
 
@@ -340,9 +328,6 @@ EOF
 
 ```bash
 sudo tee /home/laborant/app/lucee_ds_check.cfm << 'EOF'
-```
-
-```cfml
 <cfscript>
   try {
     queryExecute("CREATE TABLE IF NOT EXISTS hd_tickets (id INT PRIMARY KEY, title VARCHAR(100))", {}, {datasource: "training_db"});
@@ -353,9 +338,6 @@ sudo tee /home/laborant/app/lucee_ds_check.cfm << 'EOF'
     writeOutput("ERROR — " & e.message);
   }
 </cfscript>
-```
-
-```bash
 EOF
 curl -s http://localhost:8888/lucee_ds_check.cfm
 ```
@@ -466,9 +448,6 @@ Now create the file:
 
 ```bash
 sudo tee /home/laborant/app/Application.cfc << 'EOF'
-```
-
-```cfml
 component {
   this.name              = "HelpdeskApp";
   this.datasource        = "training_db";
@@ -509,9 +488,6 @@ component {
     }
   }
 }
-```
-
-```bash
 EOF
 ```
 
@@ -558,9 +534,6 @@ Now create the full file:
 
 ```bash
 sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
-```
-
-```cfml
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -713,9 +686,6 @@ sudo tee /home/laborant/app/lucee_tickets.cfm << 'EOF'
 </form>
 </body>
 </html>
-```
-
-```bash
 EOF
 ```
 
