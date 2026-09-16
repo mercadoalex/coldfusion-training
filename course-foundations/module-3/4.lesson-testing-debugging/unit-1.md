@@ -94,6 +94,24 @@ The log format includes a timestamp, thread ID, severity, and your message — s
 
 TestBox is the standard BDD/TDD testing framework for CFML. It runs on CommandBox (Lucee, port 8888) and lets you write readable test specs that describe expected behaviour.
 
+::hint-box
+---
+:summary: 💡 What is TestBox — and who makes it?
+---
+
+**TestBox** is an open-source testing framework built and maintained by **Ortus Solutions**, the same company behind CommandBox and ColdBox. It is the de-facto standard for CFML unit testing and ships with:
+
+- **BDD syntax** — `describe`, `it`, `expect` blocks that read like plain English specifications
+- **TDD syntax** — traditional `@Test` annotation style if you prefer
+- **Mocking engine** — `createMock()` and `createStub()` let you isolate a CFC from its dependencies during testing
+- **Multiple runners** — run tests from the terminal via `box testbox run`, from a browser via the HTML runner, or as part of a CI/CD pipeline
+- **Rich reporters** — text, JSON, TAP, JUnit XML output formats so results integrate with GitHub Actions, Jenkins, or any CI system
+
+TestBox is installed as a **CommandBox package** (`box install testbox`) — it lives in your project directory alongside your app code, not inside ColdFusion itself. This means the same test suite can run against Adobe CF, Lucee, or any CFML engine without changes.
+
+The current stable release is **TestBox 6.x**, which requires CommandBox 6+ and Java 11+. The lab VM ships with both.
+::
+
 ::image-box
 ---
 :src: __static__/testbox-bdd-spec-structure-v1.png
