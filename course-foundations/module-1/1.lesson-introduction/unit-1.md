@@ -130,6 +130,38 @@ Key architectural points:
 
 ---
 
+## ColdFusion and the JEE platform
+
+ColdFusion is built on top of the **Java Enterprise Edition (JEE)** platform and uses a JEE application server for its core services — database connectivity, naming and directory services, and other runtime infrastructure. This is not just an implementation detail: it directly shapes what you can do with ColdFusion applications.
+
+ColdFusion can be deployed in two ways:
+
+- **Server configuration** — ColdFusion ships with a bundled JEE server (Apache Tomcat). This is the standard setup and what you are using in this lab.
+- **JEE configuration (Enterprise only)** — ColdFusion can be deployed as a WAR/EAR on an independent JEE application server such as IBM WebSphere, Oracle WebLogic, or JBoss.
+
+By running on top of the JEE platform, ColdFusion inherits its power while hiding its complexity behind CFML tags and functions. This also means ColdFusion pages can integrate directly with the Java ecosystem:
+
+| Capability | What it means in practice |
+|---|---|
+| **Share session data with JSPs and Java servlets** | CFML and Java code running in the same container can read and write the same `session` scope |
+| **Import JSP tag libraries** | Custom JSP tags can be imported and used like ColdFusion custom tags |
+| **Integrate with Java objects** | You can call any Java class, JavaBean, or Enterprise JavaBean directly from CFML using `createObject("java", ...)` |
+| **Access the full JEE Java API** | JDBC drivers, JMS, JNDI, and other JEE APIs are available to CFML code |
+
+::hint-box
+---
+:summary: 💡 Why does this matter for CFML developers?
+---
+Understanding that ColdFusion runs inside a JVM servlet container explains several behaviours you will encounter throughout this course:
+
+- Why CF configuration lives in `WEB-INF/` and `cfclasses/` directories
+- Why restarting CF is sometimes needed to pick up code changes (the JVM class cache)
+- Why you can drop `.jar` files into the classpath and call Java libraries from CFML
+- Why performance tuning involves JVM flags (`-Xmx`, `-Xms`, GC settings) as much as CFML-level changes
+::
+
+---
+
 ## Adobe ColdFusion vs. Lucee
 
 Both engines execute the same CFML language core, but they differ in licensing, extension model, and some built-in capabilities.
@@ -323,4 +355,7 @@ When all the checks above are green, this lesson is complete. Your progress is s
 | **CommandBox** | CLI + embedded server tool for Lucee; analogous to Node's `npm` + `node` |
 | **cfscript** | Block tag (`<cfscript>...</cfscript>`) that enables ECMAScript-style syntax |
 | **Scope** | Named variable namespace (e.g., `variables`, `session`, `application`, `request`) |
+| **JEE** | Java Enterprise Edition — the platform ColdFusion runs on top of |
+| **Servlet container** | The JEE runtime (Tomcat in the lab) that hosts the CF engine |
+| **JVM** | Java Virtual Machine — the process CF runs inside; tuned via `-Xmx`/`-Xms` flags |
 
