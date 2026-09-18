@@ -642,6 +642,7 @@ component persistent="true" table="hd_tickets" {
   property name="description" ormtype="string";
   property name="status"      ormtype="string"       default="open";
   property name="priority"    ormtype="string"       default="medium";
+  property name="userId"      column="USER_ID"       ormtype="integer";
   property name="category"    fieldtype="many-to-one" cfc="Category"
                               fkcolumn="category_id";
 
@@ -713,6 +714,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/orm_rel_test.cfm << 'EOF'
     t.setTitle("Monitor flickering");
     t.setStatus("open");
     t.setPriority("high");
+    t.setUserId(1);
     t.setCategory(cat);
     EntitySave(t);
 
