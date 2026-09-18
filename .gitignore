@@ -19,3 +19,6 @@ docs/
 add_lesson_complete.py
 fix_index_task_placement.py
 fix_stray_playground_task.py
+
+*.pdf
+*.txt
