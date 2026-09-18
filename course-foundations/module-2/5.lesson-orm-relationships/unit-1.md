@@ -593,6 +593,30 @@ _Setting `inverse="true"` on the `one-to-many` side prevents Hibernate from issu
 
 ## Activity 1 — Define a one-to-many relationship
 
+::hint-box
+---
+:summary: Prerequisite — ORM must be enabled in Application.cfc
+---
+
+This activity requires `ormenabled = true` in `Application.cfc`. If you completed the ORM Basics lesson this is already in place. If not, or if the file was reset, run this first:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
+component {
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.ormenabled = true;
+  this.ormsettings = {
+    datasource : "training_db",
+    dbcreate   : "update",
+    logsql     : false
+  };
+}
+EOF
+```
+
+::
+
 **Activity:** Create `Category.cfc` and update `Ticket.cfc` so that each category has many tickets and each ticket belongs to one category.
 
 ```bash
