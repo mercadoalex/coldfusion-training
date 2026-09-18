@@ -1,9 +1,257 @@
 ---
 kind: unit
 
-title: ORM Relationships — One-to-Many, Many-to-One, and Beyond
+title: ORM Relationships — Mapping, Objects, and Associations
 
 name: orm-relationships-unit-1
+---
+
+## ORM entity mapping in detail
+
+The ORM basics lesson introduced a simple `Ticket.cfc` with a handful of properties. This lesson goes deeper — looking at the full set of mapping attributes available on `cfcomponent` and `cfproperty`, then building on that foundation to define relationships between entities.
+
+::image-box
+---
+:src: __static__/orm-artist-mapping-diagram-v1.png
+:alt: Diagram showing Artist.cfc on the left with cfcomponent attributes (persistent=true, entityname=Artist, table=Artists) and cfproperty declarations (id with ARTISTID column, firstname, lastname, address, city, state, postalcode, email, phone, fax, thepassword) mapping to an Artists database table on the right — bidirectional arrow labelled "Hibernate ORM" connects the two sides
+:max-width: 860px
+---
+_The `Artist.cfc` entity — `entityname` controls the HQL name, `table` controls the database table name, `column` on `cfproperty` overrides the column name._
+::
+
+### cfcomponent mapping attributes
+
+| Attribute | Default | Description |
+|---|---|---|
+| `persistent` | `false` | **Required.** Set `true` to make this CFC an ORM entity |
+| `entityname` | CFC file name | The name Hibernate uses internally — used in HQL queries and `EntityLoad` calls |
+| `table` | entityname | The database table this entity maps to |
+| `schema` | — | Database schema name |
+| `catalog` | — | Database catalog name |
+| `lazy` | `true` | Whether instances are loaded lazily when navigating associations |
+| `batchsize` | — | Number of entities to batch-load at once when lazy-loading |
+| `dynamicupdate` | `false` | Only include changed columns in the `UPDATE` SQL — useful for wide tables |
+| `dynamicinsert` | `false` | Only include non-null columns in the `INSERT` SQL |
+| `readonly` | `false` | If `true`, no insert/update/delete is ever issued — useful for views |
+| `discriminatorvalue` | entityname | Used in table-per-hierarchy inheritance |
+| `discriminatorcolumn` | — | Column that distinguishes subclasses in a single-table hierarchy |
+
+### cfproperty mapping attributes
+
+```cfml
+// Artist.cfc — full mapping example
+component persistent="true" entityname="Artist" table="Artists" {
+  property name="id"          column="ARTISTID"   fieldtype="id"  generator="increment";
+  property name="firstname";
+  property name="lastname";
+  property name="address";
+  property name="city";
+  property name="state";
+  property name="postalcode";
+  property name="email";
+  property name="phone";
+  property name="fax";
+  property name="thepassword";
+}
+```
+
+Key points in this example:
+- `entityname="Artist"` — the name used in HQL (`FROM Artist`) and `EntityLoad("Artist", ...)`, which can differ from the CFC filename
+- `table="Artists"` — maps to the `Artists` database table (different from the entityname)
+- `column="ARTISTID"` on the `id` property — maps to the actual database column name `ARTISTID` rather than the default `id`
+- `generator="increment"` — Hibernate manages the PK sequence itself (use `"native"` to delegate to the database's AUTO_INCREMENT)
+- Properties without attributes (`firstname`, `lastname`, etc.) auto-map to columns with the same name
+
+::details-box
+---
+:summary: cfproperty column-mapping attributes reference
+---
+
+| Attribute | Default | Description |
+|---|---|---|
+| `name` | — | **Required.** Property name — used for getter/setter names |
+| `column` | property name | Override the database column name (useful when names differ) |
+| `fieldtype` | `column` | `column`, `id`, `version`, `timestamp`, `one-to-one`, `one-to-many`, `many-to-one`, `many-to-many` |
+| `ormtype` | `string` | Data type: `string`, `integer`, `long`, `float`, `double`, `boolean`, `date`, `timestamp`, `text`, `binary` |
+| `generator` | `native` | PK generation strategy: `native`, `increment`, `identity`, `sequence`, `foreign`, `assigned` |
+| `length` | — | Column length — adds a `VARCHAR(n)` constraint when ORM creates the table |
+| `notnull` | `false` | Adds a NOT NULL constraint |
+| `unique` | `false` | Adds a UNIQUE constraint |
+| `default` | — | Default value inserted when no value is set |
+| `dbdefault` | — | Default value at the database level |
+| `insert` | `true` | Include this column in INSERT statements |
+| `update` | `true` | Include this column in UPDATE statements — set `false` for created-at timestamps |
+| `optimisticlock` | `true` | Whether changes to this property acquire an optimistic lock |
+| `lazy` | `false` | Load this property lazily (useful for `text`/`binary` large-value columns) |
+| `formula` | — | A SQL expression evaluated as a computed column — read-only |
+
+::
+
+---
+
+## Working with ORM objects
+
+Once your entities are defined you interact with them using ColdFusion's built-in ORM functions. These functions wrap Hibernate's session API in a simple ColdFusion interface.
+
+### EntityNew — create an object without saving
+
+`EntityNew(entityName)` creates a new instance of the entity in memory without touching the database:
+
+```cfml
+<cfscript>
+  artist = EntityNew("Artist");
+  artist.setFirstname("Georgia");
+  artist.setLastname("O'Keeffe");
+  artist.setCity("Abiquiú");
+  artist.setState("NM");
+  // Not yet in the database — no SQL issued yet
+</cfscript>
+```
+
+You can also pass an initial struct of values as the second argument:
+
+```cfml
+artist = EntityNew("Artist", { firstname: "Frida", lastname: "Kahlo", city: "Mexico City" });
+```
+
+### EntitySave — persist an object
+
+`EntitySave(entity)` issues an `INSERT` for new objects and an `UPDATE` for objects loaded from the database. Hibernate's **dirty checking** means `EntitySave` on an already-loaded object only issues an `UPDATE` if a property actually changed:
+
+```cfml
+<cfscript>
+  // INSERT — new object
+  employee = EntityNew("Employee");
+  employee.setFirstName("Tom");
+  employee.setLastName("Jones");
+  employee.setSalary(100000);
+  employee.setContract("Y");
+  EntitySave(employee);
+
+  // UPDATE — loaded object
+  employee.setSalary(125000);
+  EntitySave(employee);   // issues UPDATE only for the salary column
+</cfscript>
+```
+
+### EntityLoadByPK — load a single record by primary key
+
+`EntityLoadByPK(entityName, pkValue)` returns the entity whose primary key matches `pkValue`, or `null` if no row is found:
+
+```cfml
+<cfscript>
+  employee = EntityLoadByPK("Employee", 1958);
+  if (isNull(employee)) {
+    writeOutput("No employee with that ID");
+  } else {
+    writeOutput(employee.getFirstName() & " " & employee.getLastName());
+  }
+</cfscript>
+```
+
+### EntityLoad — load a collection
+
+`EntityLoad(entityName)` returns all rows. Pass a struct as the second argument to filter by property values:
+
+```cfml
+<cfscript>
+  // All employees
+  all = EntityLoad("Employee");
+
+  // Only employees in New York, ordered by lastname
+  nyEmployees = EntityLoad("Employee", { city: "New York" }, "lastname asc");
+</cfscript>
+```
+
+### EntityDelete — remove a record
+
+`EntityDelete(entity)` deletes the row from the database. You must first load the object with `EntityLoadByPK`:
+
+```cfml
+<cfscript>
+  employee = EntityLoadByPK("Employee", 1958);
+  EntityDelete(employee);
+  // Row with PK 1958 is now deleted from the Employee table
+</cfscript>
+```
+
+::hint-box
+---
+:summary: Always load before you delete — never pass an un-loaded object to EntityDelete
+---
+
+`EntityDelete` requires a **managed entity** — an object that Hibernate is tracking in the current session. Passing a manually constructed object (not loaded via `EntityLoad` or `EntityLoadByPK`) will throw a `TransientObjectException`.
+
+If you need to delete by PK, always call `EntityLoadByPK` first:
+
+```cfml
+// CORRECT
+toDelete = EntityLoadByPK("Ticket", 42);
+if (!isNull(toDelete)) EntityDelete(toDelete);
+
+// WRONG — throws TransientObjectException
+fake = new Ticket();
+fake.setId(42);
+EntityDelete(fake);   // ✗
+```
+
+::
+
+### Getters and setters — auto-generated methods
+
+ColdFusion generates `get<PropertyName>()` and `set<PropertyName>()` methods for every `cfproperty`. You never write these yourself:
+
+```cfml
+<cfscript>
+  artist = EntityLoadByPK("Artist", 1);
+  // Auto-generated getters
+  name     = artist.getFirstname();    // → "Georgia"
+  city     = artist.getCity();         // → "Abiquiú"
+
+  // Auto-generated setters
+  artist.setEmail("g@example.com");
+  artist.setPhone("505-555-0100");
+  EntitySave(artist);
+</cfscript>
+```
+
+You can override these methods in the CFC body if you need custom behaviour — your implementation takes precedence over the generated one.
+
+### ORMReload — reload after config changes
+
+Hibernate builds its session factory when the application starts. If you change `Application.cfc` ORM settings or add/modify a persistent CFC, call `ORMReload()` to rebuild the session factory without restarting ColdFusion:
+
+```cfml
+<cfscript>
+  ORMReload();   // rebuilds the Hibernate session factory
+  employees = EntityLoad("Employee");
+  writeDump(employees);
+</cfscript>
+```
+
+::hint-box
+---
+:summary: When to call ORMReload — and when not to
+---
+
+Call `ORMReload()` when:
+- You added a new persistent CFC
+- You changed `cfcomponent` or `cfproperty` mapping attributes
+- You changed `ormsettings` in `Application.cfc`
+- You renamed an entity or changed `table`/`column` attributes
+
+**Do NOT call `ORMReload()` on every page request.** It is expensive — it discards the Hibernate session factory and rebuilds it from scratch. In production the session factory is built once at application start. `ORMReload()` is a development tool only.
+
+If you need `ORMReload()` in a CFM page during development, place it inside a condition:
+
+```cfml
+if (structKeyExists(url, "reload")) ORMReload();
+```
+
+Access the page with `?reload=1` when you need it, normal requests skip it.
+
+::
+
 ---
 
 ## Why relationships matter in ORM
@@ -270,6 +518,8 @@ component persistent="true" table="Products" {
 | `where` | one-to-many, many-to-many | — | SQL WHERE filter applied when loading the collection |
 | `constrained` | one-to-one | `false` | Add a FK constraint on this table's PK referencing the other table |
 | `batchsize` | one-to-many, many-to-many | — | Number of collections loaded at once when lazy-loading |
+| `structkeycolumn` | one-to-many, many-to-many (struct) | — | Column in the target table to use as struct key |
+| `structkeytype` | one-to-many, many-to-many (struct) | — | Data type of the struct key |
 
 ::
 
@@ -320,6 +570,15 @@ property name="artist" fieldtype="many-to-one" cfc="Artist"
 ```
 
 For many-to-many relationships, set `inverse="true"` on either side — just pick one consistently.
+
+::image-box
+---
+:src: __static__/orm-inverse-diagram-v1.png
+:alt: Diagram showing a bidirectional Artist-Art relationship — Artist.cfc box on the left has a property labelled "art fieldtype=one-to-many inverse=true" with a dashed arrow pointing right; Art.cfc box on the right has a property labelled "artist fieldtype=many-to-one fkcolumn=ARTISTID" with a solid arrow pointing left — the solid arrow is labelled "SQL owner" and the dashed arrow is labelled "inverse — no SQL from this side"
+:max-width: 760px
+---
+_Setting `inverse="true"` on the `one-to-many` side prevents Hibernate from issuing a duplicate UPDATE to set the FK — the `many-to-one` side owns the SQL._
+::
 
 ---
 
@@ -491,6 +750,26 @@ Run the `sudo tee` command above to create `orm_rel_test.cfm`, then open `/orm_r
 #completed
 `orm_rel_test.cfm` runs without errors — ORM relationships are working. ✓
 ::
+
+---
+
+## Key takeaways
+
+| Topic | What to remember |
+|---|---|
+| **entityname vs table** | `entityname` is the name used in HQL and `EntityLoad`; `table` is the database table name — they can differ |
+| **column attribute** | Use `column="ARTISTID"` on `cfproperty` to map a property to a differently-named database column |
+| **EntityNew** | Creates an in-memory object — no SQL issued until `EntitySave` |
+| **EntitySave** | Issues INSERT for new objects, UPDATE for dirty loaded objects — Hibernate's dirty-checking skips unchanged properties |
+| **EntityLoadByPK** | Loads a single row by PK — returns `null` if not found, always check with `isNull()` |
+| **EntityDelete** | Requires a managed entity loaded via `EntityLoad`/`EntityLoadByPK` — never pass a manually created object |
+| **ORMReload** | Rebuilds the session factory — use only in development after changing entity mappings, never on every request |
+| **one-to-many FK** | The foreign key lives in the **target** (child) table, not the parent |
+| **many-to-one FK** | The foreign key lives in the **source** (child) table — it's the same FK, just seen from the other side |
+| **many-to-many link table** | Use `linktable`, `fkcolumn`, and `inversejoincolumn` — the link table has no entity of its own |
+| **cascade="all-delete-orphan"** | The standard choice for owned one-to-many collections — deletes children when they are removed from the collection |
+| **inverse="true"** | Put on the `one-to-many` side of a bidirectional relationship to prevent Hibernate issuing a duplicate SQL UPDATE |
+| **lazy="true" (default)** | Collections are not loaded until accessed — avoids N+1 when you don't need the related objects |
 
 ---
 
