@@ -300,6 +300,15 @@ Set `fieldtype` on `cfproperty` to one of:
 | `many-to-one` | Many sources reference the same target (foreign key on source table) |
 | `many-to-many` | Both sides hold collections — requires a link table |
 
+::image-box
+---
+:src: __static__/orm-relationship-types-grid-v1.png
+:alt: 2x2 grid of four cards — top-left blue card shows one-to-one with Employee and OfficeCubicle connected 1-to-1; top-right green card shows one-to-many with Artist connected to a stack of Art objects; bottom-left amber card shows many-to-one with multiple Art boxes converging on one Artist; bottom-right purple card shows many-to-many with Order and Product connected through an Order_Product link table
+:max-width: 860px
+---
+_The four ORM relationship types — each maps directly to a `fieldtype` value on `cfproperty`._
+::
+
 ---
 
 ## One-to-one relationships
