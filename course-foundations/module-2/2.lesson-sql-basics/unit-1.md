@@ -315,21 +315,3 @@ In the next lesson you will learn `<cfqueryparam>` — the modern, safe way to p
 ---
 
 When you are ready, move on to the next lesson — **SQL with cfquery & queryParam** — where you will write these statements inside ColdFusion using `<cfquery>` and protect them with `<cfqueryparam>`.
-
-::simple-task
----
-:tasks: tasks
-:name: verify_lesson_complete
----
-#active
-All done? Hit **Check** to mark this lesson complete and move on to SQL with cfquery.
-
-#completed
-SQL primer complete. On to cfquery! ✓
-::
-
-::remark-box
-Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
-
-📧 Alex — mercadoalex[at]gmail.com
-::

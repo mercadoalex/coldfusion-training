@@ -24,11 +24,4 @@ tagz:
 playground:
   name: cf-alex-edcdf975
 
-tasks:
-  verify_lesson_complete:
-    machine: dev-machine
-    user: laborant
-    run: |
-      echo "SQL primer complete — well done!"
-
 ---
