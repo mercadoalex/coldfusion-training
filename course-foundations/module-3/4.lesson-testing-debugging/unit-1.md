@@ -195,36 +195,34 @@ _`box install testbox` pulls TestBox and its dependencies from ForgeBox. The "In
 TestBox is a CommandBox package — it installs into the Lucee app at `~/app/` and runs under the Lucee server on port 8888. The ColdFusion server on port 8500 is a separate runtime. Your test specs can test CFCs that live in the CF wwwroot, but the test runner itself is served by Lucee/CommandBox.
 ::
 
-### Make TicketService available to Lucee
-
-`TicketService.cfc` lives in the CF wwwroot (`/opt/coldfusion2025/cfusion/wwwroot/`), but the test runner runs under **Lucee** at `~/app/`. Copy it across so Lucee can find it:
-
-```bash
-cp /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc ~/app/
-```
-
 ### Write a test spec
 
-Create the tests directory and a spec file:
+Create the tests directory and spec file:
 
 ```bash
 mkdir -p ~/app/tests
-sudo tee ~/app/tests/TicketServiceTest.cfc << 'EOF'
+tee ~/app/tests/TicketServiceTest.cfc << 'EOF'
 component extends="testbox.system.BaseSpec" {
 
   function run() {
 
+    beforeAll(function() {
+      // Seed the in-memory H2 database that Application.cfc declares for Lucee.
+      // This must run before any test — the in-memory DB is empty on first request.
+      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
+    });
+
     describe("TicketService", function() {
 
+      var svc = new TicketService();
+
       it("should return all tickets as an array", function() {
-        var svc    = new TicketService();
         var result = svc.getAll();
         expect(result).toBeArray();
-        expect(arrayLen(result)).toBeGTE(0);
+        expect(arrayLen(result)).toBeGTE(1);
       });
 
       it("should return a single ticket by id", function() {
-        var svc    = new TicketService();
         var ticket = svc.getById(1);
         expect(ticket).toBeStruct();
         expect(ticket).toHaveKey("title");
@@ -413,32 +411,36 @@ A `training.log` file must exist in the CF logs directory.
 
 ## Activity 3 — Install TestBox and write a test spec
 
-Install TestBox into your student app, then create the test spec:
+Install TestBox into your student app, then create the spec:
 
 ```bash
 cd ~/app && box install testbox
 ```
 
-Then create the spec:
-
 ```bash
 mkdir -p ~/app/tests
-sudo tee ~/app/tests/TicketServiceTest.cfc << 'EOF'
+tee ~/app/tests/TicketServiceTest.cfc << 'EOF'
 component extends="testbox.system.BaseSpec" {
 
   function run() {
 
+    beforeAll(function() {
+      // Seed the in-memory H2 database that Application.cfc declares for Lucee.
+      // This must run before any test — the in-memory DB is empty on first request.
+      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
+    });
+
     describe("TicketService", function() {
 
+      var svc = new TicketService();
+
       it("should return all tickets as an array", function() {
-        var svc    = new TicketService();
         var result = svc.getAll();
         expect(result).toBeArray();
-        expect(arrayLen(result)).toBeGTE(0);
+        expect(arrayLen(result)).toBeGTE(1);
       });
 
       it("should return a single ticket by id", function() {
-        var svc    = new TicketService();
         var ticket = svc.getById(1);
         expect(ticket).toBeStruct();
         expect(ticket).toHaveKey("title");
@@ -513,22 +515,37 @@ The `cd ~/app` is required — `box install` places packages relative to the cur
 
 ::hint-box
 ---
-:summary: 💡 TicketService is in the CF wwwroot, not ~/app — copy it first
+:summary: 💡 TicketService and seed-db.cfm — where they live
 ---
-`TicketService.cfc` lives at `/opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc`. Lucee's web root is `~/app/` — it cannot see files in the CF wwwroot. Copy the CFC before running the tests:
-
-```bash
-cp /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc ~/app/
-```
+`TicketService.cfc` and `seed-db.cfm` are in `~/app/` — the Lucee web root. They are **not** the same files as in `/opt/coldfusion2025/cfusion/wwwroot/`. The ones in `~/app/` are what the TestBox runner uses, and `seed-db.cfm` is what the spec's `beforeAll` block calls via `cfhttp` to seed the Lucee-side in-memory H2 database before the tests run.
 ::
 
 ::hint-box
 ---
-:summary: ⚠️ "Datasource [training_db] doesn't exist" — Lucee has no datasources configured
+:summary: ⚠️ "Datasource [training_db] doesn't exist" — Application.cfc missing or not loaded
 ---
-`TicketService.cfc` queries a datasource named `training_db`. That datasource is defined in the **ColdFusion Admin** (CF runs on port 8500). Lucee (port 8888) has no datasources configured by default — so when the spec calls `new TicketService()` under Lucee, the query fails immediately.
+`TicketService.cfc` queries a datasource named `training_db`. That datasource is declared in `~/app/Application.cfc` for Lucee. If you see this error, verify the file exists:
 
-Fix: create an `Application.cfc` in `~/app/` that declares the same H2 datasource inline:
+```bash
+cat ~/app/Application.cfc
+```
+
+It should contain:
+
+```cfml
+component {
+  this.name = "cfTrainingApp";
+
+  this.datasources["training_db"] = {
+    class:            "org.h2.Driver",
+    connectionString: "jdbc:h2:mem:training_db;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE",
+    username:         "sa",
+    password:         ""
+  };
+}
+```
+
+If the file is missing, create it and restart the Lucee server:
 
 ```bash
 tee ~/app/Application.cfc << 'EOF'
@@ -536,16 +553,17 @@ component {
   this.name = "cfTrainingApp";
 
   this.datasources["training_db"] = {
-    type:     "h2",
-    database: "/opt/coldfusion2025/cfusion/db/training",
-    username: "sa",
-    password: ""
+    class:            "org.h2.Driver",
+    connectionString: "jdbc:h2:mem:training_db;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE",
+    username:         "sa",
+    password:         ""
   };
 }
 EOF
+cd ~/app && box server restart
 ```
 
-This tells Lucee where the H2 database file is (the same file CF uses) so `TicketService.cfc` can query it without any changes to the CFC itself.
+`DATABASE_TO_UPPER=FALSE` tells H2 to preserve column-name case exactly as written in SQL, so `u.name AS submitter` resolves to `submitter` rather than `SUBMITTER`.
 ::
 
 ::simple-task

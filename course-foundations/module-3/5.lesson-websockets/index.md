@@ -39,15 +39,40 @@ tasks:
   verify_ws_handler:
     machine: dev-machine
     user: laborant
-    needs:
-      - verify_ws_page
     run: |
-      COUNT=$(find /opt/coldfusion2025/cfusion/wwwroot -name "*.cfc" | xargs grep -li "wsGetAllChannels\|wsPublish\|onWSMessage" 2>/dev/null | wc -l)
-      if [ "${COUNT}" -lt 1 ]; then
-        echo "No WebSocket handler CFC found"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/WSHandler.cfc"
+      if [ ! -f "${FILE}" ]; then
+        echo "WSHandler.cfc not found"
         exit 1
       fi
-      echo "WebSocket handler CFC found"
+      if ! grep -q "wsPublish" "${FILE}"; then
+        echo "WSHandler.cfc exists but does not call wsPublish"
+        exit 1
+      fi
+      if ! grep -q "onWSMessage" "${FILE}"; then
+        echo "WSHandler.cfc exists but is missing onWSMessage"
+        exit 1
+      fi
+      echo "WebSocket handler CFC found: ${FILE}"
+
+  verify_ws_channels:
+    machine: dev-machine
+    user: laborant
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/Application.cfc"
+      if [ ! -f "${FILE}" ]; then
+        echo "Application.cfc not found"
+        exit 1
+      fi
+      if ! grep -q "wschannels" "${FILE}"; then
+        echo "Application.cfc exists but this.wschannels is not defined"
+        exit 1
+      fi
+      if ! grep -q "WSHandler" "${FILE}"; then
+        echo "Application.cfc exists but WSHandler is not referenced in wschannels"
+        exit 1
+      fi
+      echo "Application.cfc has wschannels registered"
 
   verify_ws_js_client:
     machine: dev-machine
