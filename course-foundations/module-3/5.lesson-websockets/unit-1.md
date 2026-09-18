@@ -510,6 +510,48 @@ _The chat demo page — once the WebSocket handshake completes the status line c
 The most common cause is a syntax error in `Application.cfc`. Check that the `this.wschannels` line is inside the `component { }` block and that all curly braces are balanced. You can also hit `http://localhost:8500/Application.cfc` in the CF admin browser tab to trigger a parse error message.
 ::
 
+::hint-box
+---
+:summary: ⚠️ Status shows "Connecting…" or immediately "Disconnected"?
+---
+This means the WebSocket channel failed to initialise — the browser connected but CF rejected the subscription. The most likely cause is that `WSHandler.cfc` is missing `extends="CFIDE.websocket.ChannelListener"` or there is a stale compiled class from a previous version.
+
+Run these commands to fix it:
+
+```bash
+# 1. Recreate WSHandler.cfc with the correct extends
+cat > /opt/coldfusion2025/cfusion/wwwroot/WSHandler.cfc << 'EOF'
+component extends="CFIDE.websocket.ChannelListener" {
+
+    public void function onWSMessage(
+        required string channel,
+        required any    data,
+        required struct client
+    ) {
+        wsPublish(channel, data);
+    }
+
+    public void function onWSOpen(required struct client) {
+        writeLog(file="websocket", text="WS opened: #client.clientid#");
+    }
+
+    public void function onWSClose(required struct client) {
+        writeLog(file="websocket", text="WS closed: #client.clientid#");
+    }
+
+}
+EOF
+
+# 2. Clear the compiled class cache
+rm -f /opt/coldfusion2025/cfusion/wwwroot/WEB-INF/cfclasses/cfWSHandler*
+
+# 3. Restart ColdFusion
+sudo /opt/coldfusion2025/cfusion/bin/coldfusion restart
+```
+
+Wait ~20 seconds for CF to come back up, then refresh `ws_demo.cfm` — the status should change to **Connected**.
+::
+
 ::simple-task
 ---
 :tasks: tasks
