@@ -763,6 +763,47 @@ Open `/orm_rel_test.cfm` in the **ColdFusion 2025** browser tab. You should see 
 curl -s http://localhost:8500/orm_rel_test.cfm | grep -i "hardware"
 ```
 
+::details-box
+---
+:summary: ⚠️ Error — "ORM is not configured for the current application"
+---
+
+::image-box
+---
+:src: __static__/orm-not-configured-v1.png
+:alt: ColdFusion error page showing "ORM is not configured for the current application" with browser details and timestamp
+:max-width: 860px
+---
+_This error means `Application.cfc` is missing `ormenabled = true` — the fix is one command._
+::
+
+This error always means the same thing: `Application.cfc` in the wwwroot does not have `this.ormenabled = true`. It typically happens when:
+
+- You skipped the ORM Basics lesson and `Application.cfc` was never updated
+- A previous activity overwrote `Application.cfc` without the ORM settings
+- The lab environment was reset
+
+**Fix — run this in the Terminal tab:**
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
+component {
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.ormenabled = true;
+  this.ormsettings = {
+    datasource : "training_db",
+    dbcreate   : "update",
+    logsql     : false
+  };
+}
+EOF
+```
+
+Then reload the page. The `ORMReload()` call at the top of `orm_rel_test.cfm` will reinitialise Hibernate automatically.
+
+::
+
 ::image-box
 ---
 :src: __static__/browser-orm-rel-test-v1.png
