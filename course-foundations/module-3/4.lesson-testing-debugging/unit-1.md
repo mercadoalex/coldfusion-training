@@ -594,8 +594,3 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 Lesson complete. On to the next one!
 ::
 
-::remark-box
-Found a bug or an issue with this lesson? Please reach out — your feedback helps improve the course for everyone.
-
-📧 Alex — mercadoalex[at]gmail.com
-::
