@@ -642,7 +642,7 @@ component persistent="true" table="hd_tickets" {
   property name="description" ormtype="string";
   property name="status"      ormtype="string"       default="open";
   property name="priority"    ormtype="string"       default="medium";
-  property name="userId"      column="USER_ID"       ormtype="integer";
+  property name="userId"      column="USER_ID"       ormtype="integer"  notnull="false";
   property name="category"    fieldtype="many-to-one" cfc="Category"
                               fkcolumn="category_id";
 
