@@ -12,7 +12,7 @@ Writing code that works once in a happy path is easy. Writing code that keeps wo
 
 **Debugging** is how you understand what your code is actually doing right now. ColdFusion gives you `cfdump`, `cflog`, and the CF Admin debugger — tools that let you inspect any variable, trace execution, and read structured log entries without touching production.
 
-**Testing** is how you prove your code does what it should — and keep proving it every time you change something. ColdFusion's testing ecosystem is built around **TestBox**, the standard BDD/TDD framework for CFML.
+**Testing** is how you prove your code does what it should — and keep proving it every time you change something. ColdFusion's testing ecosystem is built around **TestBox**, the de-facto standard BDD/TDD framework for CFML, built by Ortus Solutions and documented at [testbox.ortusbooks.com](https://testbox.ortusbooks.com).
 
 In this lesson you will:
 1. Use `cfdump` to inspect live data structures in the browser
@@ -49,13 +49,21 @@ Useful `cfdump` attributes:
 | `var` | Variable to dump (required) |
 | `label` | Heading above the dump |
 | `top` | Limit depth of nested structures — prevents huge dumps |
+| `expand` | `true` (default) expands nested structures; `false` collapses them |
 | `output` | `"browser"` (default) renders HTML; `"console"` writes to the CF console log |
+| `format` | `"html"` (default) or `"text"` — use `"text"` for CLI output |
 
 ::hint-box
 ---
 :summary: 💡 Never leave cfdump in production code
 ---
-`cfdump` outputs HTML directly into the response — if a `cfdump` call is left in a JSON API endpoint it will corrupt the response. Use it only during development, and always remove it before committing. A `grep -r "cfdump" /opt/coldfusion2025/cfusion/wwwroot/` before a deploy is a good habit.
+`cfdump` outputs HTML directly into the response. If a `cfdump` call is left in a JSON API endpoint it will corrupt the JSON and break API consumers. Use it only during development, always remove it before committing. A quick check before deploy:
+
+```bash
+grep -r "cfdump" /opt/coldfusion2025/cfusion/wwwroot/
+```
+
+If that returns any hits, remove them before shipping.
 ::
 
 ---
@@ -65,18 +73,25 @@ Useful `cfdump` attributes:
 `cflog` writes structured entries to a named log file in CF's log directory — visible in the terminal without touching the browser.
 
 ```cfml
-<cflog file="training" text="Processing ticket #url.id#" type="information">
-<cflog file="training" text="Ticket not found: #url.id#" type="warning">
-<cflog file="training" text="DB error: #cfcatch.message#" type="error">
+<cflog file="training" text="Processing ticket #url.id#"    type="information">
+<cflog file="training" text="Ticket not found: #url.id#"    type="warning">
+<cflog file="training" text="DB error: #cfcatch.message#"   type="error">
+<cflog file="training" text="Server shutting down"          type="fatal">
 ```
 
-Log types: `information`, `warning`, `error`, `fatal`.
+**cflog attributes:**
+
+| Attribute | Required | Description |
+|---|---|---|
+| `file` | Yes | Log filename — CF creates `<name>.log` in the CF logs directory automatically |
+| `text` | Yes | Message to write — can include any CFML expressions |
+| `type` | No | Severity: `information`, `warning`, `error`, `fatal` — default is `information` |
+| `application` | No | `true` adds the application name to the entry; `false` (default) omits it |
+| `thread` | No | `true` adds the thread ID — useful for debugging async/scheduled tasks |
 
 The `file` attribute sets the log filename — CF creates the file automatically on the **first write**. It will not exist until at least one `cflog` call has executed. Once it does, you can tail it live:
 
 ```bash
-# First trigger a write by loading a page that has a cflog call,
-# then tail the file:
 tail -f /opt/coldfusion2025/cfusion/logs/training.log
 ```
 
@@ -94,9 +109,7 @@ tail: cannot open '.../training.log' for reading: No such file or directory
 tail: no files remaining
 ```
 
-This is expected — **ColdFusion does not create the log file until the first entry is written**. The file does not exist on disk until a CFML page containing a `cflog` call is actually requested.
-
-The correct sequence is:
+This is expected — **ColdFusion does not create the log file until the first entry is written**. The correct sequence is:
 
 **Step 1 — add a cflog call to a page** (skip if you already have one):
 
@@ -118,13 +131,11 @@ curl -s http://localhost:8500/debug-demo.cfm > /dev/null
 tail -f /opt/coldfusion2025/cfusion/logs/training.log
 ```
 
-If you want to open the tail first and wait, use `-F` instead of `-f`:
+If you want to open the tail first and wait, use `-F` instead of `-f` — it retries until the file appears:
 
 ```bash
 tail -F /opt/coldfusion2025/cfusion/logs/training.log
 ```
-
-`-F` retries if the file does not exist yet — it will start streaming as soon as CF creates it.
 ::
 
 ::hint-box
@@ -139,24 +150,61 @@ tail -F /opt/coldfusion2025/cfusion/logs/training.log
 
 ## 3. TestBox — unit testing for CFML
 
-TestBox is the standard BDD/TDD testing framework for CFML. It runs on CommandBox (Lucee, port 8888) and lets you write readable test specs that describe expected behaviour.
+**TestBox** is the de-facto standard testing framework for CFML, built and maintained by [Ortus Solutions](https://www.ortussolutions.com). It is open source, actively maintained, and the framework you will encounter on almost every serious CFML project.
+
+Full documentation: **[testbox.ortusbooks.com](https://testbox.ortusbooks.com)**
+
+::details-box
+---
+:summary: What is TestBox — features, versions, and how it fits with ColdFusion
+---
+
+TestBox ships with everything a CFML developer needs to write and run tests:
+
+| Feature | What it gives you |
+|---|---|
+| **BDD syntax** | `describe`, `it`, `expect` blocks that read like plain English specifications |
+| **TDD syntax** | Traditional `@Test` annotation style for developers who prefer it |
+| **Mocking engine** | `createMock()` and `createStub()` isolate a CFC from its dependencies |
+| **Multiple runners** | `StreamingRunner.cfm` (plain text), `HTMLRunner.cfm` (browser), `TextRunner.cfm` (CI-friendly) |
+| **Rich reporters** | Text, JSON, TAP, JUnit XML — integrates with GitHub Actions, Jenkins, GitLab CI |
+| **beforeAll / afterAll** | Suite-level setup and teardown — seed databases, create fixtures, clean up |
+| **beforeEach / afterEach** | Per-test setup and teardown — reset state between tests |
+
+**How it installs:**
+TestBox is a **CommandBox package** — it installs into your project directory alongside your app code, not inside ColdFusion itself. The same test suite runs against Adobe CF, Lucee, or any CFML engine without changes.
+
+**Versions:**
+The current stable release is **TestBox 6.x**, which requires CommandBox 6+ and Java 11+. The lab VM ships with both.
+
+**TestBox vs ColdFusion:**
+TestBox is not part of Adobe ColdFusion — it is a community package. Adobe CF ships with `MXUnit` (an older built-in test runner), but the CFML community has moved to TestBox as the standard. When you search for CFML testing examples online, TestBox is what you will find.
+
+**Further reading:**
+- Full docs: [testbox.ortusbooks.com](https://testbox.ortusbooks.com)
+- ForgeBox package: [forgebox.io/view/testbox](https://forgebox.io/view/testbox)
+- Source code: [github.com/Ortus-Solutions/TestBox](https://github.com/Ortus-Solutions/TestBox)
+::
 
 ::hint-box
 ---
-:summary: 💡 What is TestBox — and who makes it?
+:summary: 💡 How TestBox fits into this lab — two servers, two roles
 ---
 
-**TestBox** is an open-source testing framework built and maintained by **Ortus Solutions**, the same company behind CommandBox and ColdBox. It is the de-facto standard for CFML unit testing and ships with:
+The lab runs two separate servers. It is important to understand which server does what:
 
-- **BDD syntax** — `describe`, `it`, `expect` blocks that read like plain English specifications
-- **TDD syntax** — traditional `@Test` annotation style if you prefer
-- **Mocking engine** — `createMock()` and `createStub()` let you isolate a CFC from its dependencies during testing
-- **Multiple runners** — run tests via `curl` against the StreamingRunner URL, from a browser via the HTML runner, or as part of a CI/CD pipeline
-- **Rich reporters** — text, JSON, TAP, JUnit XML output formats so results integrate with GitHub Actions, Jenkins, or any CI system
+| Server | Port | Runtime | Role |
+|---|---|---|---|
+| **ColdFusion 2025** | `8500` | Adobe CF | Runs your CF application (`/opt/coldfusion2025/cfusion/wwwroot/`) |
+| **CommandBox / Lucee** | `8888` | Lucee | Runs `~/app/` — including TestBox and the `TicketService` being tested |
 
-TestBox is installed as a **CommandBox package** (`box install testbox`) — it lives in your project directory alongside your app code, not inside ColdFusion itself. This means the same test suite can run against Adobe CF, Lucee, or any CFML engine without changes.
+TestBox itself **runs on port 8888** (Lucee/CommandBox). Your test specs live in `~/app/tests/` and are served by that Lucee server. The `TicketService.cfc` and `seed-db.cfm` files in `~/app/` are what the specs test — they are **not** the same files in the CF wwwroot.
 
-The current stable release is **TestBox 6.x**, which requires CommandBox 6+ and Java 11+. The lab VM ships with both.
+When you run:
+```bash
+curl "http://localhost:8888/testbox/system/runners/StreamingRunner.cfm?directory=tests"
+```
+You are asking the **Lucee server** to execute your specs. Lucee loads your `TicketService.cfc` from `~/app/`, queries the in-memory H2 database declared in `~/app/Application.cfc`, and reports the results.
 ::
 
 ::image-box
@@ -188,12 +236,21 @@ This downloads TestBox into `~/app/testbox/` and makes the test runner available
 _`box install testbox` pulls TestBox and its dependencies from ForgeBox. The "Initializing libraries" message only appears on the first run — subsequent installs are faster._
 ::
 
-::hint-box
----
-:summary: 💡 Why does TestBox run on port 8888 and not 8500?
----
-TestBox is a CommandBox package — it installs into the Lucee app at `~/app/` and runs under the Lucee server on port 8888. The ColdFusion server on port 8500 is a separate runtime. Your test specs can test CFCs that live in the CF wwwroot, but the test runner itself is served by Lucee/CommandBox.
-::
+### What TicketService does
+
+Before writing the spec, understand what you are testing. `TicketService.cfc` in `~/app/` is a service CFC that queries the `hd_tickets` table in the Lucee-side H2 database. It exposes two methods:
+
+| Method | What it returns |
+|---|---|
+| `getAll()` | An array of ticket structs — every row in `hd_tickets` |
+| `getById(id)` | A single ticket struct for the given primary key |
+
+The `beforeAll` block in the test spec calls `seed-db.cfm` via `cfhttp` to populate the in-memory H2 database before any test runs. Without that seed call, `getAll()` returns an empty array and `getById(1)` returns nothing — both tests would fail.
+
+```bash
+# Verify TicketService and seed-db.cfm exist in ~/app/
+ls ~/app/TicketService.cfc ~/app/seed-db.cfm
+```
 
 ### Write a test spec
 
@@ -207,8 +264,8 @@ component extends="testbox.system.BaseSpec" {
   function run() {
 
     beforeAll(function() {
-      // Seed the in-memory H2 database that Application.cfc declares for Lucee.
-      // This must run before any test — the in-memory DB is empty on first request.
+      // Seed the in-memory H2 database before any test runs.
+      // Without this, the database is empty and both tests fail.
       cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
     });
 
@@ -241,14 +298,51 @@ EOF
 :alt: Annotated TestBox BDD spec file — the component declaration, run function, describe block, it block, and expect assertions are each labelled with callout lines explaining their role in the spec structure
 :max-width: 860px
 ---
-_Anatomy of a TestBox spec: each part of the file has a specific role — understand the structure before running the suite._
+_Anatomy of a TestBox spec: each part has a specific role — understand the structure before running the suite._
 ::
+
+**What each line does:**
+
+| Part | What it does |
+|---|---|
+| `extends="testbox.system.BaseSpec"` | Required — gives the CFC all TestBox assertion and runner methods |
+| `function run()` | TestBox calls this automatically to discover and run all specs |
+| `beforeAll(function() {...})` | Runs once before any `it()` block — use for seeding data, creating shared objects |
+| `describe("TicketService", ...)` | Groups related tests — the name appears in failure messages |
+| `var svc = new TicketService()` | Creates a fresh instance of the service — runs once per `describe` block |
+| `it("should ...", function() {...})` | One test case — describes one expected behaviour |
+| `expect(result).toBeArray()` | Asserts the result is a CF array — throws if it is not |
+| `expect(arrayLen(result)).toBeGTE(1)` | Asserts at least one record exists — requires the seed to have run |
 
 ::hint-box
 ---
+:summary: 💡 Common TestBox matchers — quick reference
+---
+
+| Matcher | What it checks |
+|---|---|
+| `toBeArray()` | Value is a CF array |
+| `toBeStruct()` | Value is a CF struct |
+| `toBeTrue()` / `toBeFalse()` | Boolean result |
+| `toBe(value)` | Strict equality (`==`) |
+| `toBeNull()` | Value is null |
+| `toHaveKey("key")` | Struct contains the named key |
+| `toBeGTE(n)` | Greater than or equal to n |
+| `toBeLTE(n)` | Less than or equal to n |
+| `toInclude("text")` | String or array contains value |
+| `toBeEmpty()` | Array, struct, or string is empty |
+| `toThrow()` | Wrapped function throws an exception |
+| `toThrow(type="...")` | Throws a specific exception type |
+
+Full matcher list: [testbox.ortusbooks.com/content/matchers](https://testbox.ortusbooks.com/content/matchers)
+::
+
+::details-box
+---
 :summary: 💡 TestBox and every other testing framework — the same pattern
 ---
-TestBox follows the same BDD/TDD patterns as every major testing framework across languages:
+
+TestBox follows the same BDD/TDD patterns used in every major language:
 
 **BDD style** — `describe` / `it` / `expect`
 
@@ -259,8 +353,6 @@ TestBox follows the same BDD/TDD patterns as every major testing framework acros
 | **RSpec** | Ruby |
 | **pytest** (with plugins) | Python |
 
-The syntax is nearly identical — if you've used Jest, TestBox will feel immediately familiar.
-
 **TDD style** — annotation-based
 
 | Framework | Language |
@@ -270,23 +362,29 @@ The syntax is nearly identical — if you've used Jest, TestBox will feel immedi
 | **NUnit / xUnit** `[Test]` / `[Fact]` | C# |
 | **PHPUnit** `@test` | PHP |
 
-**Key concepts that carry over directly:** test suite → `describe()`, test case → `it()`, assertion → `expect()`, mocking → `createMock()` / `createStub()`, and JUnit XML reporters so results plug straight into GitHub Actions or Jenkins.
-
-The one CFML-specific detail: instead of a CLI command like `jest` or `pytest`, you hit a URL (`StreamingRunner.cfm`) — because the test engine runs inside the application server. Everything else is standard.
+The one CFML-specific detail: instead of a CLI command like `jest` or `pytest`, you hit a URL — because the test engine runs inside the application server. Everything else maps directly.
 ::
 
 ### Run the tests
 
-Hit the StreamingRunner directly with `curl` — no interactive CLI, no hanging:
+Hit the StreamingRunner with `curl` — plain text output, no interactive CLI, no hanging:
 
 ```bash
 curl -s "http://localhost:8888/testbox/system/runners/StreamingRunner.cfm?directory=tests"
 ```
 
-A passing suite outputs a plain-text summary ending with:
+A passing suite ends with:
 
 ```
 Tests: 2 Passed: 2 Failed: 0 Errors: 0 Skipped: 0
+```
+
+A failing test shows exactly which `it()` block failed and why:
+
+```
+[FAIL] TicketService > should return all tickets as an array
+  Expected [] to have a length greater than or equal to 1
+  >> Did you forget to run seed-db.cfm in beforeAll?
 ```
 
 ::details-box
@@ -296,41 +394,22 @@ Tests: 2 Passed: 2 Failed: 0 Errors: 0 Skipped: 0
 
 Three approaches to testing — all valid, each framing the work differently:
 
-**TDD (Test-Driven Development)** — write the test first, watch it fail, then write the code to make it pass. Tests are written from a technical perspective: "assert that `getAll()` returns an array." The test drives the implementation — you cannot write code without a failing test to justify it.
+**TDD (Test-Driven Development)** — write the test first, watch it fail, then write the code to make it pass. The test drives the implementation — you cannot write code without a failing test to justify it.
 
-**BDD (Behaviour-Driven Development)** — write tests that describe expected *behaviour* in plain language. The test reads like a specification: "it should return all tickets as an array." TestBox's `describe`/`it`/`expect` syntax is BDD. The goal is readability — a failing test message tells a developer (and a product manager) exactly what stopped working:
+**BDD (Behaviour-Driven Development)** — write tests that describe expected *behaviour* in plain language: "it should return all tickets as an array." TestBox's `describe`/`it`/`expect` syntax is BDD. A failing test message tells both developers and product managers exactly what stopped working.
 
-```
-TicketService > should return all tickets as an array — FAILED
-```
+**SDD (Specification-Driven Development)** — the direction the industry is moving toward with AI-assisted development. The specification is the source of truth — both code *and* tests are generated or verified against it.
 
-**SDD (Specification-Driven Development)** — the direction the industry is moving toward, especially with AI-assisted development. In SDD the specification *is* the source of truth — you write a formal, machine-readable spec first (an OpenAPI document, a structured requirements file, or a prompt), and both the code *and* the tests are generated or verified against it. The spec becomes the contract between product, development, and QA.
+> SDD is not a replacement for TDD or BDD — it is a layer above them. The generated tests still run as TDD or BDD tests.
 
-The key shift: in TDD/BDD a human writes the test by hand. In SDD the spec drives everything — tests, stubs, documentation, and validation can all be derived from a single authoritative document. Tools like OpenSpec (which powers this course's own content pipeline) are early examples of this pattern applied to documentation and code.
-
-> SDD is not a replacement for TDD or BDD — it is a layer above them. The generated tests still run as TDD or BDD tests. The difference is *where the specification lives* and *who (or what) writes the tests*.
-
-> 🎓 **Advanced Course** — AI-assisted development in ColdFusion is covered in depth in the Advanced Course: using AI to generate CFML from specs, writing prompts that produce testable code, integrating LLM APIs directly into CF applications, and building pipelines where a specification drives both code generation and test validation automatically.
-
-**Common TestBox matchers:**
-
-| Matcher | What it checks |
-|---|---|
-| `toBeArray()` | Value is an array |
-| `toBeStruct()` | Value is a struct |
-| `toBeTrue()` / `toBeFalse()` | Boolean result |
-| `toBe(value)` | Strict equality |
-| `toHaveKey("key")` | Struct contains the key |
-| `toBeGTE(n)` | Greater than or equal to n |
-| `toInclude("text")` | String or array contains value |
-| `toThrow()` | Wrapped code throws an exception |
+> 🎓 AI-assisted development in ColdFusion — generating CFML from specs, building pipelines where a spec drives code generation and test validation — is covered in the **Advanced Course**.
 ::
 
 ---
 
 ## 4. CF Admin Debugger
 
-For deeper request-level tracing, ColdFusion's built-in debugger appends a full diagnostic panel to every rendered page — showing SQL queries executed, their times, template execution times, and variable scopes.
+For deeper request-level tracing, ColdFusion's built-in debugger appends a full diagnostic panel to every rendered page — showing SQL queries executed, their execution times, template load times, and variable scopes.
 
 Enable it in CF Admin:
 1. Open CF Admin → **Debugging & Logging → Debug Output Settings**
@@ -343,7 +422,7 @@ Debugging output appears at the bottom of every CF page response. It is automati
 
 ## Activity 1 — Inspect data with cfdump
 
-Create a page that dumps a struct and an array so you can see cfdump in action:
+Create a page that dumps a struct and array so you can see cfdump in action:
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/debug-demo.cfm << 'EOF'
@@ -411,11 +490,21 @@ A `training.log` file must exist in the CF logs directory.
 
 ## Activity 3 — Install TestBox and write a test spec
 
-Install TestBox into your student app, then create the spec:
+First, verify the files TestBox will test are in place:
+
+```bash
+ls ~/app/TicketService.cfc ~/app/seed-db.cfm ~/app/Application.cfc
+```
+
+All three must exist. If any are missing, see the hint boxes below before continuing.
+
+Install TestBox into your student app:
 
 ```bash
 cd ~/app && box install testbox
 ```
+
+Then create the spec:
 
 ```bash
 mkdir -p ~/app/tests
@@ -425,8 +514,8 @@ component extends="testbox.system.BaseSpec" {
   function run() {
 
     beforeAll(function() {
-      // Seed the in-memory H2 database that Application.cfc declares for Lucee.
-      // This must run before any test — the in-memory DB is empty on first request.
+      // Seed the in-memory H2 database before any test runs.
+      // Without this, the database is empty and both tests fail.
       cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
     });
 
@@ -491,19 +580,43 @@ All tests must pass — zero failures, zero errors.
 ---
 :summary: ⚠️ "Page StreamingRunner.cfm not found" — TestBox installed in the wrong directory
 ---
-This error means Lucee cannot find `~/app/testbox/` — either TestBox was never installed, or it was installed from the wrong directory. Verify the files are in the right place:
+This error means Lucee cannot find `~/app/testbox/`. Verify:
 
 ```bash
 ls ~/app/testbox/system/runners/
 ```
 
-You should see `StreamingRunner.cfm` in that listing. If the directory does not exist, re-install from the correct location:
+You should see `StreamingRunner.cfm`. If the directory does not exist, re-install from the correct location:
 
 ```bash
 cd ~/app && box install testbox
 ```
 
-The `cd ~/app` is required — `box install` places packages relative to the current working directory. Installing from `~` or anywhere else puts `testbox/` somewhere the Lucee server (rooted at `~/app/`) cannot find it.
+The `cd ~/app` is required — `box install` places packages relative to the **current working directory**. Installing from `~` or any other path puts `testbox/` somewhere the Lucee server (rooted at `~/app/`) cannot reach.
+::
+
+::hint-box
+---
+:summary: ⚠️ Tests fail with "Expected [] to have length GTE 1" — seed-db.cfm not running
+---
+This means the `beforeAll` seed call failed silently. The database is empty so `getAll()` returns an empty array. Debug steps:
+
+**Step 1 — test seed-db.cfm directly:**
+```bash
+curl -s http://localhost:8888/seed-db.cfm
+```
+You should see output confirming rows were inserted. If you see an error, the seed file has a problem.
+
+**Step 2 — check the Lucee server is running:**
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/
+```
+Should return `200`. If not, restart: `cd ~/app && box server restart`
+
+**Step 3 — verify seed-db.cfm exists:**
+```bash
+ls ~/app/seed-db.cfm
+```
 ::
 
 ::hint-box
@@ -517,14 +630,14 @@ The `cd ~/app` is required — `box install` places packages relative to the cur
 ---
 :summary: 💡 TicketService and seed-db.cfm — where they live
 ---
-`TicketService.cfc` and `seed-db.cfm` are in `~/app/` — the Lucee web root. They are **not** the same files as in `/opt/coldfusion2025/cfusion/wwwroot/`. The ones in `~/app/` are what the TestBox runner uses, and `seed-db.cfm` is what the spec's `beforeAll` block calls via `cfhttp` to seed the Lucee-side in-memory H2 database before the tests run.
+`TicketService.cfc` and `seed-db.cfm` are in `~/app/` — the Lucee web root. They are **not** the same files as in `/opt/coldfusion2025/cfusion/wwwroot/`. The ones in `~/app/` are what the TestBox runner uses. `seed-db.cfm` is called by the spec's `beforeAll` block via `cfhttp` to populate the Lucee-side in-memory H2 database before the tests run.
 ::
 
 ::hint-box
 ---
 :summary: ⚠️ "Datasource [training_db] doesn't exist" — Application.cfc missing or not loaded
 ---
-`TicketService.cfc` queries a datasource named `training_db`. That datasource is declared in `~/app/Application.cfc` for Lucee. If you see this error, verify the file exists:
+`TicketService.cfc` queries a datasource named `training_db` declared in `~/app/Application.cfc`. Verify it exists:
 
 ```bash
 cat ~/app/Application.cfc
@@ -545,7 +658,7 @@ component {
 }
 ```
 
-If the file is missing, create it and restart the Lucee server:
+If missing, create it and restart:
 
 ```bash
 tee ~/app/Application.cfc << 'EOF'
@@ -563,7 +676,7 @@ EOF
 cd ~/app && box server restart
 ```
 
-`DATABASE_TO_UPPER=FALSE` tells H2 to preserve column-name case exactly as written in SQL, so `u.name AS submitter` resolves to `submitter` rather than `SUBMITTER`.
+`DATABASE_TO_UPPER=FALSE` tells H2 to preserve column-name case exactly as written in SQL.
 ::
 
 ::simple-task
@@ -580,6 +693,16 @@ TestBox tests pass. ✓
 
 ---
 
+## Further reading
+
+- **TestBox documentation** — [testbox.ortusbooks.com](https://testbox.ortusbooks.com) — full reference for matchers, mocking, reporters, and CI integration
+- **ForgeBox** — [forgebox.io/view/testbox](https://forgebox.io/view/testbox) — package listing, version history, changelog
+- **Ortus Solutions blog** — [www.ortussolutions.com/blog](https://www.ortussolutions.com/blog) — tutorials and TestBox release announcements
+- **ColdFusion docs — cflog** — [helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-j-l/cflog.html](https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-j-l/cflog.html)
+- **ColdFusion docs — cfdump** — [helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-d-e/cfdump.html](https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-d-e/cfdump.html)
+
+---
+
 When all the checks above are green, this lesson is complete. Your progress is saved automatically — move straight on to the next lesson.
 
 ::simple-task
@@ -593,4 +716,3 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 #completed
 Lesson complete. On to the next one!
 ::
-
