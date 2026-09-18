@@ -168,8 +168,7 @@ TestBox ships with everything a CFML developer needs to write and run tests:
 | **Mocking engine** | `createMock()` and `createStub()` isolate a CFC from its dependencies |
 | **Multiple runners** | `StreamingRunner.cfm` (plain text), `HTMLRunner.cfm` (browser), `TextRunner.cfm` (CI-friendly) |
 | **Rich reporters** | Text, JSON, TAP, JUnit XML — integrates with GitHub Actions, Jenkins, GitLab CI |
-| **beforeAll / afterAll** | Suite-level setup and teardown — seed databases, create fixtures, clean up |
-| **beforeEach / afterEach** | Per-test setup and teardown — reset state between tests |
+| **beforeEach / afterEach** | Per-test setup and teardown — reset state between each `it()` block |
 
 **How it installs:**
 TestBox is a **CommandBox package** — it installs into your project directory alongside your app code, not inside ColdFusion itself. The same test suite runs against Adobe CF, Lucee, or any CFML engine without changes.
@@ -265,11 +264,10 @@ component extends="testbox.system.BaseSpec" {
 
     describe("TicketService", function() {
 
-      this.beforeAll(function() {
-        // Seed the database before any test in this suite runs.
-        // Use this.beforeAll() — plain beforeAll() cannot resolve inside a closure in Lucee.
-        cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
-      });
+      // Seed the database once before the tests are defined.
+      // This TestBox version only has beforeEach/afterEach — no beforeAll.
+      // Calling cfhttp here runs once when the describe closure is executed.
+      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
 
       var svc = new TicketService();
 
@@ -308,8 +306,8 @@ _Anatomy of a TestBox spec: each part has a specific role — understand the str
 | `extends="testbox.system.BaseSpec"` | Required — gives the CFC all TestBox assertion and runner methods |
 | `function run()` | TestBox calls this automatically to discover and run all specs |
 | `describe("TicketService", ...)` | Groups related tests — the name appears in failure messages |
-| `this.beforeAll(function() {...})` | **Must use `this.` prefix inside a closure** — seeds the database once before any `it()` runs |
-| `var svc = new TicketService()` | Creates a fresh instance of the service — runs once per `describe` block |
+| `cfhttp(url="...seed-db.cfm")` | Runs once when the `describe` closure executes — seeds the DB before any `it()` |
+| `var svc = new TicketService()` | Creates a fresh instance of the service — available to all `it()` blocks below |
 | `it("should ...", function() {...})` | One test case — describes one expected behaviour |
 | `expect(result).toBeArray()` | Asserts the result is a CF array — throws if it is not |
 | `expect(arrayLen(result)).toBeGTE(1)` | Asserts at least one record exists — requires the seed to have run |
@@ -515,11 +513,10 @@ component extends="testbox.system.BaseSpec" {
 
     describe("TicketService", function() {
 
-      this.beforeAll(function() {
-        // Seed the database before any test in this suite runs.
-        // Use this.beforeAll() — plain beforeAll() cannot resolve inside a closure in Lucee.
-        cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
-      });
+      // Seed the database once before the tests are defined.
+      // This TestBox version only has beforeEach/afterEach — no beforeAll.
+      // Calling cfhttp here runs once when the describe closure is executed.
+      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
 
       var svc = new TicketService();
 
@@ -597,25 +594,26 @@ The `cd ~/app` is required — `box install` places packages relative to the **c
 
 ::hint-box
 ---
-:summary: ⚠️ "No matching function [BEFOREALL] found" — use this.beforeAll() inside closures
+:summary: ⚠️ "No matching function [BEFOREALL] found" — beforeAll does not exist in this TestBox version
 ---
-This is a **Lucee closure scoping issue**. Inside the anonymous function passed to `describe()`, Lucee cannot resolve `beforeAll` as a free function — it needs to be called on `this` to reach the inherited `BaseSpec` method.
+The version of TestBox installed in this lab (`box install testbox` pulls the latest) only exposes **`beforeEach`** and **`afterEach`** as lifecycle hooks inside `describe`. There is no `beforeAll`.
 
-**Wrong — bare beforeAll() inside a closure:**
-```cfml
-describe("TicketService", function() {
-  beforeAll(function() { ... });  // ← ERROR in Lucee: cannot resolve BEFOREALL
-});
+Check what your installed version actually provides:
+
+```bash
+grep -n "function before\|function after\|function setUp\|function setup" ~/app/testbox/system/BaseSpec.cfc | head -20
 ```
 
-**Correct — this.beforeAll() forces resolution on the CFC instance:**
+**Do not use `beforeAll` — it does not exist.** Instead, place any one-time setup code (like the seed call) directly at the top of the `describe` closure body. It executes once when TestBox processes the suite:
+
 ```cfml
 describe("TicketService", function() {
-  this.beforeAll(function() { ... });  // ← correct
+  // Runs once when TestBox processes this describe block — no lifecycle hook needed
+  cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
+
+  it("should ...", function() { ... });
 });
 ```
-
-The same rule applies to `this.afterAll()`, `this.beforeEach()`, and `this.afterEach()` — always use the `this.` prefix when calling TestBox lifecycle functions inside a `describe` closure on Lucee.
 
 ::
 
