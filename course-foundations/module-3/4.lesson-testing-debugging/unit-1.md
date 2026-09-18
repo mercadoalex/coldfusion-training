@@ -263,13 +263,13 @@ component extends="testbox.system.BaseSpec" {
 
   function run() {
 
-    beforeAll(function() {
-      // Seed the in-memory H2 database before any test runs.
-      // Without this, the database is empty and both tests fail.
-      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
-    });
-
     describe("TicketService", function() {
+
+      beforeAll(function() {
+        // Seed the database before any test in this suite runs.
+        // beforeAll must be INSIDE describe() — not at the run() level.
+        cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
+      });
 
       var svc = new TicketService();
 
@@ -307,8 +307,8 @@ _Anatomy of a TestBox spec: each part has a specific role — understand the str
 |---|---|
 | `extends="testbox.system.BaseSpec"` | Required — gives the CFC all TestBox assertion and runner methods |
 | `function run()` | TestBox calls this automatically to discover and run all specs |
-| `beforeAll(function() {...})` | Runs once before any `it()` block — use for seeding data, creating shared objects |
 | `describe("TicketService", ...)` | Groups related tests — the name appears in failure messages |
+| `beforeAll(function() {...})` | **Must be inside `describe()`** — runs once before any `it()` in the suite; seeds the database |
 | `var svc = new TicketService()` | Creates a fresh instance of the service — runs once per `describe` block |
 | `it("should ...", function() {...})` | One test case — describes one expected behaviour |
 | `expect(result).toBeArray()` | Asserts the result is a CF array — throws if it is not |
@@ -513,13 +513,13 @@ component extends="testbox.system.BaseSpec" {
 
   function run() {
 
-    beforeAll(function() {
-      // Seed the in-memory H2 database before any test runs.
-      // Without this, the database is empty and both tests fail.
-      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
-    });
-
     describe("TicketService", function() {
+
+      beforeAll(function() {
+        // Seed the database before any test in this suite runs.
+        // beforeAll must be INSIDE describe() — not at the run() level.
+        cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
+      });
 
       var svc = new TicketService();
 
@@ -593,6 +593,34 @@ cd ~/app && box install testbox
 ```
 
 The `cd ~/app` is required — `box install` places packages relative to the **current working directory**. Installing from `~` or any other path puts `testbox/` somewhere the Lucee server (rooted at `~/app/`) cannot reach.
+::
+
+::hint-box
+---
+:summary: ⚠️ "No matching function [BEFOREALL] found" — beforeAll is in the wrong place
+---
+`beforeAll` is a lifecycle function that only exists **inside a `describe` block**. Calling it directly inside `run()` before any `describe` block causes Lucee to throw "No matching function [BEFOREALL] found".
+
+**Wrong — beforeAll outside describe:**
+```cfml
+function run() {
+  beforeAll(function() { ... });  // ← ERROR: not in scope here
+
+  describe("...", function() { ... });
+}
+```
+
+**Correct — beforeAll inside describe:**
+```cfml
+function run() {
+  describe("TicketService", function() {
+    beforeAll(function() { ... });  // ← correct: in scope here
+
+    it("should ...", function() { ... });
+  });
+}
+```
+
 ::
 
 ::hint-box
