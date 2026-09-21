@@ -23,6 +23,7 @@ cat <<EOF > "$HOME/.local/share/code-server/User/settings.json"
   "workbench.startupEditor": "none",
   "workbench.welcomePage.walkthroughs.openOnInstall": false,
   "editor.tabSize": 2,
+  "files.simpleDialog.enable": true,
   "files.associations": {
     "*.cfm": "cfml",
     "*.cfc": "cfml",
