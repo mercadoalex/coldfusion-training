@@ -44,7 +44,7 @@ EnvironmentFile=-/etc/default/%p
 EOF
 
 sudo tee -a /lib/systemd/system/code-server.service <<'EOF'
-ExecStart=/usr/bin/code-server --bind-addr=127.0.0.1:50062 --auth none --disable-telemetry --disable-update-check --disable-workspace-trust --disable-getting-started-override --app-name="iximiuz Labs" $CODE_SERVER_PATH
+ExecStart=/usr/bin/node --max-old-space-size=256 /usr/bin/code-server --bind-addr=127.0.0.1:50062 --auth none --disable-telemetry --disable-update-check --disable-workspace-trust --disable-getting-started-override --app-name="iximiuz Labs" /opt/coldfusion2025/cfusion/wwwroot
 EOF
 
 sudo tee /etc/systemd/system/code-server-proxy.service <<EOF

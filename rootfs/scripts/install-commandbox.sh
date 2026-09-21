@@ -70,12 +70,29 @@ cat > "${APP_DIR}/server.json" <<EOF
     }
   },
   "jvm": {
-    "heapSize": "256m",
-    "minHeapSize": "128m"
+    "heapSize": "192m",
+    "minHeapSize": "64m",
+    "args": "-cp /opt/coldfusion2025/cfusion/lib/h2-2.2.224.jar"
   },
   "openbrowser": false,
   "cfconfig": {
-    "adminPassword": "training"
+    "adminPassword": "training",
+    "dataSources": {
+      "training_db": {
+        "type":             "Other",
+        "class":            "org.h2.Driver",
+        "connectionString": "jdbc:h2:mem:training_db;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE",
+        "username":         "sa",
+        "password":         "",
+        "blob":             false,
+        "clob":             false,
+        "connectionLimit":  -1,
+        "connectionTimeout": 1,
+        "storage":          false,
+        "verify":           false,
+        "custom":           ""
+      }
+    }
   }
 }
 EOF
@@ -103,6 +120,28 @@ if [ -f "${LUCEE_ZIP}" ]; then
   mkdir -p "${CB_ENGINE_CACHE}"
   cp "${LUCEE_ZIP}" "${CB_ENGINE_CACHE}/${CB_ENGINE_FILENAME}"
   echo "[BOX] Lucee engine cached at ${CB_ENGINE_CACHE}/${CB_ENGINE_FILENAME}"
+
+  # ── Inject H2 JDBC driver into the Lucee engine WAR at build time ──────────
+  # Lucee ships as a WAR/ZIP. The server-wide JDBC lib path inside it is:
+  #   WEB-INF/lucee-server/context/lib/
+  # By injecting at build time we guarantee the driver is present when CommandBox
+  # extracts the engine on first VM boot — no runtime inject script needed.
+  H2_SRC="/opt/coldfusion2025/cfusion/lib/h2-2.2.224.jar"
+  if [ -f "${H2_SRC}" ]; then
+    echo "[BOX] Injecting H2 jar into Lucee engine ZIP..."
+    INJECT_TMP=$(mktemp -d)
+    cp "${CB_ENGINE_CACHE}/${CB_ENGINE_FILENAME}" "${INJECT_TMP}/lucee.zip"
+    # Add the jar at the correct path inside the ZIP (zip merges if entry exists)
+    ( cd "${INJECT_TMP}" && \
+      mkdir -p WEB-INF/lucee-server/context/lib && \
+      cp "${H2_SRC}" WEB-INF/lucee-server/context/lib/ && \
+      zip -r lucee.zip WEB-INF/lucee-server/context/lib/h2-2.2.224.jar )
+    cp "${INJECT_TMP}/lucee.zip" "${CB_ENGINE_CACHE}/${CB_ENGINE_FILENAME}"
+    rm -rf "${INJECT_TMP}"
+    echo "[BOX] H2 jar injected into Lucee engine ZIP."
+  else
+    echo "[BOX] WARNING: H2 jar not found at ${H2_SRC} — skipping injection."
+  fi
 else
   echo "[BOX] NOTE: lucee-engine-${LUCEE_VERSION}.zip not found in downloads/."
   echo "[BOX] Lucee will download on first box server start inside the VM (~60s)."

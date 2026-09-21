@@ -27,7 +27,7 @@
     <adminport>45564</adminport>
 
     <!-- JVM options for training (lean memory footprint) -->
-    <jvmargs>-server -Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200</jvmargs>
+    <jvmargs>-server -Xms128m -Xmx384m -XX:+UseG1GC -XX:MaxGCPauseMillis=200</jvmargs>
 
     <!-- CF home -->
     <cfhome>/opt/coldfusion2025/cfusion</cfhome>

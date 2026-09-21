@@ -24,6 +24,22 @@ The platform has two layers:
 _CFML offers two syntaxes that compile to identical bytecode — tags (left) and cfscript (right)._
 ::
 
+::hint-box
+---
+:summary: 💡 Which syntax should I use — tags or CFScript?
+---
+
+Both syntaxes compile to identical bytecode, so there is no performance difference. The choice is about readability and maintainability:
+
+- **CFScript** is recommended for **business logic, CFCs, controllers, and services**. It is more concise, integrates better with unit testing frameworks (like TestBox), and has stronger IDE and linting support.
+- **Tag syntax** is recommended for **views** — `.cfm` files that mix HTML markup with dynamic output — because interleaving `<cfoutput>` and HTML tags is natural and readable.
+
+A practical rule of thumb: if the file outputs HTML, use tags. If the file contains logic, use CFScript.
+
+--
+
+::
+
 ---
 
 ## A brief history of CFML
@@ -305,24 +321,62 @@ Run the curl command above — confirm Lucee returns HTTP 200 on port 8888.
 Lucee is running on port 8888. ✓
 ::
 
-### Create and test your first ColdFusion page
+### 🖐 Hands-on activity: Create and test your first ColdFusion page
 
-1. In VS Code, create a file called `hello.cfm` in the webroot.
-2. Add this content:
+You are going to write a real `.cfm` file, have ColdFusion compile and execute it, and verify the output. Choose the option that feels more comfortable — both produce exactly the same result.
+
+> **Where does the file need to live?**
+> ColdFusion 2025 serves files from its **webroot** folder:
+> `/opt/coldfusion2025/cfusion/wwwroot/`
+> Any `.cfm` file saved there is immediately accessible at `http://localhost:8500/<filename>.cfm` — no restart needed.
+
+---
+
+#### Option A — Using the IDE tab (VS Code in the browser)
+
+The IDE tab opens directly inside the webroot folder — you have full read/write access there as the `laborant` user, no `sudo` required.
+
+1. Click the **IDE** tab in your lab environment.
+2. The Explorer panel on the left already shows the contents of `/opt/coldfusion2025/cfusion/wwwroot/` — this is your working folder for all CF 2025 exercises.
+3. Right-click anywhere in the Explorer panel → **New File** → type `hello.cfm` → press **Enter**.
+4. The new file opens in the editor. Paste this content:
 
 ```cfml
 <cfset greeting = "Hello from ColdFusion 2025!">
 <cfoutput>#greeting#</cfoutput>
 ```
 
-3. Verify it through the engine:
+5. Save the file: **`Ctrl+S`** (Windows/Linux) or **`Cmd+S`** (Mac).
+   You will see the dot on the tab disappear — that confirms the file is saved to disk.
+
+---
+
+#### Option B — Using the Terminal (faster, no mouse needed)
+
+1. Click the **Terminal** tab in your lab environment.
+2. Run this single command — it creates the file and writes the content in one step:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/hello.cfm << 'EOF'
+<cfset greeting = "Hello from ColdFusion 2025!">
+<cfoutput>#greeting#</cfoutput>
+EOF
+```
+
+> `sudo tee` is used here because it is the most reliable way to write to system paths from the terminal. The `laborant` user also owns the wwwroot folder directly, so you could equally use `cat >` or create the file with `nano` — but `tee` works everywhere with no editor knowledge needed.
+
+---
+
+#### Verify it ran correctly
+
+Whichever option you used, confirm ColdFusion compiled and executed the file:
 
 ```bash
 curl -s http://localhost:8500/hello.cfm
 # Expected output: Hello from ColdFusion 2025!
 ```
 
-If you see the greeting text (not the raw CFML source), the engine compiled and executed your file correctly.
+If you see the greeting text — not the raw `<cfset>` source — the engine picked up your file, compiled it to bytecode, and returned the rendered output. That is the ColdFusion request pipeline working end to end.
 
 ::simple-task
 ---
