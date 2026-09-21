@@ -232,6 +232,17 @@ limited to 2 CPUs and 2 instances — perfect for training):
 
 ---
 
+## Student Guides
+
+> These guides live in `docs/` (gitignored) and are never pushed to iximiuz Labs.
+> They are linked here for instructors and advanced students.
+
+| Guide | Description |
+|---|---|
+| [Remote-SSH Setup](docs/remote-ssh-setup.md) | Optional: connect your local VS Code to the playground VM for a faster editing experience |
+
+---
+
 ## Contributing
 
 PRs welcome. Please test with `make build` (stub mode) before submitting.
