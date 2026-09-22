@@ -1,12 +1,12 @@
 ---
 kind: unit
 
-title: Real-Time Communication with WebSockets
+title: WebSockets — Live, Two-Way Connections Without the Request Overhead
 
 name: real-time-websockets-unit-1
 ---
 
-## WebSockets — Persistent Connections for Real-Time Apps
+## WebSockets — Live, Two-Way Connections Without the Request Overhead
 
 HTTP is a **request–response** protocol: the client sends a request, the server replies, and the connection closes. That works well for loading pages and calling APIs, but it is the wrong tool for anything that must push data from the server to the client without being asked — live chat messages, real-time notifications, live dashboards.
 
