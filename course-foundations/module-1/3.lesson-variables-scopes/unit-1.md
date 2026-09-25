@@ -372,6 +372,15 @@ curl -s http://localhost:8500/student/cfdump_demo.cfm | grep -i "greeting"
 # Expected: a line containing "greeting"
 ```
 
+::image-box
+---
+:src: __static__/cfdump-v1.png
+:alt: Browser window showing the rendered output of cfdump_demo.cfm — two colour-coded HTML tables produced by cfdump: the first labelled "variables scope" with rows for greeting (Hello from cfdump) and counter (42), the second labelled "url scope" showing an empty struct
+:max-width: 860px
+---
+_`<cfdump>` renders each scope as a formatted table — instantly shows every variable name and value at runtime._
+::
+
 ::simple-task
 ---
 :tasks: tasks
