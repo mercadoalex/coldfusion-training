@@ -50,6 +50,9 @@ _Key `this.*` settings in Application.cfc — configure once, effective for ever
 
 ## Activity 1 — Create Application.cfc
 
+> **Why `wwwroot/` and not `student/`?**
+> `Application.cfc` must live in the **web root** (`/opt/coldfusion2025/cfusion/wwwroot/`) — not in `student/`. ColdFusion walks up the directory tree from the requested page to find `Application.cfc`, so placing it in `wwwroot/` means it governs every request to the engine, including your `student/` pages. If you put it inside `student/` it would only apply to files in that subfolder. This is the one file in this course that intentionally lives outside `student/`.
+
 **Activity:** Create `Application.cfc` in the web root.
 
 **Terminal tab:**
@@ -89,7 +92,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/`, create `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. The folder already exists — VS Code will open it immediately. Then right-click in the Explorer panel → **New File** → name it `Application.cfc`, paste the content below, and save with **Ctrl+S**:
 
 ```cfml
 component {
@@ -371,8 +374,12 @@ Elastic Stack
 
 ::hint-box
 ---
-:summary: Need to edit Application.cfc? Use vi
+:summary: 💡 Need to edit Application.cfc? The IDE is the easiest option
 ---
+
+The simplest way is to open the **IDE tab** — click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. `Application.cfc` will appear in the Explorer panel; click it, make your changes, and save with **Ctrl+S**.
+
+If you prefer to stay in the **Terminal**, you can also use `vi` — but be aware it has a steep learning curve if you haven't used it before. It is completely optional:
 
 ```bash
 vi /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
@@ -384,6 +391,8 @@ vi /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
 | `Esc` | Back to normal mode |
 | `:wq` + Enter | Save and quit |
 | `:q!` + Enter | Quit without saving |
+
+If `vi` feels unfamiliar, stick with the IDE tab — it is always the safer choice.
 
 ::
 
