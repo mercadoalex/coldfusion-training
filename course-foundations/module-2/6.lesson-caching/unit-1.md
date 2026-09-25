@@ -235,12 +235,12 @@ For this training environment, TTL-only is fine. In production, always invalidat
 
 You are going to create a new file called `cache_demo.cfm` in the ColdFusion web root. This file does not exist yet — the command below creates it for you.
 
-**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`
+**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm`
 
 In the **Terminal** tab, run the `sudo tee` command below. It writes the full file in one step — no editor needed:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -293,7 +293,7 @@ EOF
 Verify `cachedwithin` is in the file:
 
 ```bash
-grep -i "cachedwithin" /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm
+grep -i "cachedwithin" /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm
 ```
 
 ::image-box
@@ -305,7 +305,7 @@ grep -i "cachedwithin" /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm
 _`cachedwithin` on `<cfquery>` — ColdFusion caches the result set for 5 minutes after the first execution._
 ::
 
-Open `/cache_demo.cfm` in the **ColdFusion 2025** browser tab to confirm the page loads and the ticket count is shown:
+Open `/student/cache_demo.cfm` in the **ColdFusion 2025** browser tab to confirm the page loads and the ticket count is shown:
 
 ::image-box
 ---
@@ -322,7 +322,7 @@ _`cache_demo.cfm` after Activity 1 — the `cachedwithin` query result rendered 
 :name: verify_query_cache
 ---
 #active
-Run the `sudo tee` command above to create `cache_demo.cfm`, then open `/cache_demo.cfm` in the browser to confirm the ticket count appears.
+Run the `sudo tee` command above to create `cache_demo.cfm`, then open `/student/cache_demo.cfm` in the browser to confirm the ticket count appears.
 
 #completed
 Query caching with `cachedwithin` is present. ✓
@@ -334,12 +334,12 @@ Query caching with `cachedwithin` is present. ✓
 
 You are going to **replace** the `cache_demo.cfm` file you created in Activity 1 with an extended version that adds a second section using `cacheGet` / `cachePut`. The `sudo tee` command overwrites the file completely — that is intentional.
 
-**File to overwrite:** `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`
+**File to overwrite:** `/opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm`
 
 In the **Terminal** tab, run:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -415,10 +415,10 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
 EOF
 ```
 
-Open `/cache_demo.cfm` in the **ColdFusion 2025** browser tab. The first load will show **Cache MISS** (red); refresh and it switches to **Cache HIT** (green).
+Open `/student/cache_demo.cfm` in the **ColdFusion 2025** browser tab. The first load will show **Cache MISS** (red); refresh and it switches to **Cache HIT** (green).
 
 ```bash
-curl -s http://localhost:8500/cache_demo.cfm | grep -i "cache"
+curl -s http://localhost:8500/student/cache_demo.cfm | grep -i "cache"
 ```
 
 ::image-box
@@ -463,14 +463,14 @@ In summary: **two clean HTTP 200 responses with identical output and no errors =
 Run the two requests back-to-back in the **Terminal** tab:
 
 ```bash
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/cache_demo.cfm
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/cache_demo.cfm
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/student/cache_demo.cfm
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/student/cache_demo.cfm
 ```
 
 Then confirm there are no errors in the rendered output:
 
 ```bash
-curl -s http://localhost:8500/cache_demo.cfm | grep -i "error\|exception" || echo "No errors found"
+curl -s http://localhost:8500/student/cache_demo.cfm | grep -i "error\|exception" || echo "No errors found"
 ```
 
 Both status lines should read **HTTP 200** and the grep should return **No errors found**. If you open the page in the browser and refresh, you will also see the Section 2 box switch from red **Cache MISS** to green **Cache HIT** — visual confirmation that the second request was served entirely from ehcache.
@@ -504,12 +504,12 @@ Run the two `curl` commands above. Both should return HTTP 200 and the grep shou
 
 You have seen that `cachePut` stores a value and `cacheGet` retrieves it. Now you will prove the other side of the cycle: **explicit invalidation**. After calling `cacheRemove`, the next `cacheGet` for that key returns `null` — a forced cache miss — so ColdFusion re-queries the database and stores a fresh value. This is exactly what you would do in production after a write operation (INSERT, UPDATE, DELETE) to ensure stale data is never served.
 
-**File to update:** `/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm`
+**File to update:** `/opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm`
 
 In the **Terminal** tab, overwrite `cache_demo.cfm` with this final version that adds a Section 3 — Cache Invalidation:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -606,7 +606,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm << 'EOF'
 EOF
 ```
 
-Now reload `/cache_demo.cfm` twice in the browser:
+Now reload `/student/cache_demo.cfm` twice in the browser:
 
 1. **First reload** — Section 2 shows **Cache HIT** (green) because the key is still warm from before. Section 3 shows **Before: PRESENT** → **After: GONE**.
 2. **Second reload** — Section 2 shows **Cache MISS** (red) again — `cacheRemove` wiped the key so ColdFusion had to re-query the database.
@@ -616,7 +616,7 @@ This is the complete invalidation cycle: store → serve from cache → invalida
 Verify `cacheRemove` is in the file:
 
 ```bash
-grep -i "cacheremove" /opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm
+grep -i "cacheremove" /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm
 ```
 
 ::image-box

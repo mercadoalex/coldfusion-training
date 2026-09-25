@@ -250,10 +250,10 @@ CF Admin endpoint audited. ✓ In production this must return 403 — never 200.
 
 ## Activity 2 — Prevent XSS with encodeForHTML()
 
-Create `/opt/coldfusion2025/cfusion/wwwroot/input_demo.cfm` that safely encodes user input:
+Create `/opt/coldfusion2025/cfusion/wwwroot/student/input_demo.cfm` that safely encodes user input:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/input_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/input_demo.cfm << 'EOF'
 <cfscript>
   name = structKeyExists(url, "name") ? encodeForHTML(url.name) : "Guest";
   writeOutput("Hello, " & name & "!");
@@ -264,7 +264,7 @@ EOF
 Test it — use URL-encoded characters so Tomcat accepts the request:
 
 ```bash
-curl -s "http://localhost:8500/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
+curl -s "http://localhost:8500/student/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
 ```
 
 `%3C` = `<`, `%3E` = `>`, `%2F` = `/` — Tomcat requires angle brackets to be URL-encoded in the request target per RFC 7230.
@@ -298,7 +298,7 @@ No — the built-in filter is a last-resort safety net, not a substitute for exp
 :name: verify_no_xss
 ---
 #active
-Create `input_demo.cfm` — run `curl -s "http://localhost:8500/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E"` and confirm it does NOT output the raw script tag.
+Create `input_demo.cfm` — run `curl -s "http://localhost:8500/student/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E"` and confirm it does NOT output the raw script tag.
 
 #completed
 Input is properly HTML-encoded — no XSS. ✓

@@ -33,7 +33,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/media_demo.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/media_demo.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "media_demo.cfm not found (got ${STATUS})"
         exit 1
@@ -46,7 +46,7 @@ tasks:
     needs:
       - verify_media_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/media_demo.cfm"
       if ! grep -qi "<video\|<audio" "${FILE}" 2>/dev/null; then
         echo "No HTML5 video or audio element found in media_demo.cfm"
         exit 1
@@ -59,12 +59,12 @@ tasks:
     needs:
       - verify_html5_video
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/upload_media.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "upload_media.cfm not found (got ${STATUS})"
         exit 1
       fi
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/upload_media.cfm"
       if ! grep -q "cffile\|action.*upload" "${FILE}" 2>/dev/null; then
         echo "No cffile upload handler found in upload_media.cfm"
         exit 1
@@ -77,12 +77,12 @@ tasks:
     needs:
       - verify_upload_handler
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/image_thumb.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/image_thumb.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "image_thumb.cfm not found (got ${STATUS})"
         exit 1
       fi
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/image_thumb.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/image_thumb.cfm"
       if ! grep -q "cfimage\|imageNew\|imageWrite" "${FILE}" 2>/dev/null; then
         echo "No cfimage usage found in image_thumb.cfm"
         exit 1

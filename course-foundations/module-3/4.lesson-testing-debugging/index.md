@@ -30,7 +30,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/debug-demo.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/debug-demo.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "debug-demo.cfm returned HTTP ${STATUS}, expected 200"
         exit 1
@@ -80,9 +80,14 @@ tasks:
     needs:
       - verify_test_exists
     run: |
-      BODY=$(curl -s "http://localhost:8888/testbox/system/runners/TextRunner.cfm?directory=tests" 2>/dev/null)
-      FAILURES=$(echo "${BODY}" | grep -oP 'Failures:\s*\K[0-9]+' || echo "0")
-      ERRORS=$(echo "${BODY}"   | grep -oP 'Errors:\s*\K[0-9]+'   || echo "0")
+      BODY=$(curl -s "http://localhost:8888/testbox/system/runners/StreamingRunner.cfm?directory=tests" 2>/dev/null)
+      FAILURES=$(echo "${BODY}" | grep -oP 'Failed:\s*\K[0-9]+'  || echo "0")
+      ERRORS=$(echo "${BODY}"   | grep -oP 'Errors:\s*\K[0-9]+'  || echo "0")
+      PASSED=$(echo "${BODY}"   | grep -oP 'Passed:\s*\K[0-9]+'  || echo "")
+      if [ -z "${PASSED}" ]; then
+        echo "TestBox runner returned no results — check http://localhost:8888/testbox/system/runners/StreamingRunner.cfm?directory=tests"
+        exit 1
+      fi
       if [ "${FAILURES}" != "0" ] || [ "${ERRORS}" != "0" ]; then
         echo "TestBox: ${FAILURES} failure(s), ${ERRORS} error(s)"
         exit 1

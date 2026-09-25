@@ -32,7 +32,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm"
       if [ ! -f "${FILE}" ]; then
         echo "chart_demo.cfm not found"
         exit 1
@@ -53,7 +53,7 @@ tasks:
     needs:
       - verify_bar_chart
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm"
       if ! grep -qi "type.*pie\|pie.*type" "${FILE}" 2>/dev/null; then
         echo "No pie chart series found in chart_demo.cfm"
         exit 1
@@ -66,7 +66,7 @@ tasks:
     needs:
       - verify_pie_chart
     run: |
-      BODY=$(curl -s http://localhost:8500/chart_demo.cfm)
+      BODY=$(curl -s http://localhost:8500/student/chart_demo.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "chart_demo.cfm is throwing an error"
         exit 1

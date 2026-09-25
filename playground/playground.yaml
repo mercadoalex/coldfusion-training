@@ -41,6 +41,11 @@ playground:
           name: ColdFusion 2025
           machine: dev-machine
           number: 8500
+        - id: http-cf-8585
+          kind: http-port
+          name: ColdFusion WebSocket
+          machine: dev-machine
+          number: 8585
         - id: http-cf-8888
           kind: http-port
           name: Lucee Dev Server

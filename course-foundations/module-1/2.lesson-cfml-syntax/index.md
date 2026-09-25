@@ -28,7 +28,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      BODY=$(curl -s http://localhost:8500/syntax_tag.cfm)
+      BODY=$(curl -s http://localhost:8500/student/syntax_tag.cfm)
       if ! echo "${BODY}" | grep -qi "tag"; then
         echo "syntax_tag.cfm does not exist or does not use tag syntax"
         exit 1
@@ -41,7 +41,7 @@ tasks:
     needs:
       - verify_tag_syntax
     run: |
-      BODY=$(curl -s http://localhost:8500/syntax_script.cfm)
+      BODY=$(curl -s http://localhost:8500/student/syntax_script.cfm)
       if ! echo "${BODY}" | grep -qi "script"; then
         echo "syntax_script.cfm does not exist or does not use cfscript"
         exit 1
@@ -54,7 +54,7 @@ tasks:
     needs:
       - verify_script_syntax
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/syntax_script.cfm"
       if ! grep -q "if\|cfif" "${FILE}" 2>/dev/null; then
         echo "Expected a conditional (if/cfif) in syntax_script.cfm"
         exit 1
@@ -67,7 +67,7 @@ tasks:
     needs:
       - verify_cfif
     run: |
-      BODY=$(curl -s http://localhost:8500/syntax_loop.cfm)
+      BODY=$(curl -s http://localhost:8500/student/syntax_loop.cfm)
       for n in 1 2 3 4 5; do
         if ! echo "${BODY}" | grep -q "${n}"; then
           echo "syntax_loop.cfm does not output number ${n}"
@@ -82,7 +82,7 @@ tasks:
     needs:
       - verify_loop_syntax
     run: |
-      BODY=$(curl -s http://localhost:8500/syntax_loop_all.cfm)
+      BODY=$(curl -s http://localhost:8500/student/syntax_loop_all.cfm)
       for word in "CFML" "Java" "count"; do
         if ! echo "${BODY}" | grep -qi "${word}"; then
           echo "syntax_loop_all.cfm is missing expected output: ${word}"

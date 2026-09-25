@@ -28,7 +28,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      BODY=$(curl -s http://localhost:8500/data_types.cfm)
+      BODY=$(curl -s http://localhost:8500/student/data_types.cfm)
       for word in "String" "Numeric" "Boolean"; do
         if ! echo "${BODY}" | grep -qi "${word}"; then
           echo "data_types.cfm is missing expected output: ${word}"
@@ -43,7 +43,7 @@ tasks:
     needs:
       - verify_data_types
     run: |
-      BODY=$(curl -s http://localhost:8500/scopes.cfm)
+      BODY=$(curl -s http://localhost:8500/student/scopes.cfm)
       if ! echo "${BODY}" | grep -qi "variables"; then
         echo "scopes.cfm does not demonstrate variable scopes"
         exit 1
@@ -56,7 +56,7 @@ tasks:
     needs:
       - verify_scopes_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/scopes.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/scopes.cfm"
       if ! grep -q "variables\." "${FILE}" 2>/dev/null; then
         echo "Expected variables. scope usage in scopes.cfm"
         exit 1
@@ -69,7 +69,7 @@ tasks:
     needs:
       - verify_variables_scope
     run: |
-      BODY=$(curl -s "http://localhost:8500/scopes.cfm?name=TestUser")
+      BODY=$(curl -s "http://localhost:8500/student/scopes.cfm?name=TestUser")
       if ! echo "${BODY}" | grep -qi "TestUser"; then
         echo "URL scope not demonstrated — ?name=TestUser not reflected in output"
         exit 1

@@ -347,7 +347,7 @@ curl -s http://localhost:8500/seed-db.cfm
 **Activity:** Click the **Terminal** tab in your lab. Copy and paste the script below to create `verify_ds.cfm` — a page that queries `training_db` and outputs a connection confirmation:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/verify_ds.cfm << 'EOF'
 <cfquery name="test" datasource="training_db">
   SELECT COUNT(*) AS total FROM hd_tickets
 </cfquery>
@@ -358,7 +358,7 @@ EOF
 Verify the page responds correctly:
 
 ```bash
-curl -s http://localhost:8500/verify_ds.cfm
+curl -s http://localhost:8500/student/verify_ds.cfm
 # Expected: Connection OK — 10 tickets found
 ```
 
@@ -490,7 +490,7 @@ Run the `sudo tee` command above to create `Application.cfc` in the web root wit
 **Activity:** Create `qoq_demo.cfm` — a page that fetches all tickets from the database in one query, then uses ColdFusion's Query of Queries feature to filter and sort the results **in memory** without a second database hit:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/qoq_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -584,13 +584,13 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm << 'EOF'
 EOF
 ```
 
-Open `/qoq_demo.cfm` in the **ColdFusion 2025** browser tab. You should see:
+Open `/student/qoq_demo.cfm` in the **ColdFusion 2025** browser tab. You should see:
 - All 10 tickets from the database
 - A filtered list of **open + high priority** tickets — expect 2 rows: **Cannot connect to VPN** and **Payroll export failing**
 - A status summary grouped by status (open, in_progress, resolved) — all derived from the same in-memory result set
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/qoq_demo.cfm
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/qoq_demo.cfm
 # Expected: 200
 ```
 

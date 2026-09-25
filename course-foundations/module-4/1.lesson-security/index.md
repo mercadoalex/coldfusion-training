@@ -41,8 +41,8 @@ tasks:
     needs:
       - verify_admin_restricted
     run: |
-      BODY=$(curl -s "http://localhost:8500/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E")
-      if ! curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/input_demo.cfm" | grep -q "200"; then
+      BODY=$(curl -s "http://localhost:8500/student/input_demo.cfm?name=%3Cscript%3Ealert(1)%3C%2Fscript%3E")
+      if ! curl -s -o /dev/null -w "%{http_code}" "http://localhost:8500/student/input_demo.cfm" | grep -q "200"; then
         echo "input_demo.cfm not found or not returning 200"
         exit 1
       fi
@@ -58,8 +58,7 @@ tasks:
     needs:
       - verify_no_xss
     run: |
-      COUNT=$(grep -rl "cfqueryparam" /opt/coldfusion2025/cfusion/wwwroot/ \
-        --exclude-dir=CFIDE --exclude-dir=WEB-INF 2>/dev/null | wc -l)
+      COUNT=$(grep -rl "cfqueryparam" /opt/coldfusion2025/cfusion/wwwroot/student/ 2>/dev/null | wc -l)
       if [ "${COUNT}" -lt 1 ]; then
         echo "No cfqueryparam usage found in student files — SQL injection risk"
         exit 1

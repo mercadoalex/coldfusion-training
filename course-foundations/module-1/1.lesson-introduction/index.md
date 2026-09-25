@@ -69,19 +69,19 @@ tasks:
     needs:
       - verify_cf_running
     run: |
-      BODY=$(curl -s http://localhost:8500/hello.cfm)
+      BODY=$(curl -s http://localhost:8500/student/hello.cfm)
       if ! echo "${BODY}" | grep -qi "hello"; then
         echo "hello.cfm does not exist or does not output a greeting"
         exit 1
       fi
       echo "hello.cfm is working correctly"
     hintcheck: |
-      if [ ! -f /opt/coldfusion2025/cfusion/wwwroot/hello.cfm ]; then
+      if [ ! -f /opt/coldfusion2025/cfusion/wwwroot/student/hello.cfm ]; then
         echo "The file hello.cfm does not exist yet."
-        echo "Create it at: /opt/coldfusion2025/cfusion/wwwroot/hello.cfm"
+        echo "Create it at: /opt/coldfusion2025/cfusion/wwwroot/student/hello.cfm"
         echo "It must output the word 'hello' somewhere in the response."
       else
-        BODY=$(curl -s http://localhost:8500/hello.cfm)
+        BODY=$(curl -s http://localhost:8500/student/hello.cfm)
         if ! echo "${BODY}" | grep -qi "hello"; then
           echo "hello.cfm exists but does not output 'hello'."
           echo "Make sure your <cfoutput> or writeOutput() includes the word 'hello'."

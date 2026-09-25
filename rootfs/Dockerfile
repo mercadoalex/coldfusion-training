@@ -152,6 +152,7 @@ EOF
 # --------------------------------------------------------------------------
 COPY rootfs/scripts/install-coldfusion.sh /tmp/install-coldfusion.sh
 COPY rootfs/cf-config/neo-datasource.xml  /tmp/neo-datasource.xml
+COPY rootfs/cf-config/neo-websocket.xml   /tmp/neo-websocket.xml
 COPY downloads/ /tmp/cf-downloads/
 RUN bash /tmp/install-coldfusion.sh && \
     rm -rf /tmp/cf-downloads
@@ -232,6 +233,7 @@ RUN chown ${LAB_USER}:${LAB_USER} /home/${LAB_USER}/.welcome && \
     chown -R ${LAB_USER}:${LAB_USER} /home/${LAB_USER} && \
     chown -R ${LAB_USER}:${LAB_USER} ${COMMANDBOX_HOME} && \
     mv /tmp/cf-wwwroot/* ${CF_HOME}/cfusion/wwwroot/ 2>/dev/null || true && \
+    mkdir -p ${CF_HOME}/cfusion/wwwroot/student && \
     chown -R ${LAB_USER}:${LAB_USER} ${CF_HOME}/cfusion/wwwroot/
 
 USER ${LAB_USER}

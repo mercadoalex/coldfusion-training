@@ -43,10 +43,12 @@ _ColdFusion generates the HTML and embeds JSON; all HTML5 API calls execute enti
 
 ## Activity 1 — Create a basic HTML5 page with dynamic CFML
 
-**Activity:** In the **Terminal** tab, create `html5_demo.cfm` — an HTML5 page that uses the correct doctype and renders a dynamic timestamp with CFML:
+**Activity:** Create `html5_demo.cfm` — an HTML5 page that uses the correct doctype and renders a dynamic timestamp with CFML.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/html5_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,10 +67,17 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `html5_demo.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+::
+
 Verify the file is served:
 
 ```bash
-curl -s http://localhost:8500/html5_demo.cfm | head -20
+curl -s http://localhost:8500/student/html5_demo.cfm | head -20
 ```
 
 ::image-box
@@ -86,7 +95,7 @@ _`html5_demo.cfm` served with a live timestamp rendered by ColdFusion._
 :name: verify_html5_page
 ---
 #active
-Click the **Terminal** tab and run the `sudo tee` command above to create `html5_demo.cfm`, then open `/html5_demo.cfm` in the browser tab to confirm it loads.
+Create `html5_demo.cfm` — use the **Terminal tab** command or the **IDE tab** above — then open `/html5_demo.cfm` in the browser tab to confirm it loads.
 
 #completed
 `html5_demo.cfm` is accessible and returns HTTP 200. ✓
@@ -198,7 +207,7 @@ The browser renders the entity as visible text, never as executable markup.
 **Activity:** Confirm that `html5_demo.cfm` contains the HTML5 doctype. If you used the `tee` command in Activity 1 it is already there. Check with:
 
 ```bash
-curl -s http://localhost:8500/html5_demo.cfm | grep -i "DOCTYPE"
+curl -s http://localhost:8500/student/html5_demo.cfm | grep -i "DOCTYPE"
 ```
 
 You should see `<!DOCTYPE html>` in the output.
@@ -406,10 +415,12 @@ When you use `serializeJSON()` to bake data into the page, the browser sees it a
 
 ## Activity 3 — Add dynamic CFML output to the page
 
-**Activity:** Update `html5_demo.cfm` to include a `writeOutput()` or `<cfoutput>` call that renders something dynamic. The file already has this from Activity 1 — this task simply confirms it. You can also extend it by embedding a JSON array of items:
+**Activity:** Update `html5_demo.cfm` to embed a JSON array of items rendered by JavaScript.
+
+**Terminal tab** — overwrite the file:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/html5_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -446,10 +457,17 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_demo.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `html5_demo.cfm`, **select all**, replace with the content from the Terminal command above, and save with **Ctrl+S**.
+::
+
 Open `/html5_demo.cfm` in the **ColdFusion 2025** browser tab to verify the fruit list renders.
 
 ```bash
-curl -s http://localhost:8500/html5_demo.cfm | grep -i "writeOutput\|cfoutput\|serializeJSON"
+curl -s http://localhost:8500/student/html5_demo.cfm | grep -i "writeOutput\|cfoutput\|serializeJSON"
 ```
 
 ::image-box
@@ -502,10 +520,12 @@ HTML5 provides built-in client-side validation via attributes like `required`, `
 
 ## Activity 4 — Build an HTML5 form with email and date validation
 
-**Activity:** In the **Terminal** tab, create `html5_form_demo.cfm` — a self-contained form that uses `type="email"` and `type="date"` for client-side validation, and echoes the submitted values back with CFML server-side processing:
+**Activity:** Create `html5_form_demo.cfm` — a self-contained form with `type="email"` and `type="date"` validation, echoing submitted values back with CFML server-side processing.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_form_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/html5_form_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -579,6 +599,15 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/html5_form_demo.cfm << 'EOF'
 EOF
 ```
 
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `html5_form_demo.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+::
+
+
 Open `/html5_form_demo.cfm` in the **ColdFusion 2025** browser tab. Try submitting:
 - An **empty form** — the browser blocks it and highlights the first missing field
 - An **invalid email** like `notanemail` — the browser shows a native email error
@@ -586,7 +615,7 @@ Open `/html5_form_demo.cfm` in the **ColdFusion 2025** browser tab. Try submitti
 - A **valid submission** — ColdFusion echoes the confirmed registration back
 
 ```bash
-curl -s http://localhost:8500/html5_form_demo.cfm | grep -i "Event Registration"
+curl -s http://localhost:8500/student/html5_form_demo.cfm | grep -i "Event Registration"
 ```
 
 ::image-box
@@ -604,7 +633,7 @@ _HTML5 `type="email"` and `type="date"` provide instant browser validation; Cold
 :name: verify_form_validation
 ---
 #active
-Create `html5_form_demo.cfm` using the `sudo tee` command above, then open it in the browser and submit a valid registration to see ColdFusion echo it back.
+Create `html5_form_demo.cfm` — use the **Terminal tab** command or the **IDE tab** above — then open it in the browser and submit a valid registration to see ColdFusion echo it back.
 
 #completed
 `html5_form_demo.cfm` is accessible and contains HTML5 form validation. ✓

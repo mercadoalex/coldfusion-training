@@ -191,7 +191,7 @@ sudo /opt/coldfusion2025/cfusion/bin/cfpm.sh install chart
 sudo /opt/coldfusion2025/cfusion/bin/coldfusion restart
 ```
 
-Wait about 30 seconds for ColdFusion to restart, then reload `/chart_demo.cfm`.
+Wait about 30 seconds for ColdFusion to restart, then reload `/student/chart_demo.cfm`.
 
 ::image-box
 ---
@@ -206,12 +206,12 @@ _`cfpm.sh install chart` installs the chart engine — restart ColdFusion after 
 
 **What you are building:** A new file `chart_demo.cfm` that queries the Help Desk database and renders a bar chart showing open ticket counts by priority.
 
-**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm`
+**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm`
 
 In the **Terminal** tab, run:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -253,10 +253,10 @@ EOF
 Verify the file exists and contains `cfchart`:
 
 ```bash
-grep -i "cfchart" /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm
+grep -i "cfchart" /opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm
 ```
 
-Open `/chart_demo.cfm` in the **ColdFusion 2025** browser tab — you should see a blue bar chart with one bar per priority value.
+Open `/student/chart_demo.cfm` in the **ColdFusion 2025** browser tab — you should see a blue bar chart with one bar per priority value.
 
 ::hint-box
 ---
@@ -272,7 +272,7 @@ Open `/chart_demo.cfm` in the **ColdFusion 2025** browser tab — you should see
 _This error means the Help Desk database has not been seeded yet — the tables exist but contain no data, or the schema was never created._
 ::
 
-The database has not been seeded yet. In the **ColdFusion 2025** browser tab, go back to the home page and click the **DB Test** button, then click **Run Seed Script**. Once the confirmation screen appears, reload `/chart_demo.cfm` and the chart will render correctly.
+The database has not been seeded yet. In the **ColdFusion 2025** browser tab, go back to the home page and click the **DB Test** button, then click **Run Seed Script**. Once the confirmation screen appears, reload `/student/chart_demo.cfm` and the chart will render correctly.
 
 ::
 
@@ -291,7 +291,7 @@ _Bar chart rendered server-side by `cfchart` — each bar represents the count o
 :name: verify_bar_chart
 ---
 #active
-Run the `sudo tee` command above to create `chart_demo.cfm` with a `cfchart` bar chart powered by a query against `training_db`. Open `/chart_demo.cfm` in the browser to confirm the chart renders.
+Run the `sudo tee` command above to create `chart_demo.cfm` with a `cfchart` bar chart powered by a query against `training_db`. Open `/student/chart_demo.cfm` in the browser to confirm the chart renders.
 
 #completed
 Bar chart with live query data is present. ✓
@@ -303,12 +303,12 @@ Bar chart with live query data is present. ✓
 
 **What you are building:** Extend `chart_demo.cfm` with a second section showing a pie chart of ticket distribution by status.
 
-**File to update:** `/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm`
+**File to update:** `/opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm`
 
 In the **Terminal** tab, overwrite the file with this extended version:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -364,7 +364,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm << 'EOF'
 EOF
 ```
 
-Reload `/chart_demo.cfm` in the browser — you should now see both charts: the bar chart above and the pie chart below it.
+Reload `/student/chart_demo.cfm` in the browser — you should now see both charts: the bar chart above and the pie chart below it.
 
 ::image-box
 ---
@@ -381,7 +381,7 @@ _Both charts on one page — bar chart for priority comparison, pie chart for st
 :name: verify_pie_chart
 ---
 #active
-Run the `sudo tee` command above to add the pie chart section to `chart_demo.cfm`. Reload `/chart_demo.cfm` in the browser and confirm both charts are visible.
+Run the `sudo tee` command above to add the pie chart section to `chart_demo.cfm`. Reload `/student/chart_demo.cfm` in the browser and confirm both charts are visible.
 
 #completed
 Pie chart series is present. ✓
@@ -398,7 +398,7 @@ HTTP 200 only tells you the page loaded — it does not prove the charts actuall
 Run this single command in the **Terminal** tab — it fetches the page and counts how many chart `<img>` tags are in the response:
 
 ```bash
-curl -s http://localhost:8500/chart_demo.cfm | grep -c "_cf_chart"
+curl -s http://localhost:8500/student/chart_demo.cfm | grep -c "_cf_chart"
 ```
 
 **Expected result: `2`** — one `<img>` for the bar chart, one for the pie chart. This is the definitive proof that both charts were generated from live query data and written to the CF chart cache successfully.
@@ -415,8 +415,8 @@ _`grep -c "_cf_chart"` returns `2` — both chart images were generated and writ
 Also confirm the page returns HTTP 200 and contains no errors:
 
 ```bash
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/chart_demo.cfm
-curl -s http://localhost:8500/chart_demo.cfm | grep -i "error\|exception" || echo "No errors found"
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/student/chart_demo.cfm
+curl -s http://localhost:8500/student/chart_demo.cfm | grep -i "error\|exception" || echo "No errors found"
 ```
 
 ::image-box
@@ -434,7 +434,7 @@ _HTTP 200 and no errors — the page is accessible and both charts rendered with
 :name: verify_chart_page
 ---
 #active
-Run `curl -s http://localhost:8500/chart_demo.cfm | grep -c "_cf_chart"` in the Terminal. The result must be `2` — confirming both the bar chart and pie chart rendered successfully from live query data.
+Run `curl -s http://localhost:8500/student/chart_demo.cfm | grep -c "_cf_chart"` in the Terminal. The result must be `2` — confirming both the bar chart and pie chart rendered successfully from live query data.
 
 #completed
 Both charts rendered successfully — two `cfchart` image tags confirmed in the response. ✓

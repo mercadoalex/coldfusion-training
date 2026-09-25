@@ -32,7 +32,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/soap_consumer.cfm"
       if [ ! -f "${FILE}" ]; then
         echo "soap_consumer.cfm not found"
         exit 1

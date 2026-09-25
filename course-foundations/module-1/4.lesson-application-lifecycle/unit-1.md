@@ -50,7 +50,9 @@ _Key `this.*` settings in Application.cfc — configure once, effective for ever
 
 ## Activity 1 — Create Application.cfc
 
-**Activity:** Click the **Terminal** tab in your lab. Copy and paste the script below to create a minimal `Application.cfc` in the web root:
+**Activity:** Create `Application.cfc` in the web root.
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
@@ -83,6 +85,42 @@ component {
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/`, create `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+
+  this.name              = "CFTraining";
+  this.sessionManagement = true;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);  // 30 minutes
+
+  public boolean function onApplicationStart() {
+    application.startTime = now();
+    writeLog(text="Application started at #now()#", file="application");
+    return true;
+  }
+
+  public boolean function onSessionStart() {
+    session.userId = 0;
+    return true;
+  }
+
+  public boolean function onRequestStart(string targetPage) {
+    return true;
+  }
+
+  public void function onError(any exception, string eventName) {
+    writeOutput("An error occurred: #exception.message#");
+  }
+
+}
+```
+::
+
 Verify it was created:
 
 ```bash
@@ -104,7 +142,7 @@ _Terminal confirming `Application.cfc` was created in the web root._
 :name: verify_application_cfc_exists
 ---
 #active
-Click the **Terminal** tab and run the `sudo tee` command above to create `Application.cfc` in the web root.
+Create `Application.cfc` in the web root — use the **Terminal tab** command or the **IDE tab** above.
 
 #completed
 `Application.cfc` exists in the web root. ✓

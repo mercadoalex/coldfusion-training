@@ -17,38 +17,36 @@
     <button onclick="sendMsg()">Send</button>
     <p id="status">Connecting…</p>
 
-    <cfwebsocket
-        name        = "chatWS"
-        onMessage   = "handleMessage"
-        onOpen      = "handleOpen"
-        onClose     = "handleClose"
-        subscribeTo = "chat"
-    >
-
     <script>
         const log    = document.getElementById("chat-log");
         const status = document.getElementById("status");
 
-        function handleOpen() {
-            status.textContent = "Connected";
-        }
+        // Derive protocol and host from the page — works on HTTP and HTTPS,
+        // through any reverse proxy, without hardcoding any address or port.
+        const wsProto = window.location.protocol === "https:" ? "wss://" : "ws://";
+        const ws = new WebSocket(wsProto + window.location.host + "/cfusion/WS/chat");
 
-        function handleMessage(msg) {
+        ws.onopen = function() {
+            status.textContent = "Connected";
+        };
+
+        ws.onmessage = function(event) {
+            const msg = JSON.parse(event.data);
             if (msg.type === "data") {
                 log.insertAdjacentHTML("beforeend",
                     `<p><strong>user</strong>: ${msg.data}</p>`);
                 log.scrollTop = log.scrollHeight;
             }
-        }
+        };
 
-        function handleClose() {
+        ws.onclose = function() {
             status.textContent = "Disconnected";
-        }
+        };
 
         function sendMsg() {
             const input = document.getElementById("msg-input");
             if (!input.value.trim()) return;
-            chatWS.publish("chat", input.value);
+            ws.send(JSON.stringify({ type: "publish", channel: "chat", data: input.value }));
             input.value = "";
         }
     </script>

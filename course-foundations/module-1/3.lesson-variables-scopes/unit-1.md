@@ -29,10 +29,12 @@ ColdFusion is dynamically typed. Variables are created on assignment and their t
 _CFML's six core data types — dynamically inferred at runtime, no explicit type declarations needed._
 ::
 
-**Activity:** Click the **Terminal** tab in your lab. Once the terminal is open, copy and paste the script below to create `data_types.cfm` and explore all six data types:
+**Activity:** Create `data_types.cfm` to explore all six data types.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/data_types.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/data_types.cfm << 'EOF'
 <cfscript>
   // String
   myString = "Hello ColdFusion";
@@ -62,10 +64,46 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/data_types.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `data_types.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  // String
+  myString = "Hello ColdFusion";
+  writeOutput("<strong>String:</strong> " & myString & "<br>");
+
+  // Numeric
+  myInt  = 42;
+  myFloat = 3.14;
+  writeOutput("<strong>Numeric:</strong> " & myInt & " / " & myFloat & "<br>");
+
+  // Boolean
+  isActive = true;
+  writeOutput("<strong>Boolean:</strong> " & isActive & "<br>");
+
+  // Date
+  today = now();
+  writeOutput("<strong>Date:</strong> " & dateFormat(today, "yyyy-mm-dd") & "<br>");
+
+  // Array
+  fruits = ["apple", "banana", "cherry"];
+  writeOutput("<strong>Array[1]:</strong> " & fruits[1] & "<br>");
+
+  // Struct
+  person = {name: "Alex", age: 30};
+  writeOutput("<strong>Struct:</strong> " & person.name & " is " & person.age & "<br>");
+</cfscript>
+```
+::
+
 Open `/data_types.cfm` in the **ColdFusion 2025** browser tab (right-click → Open Link in New Tab, then change the path). Or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/data_types.cfm
+curl -s http://localhost:8500/student/data_types.cfm
 ```
 
 ::image-box
@@ -116,10 +154,12 @@ The `variables` scope is the default when you omit a prefix. Always prefix `sess
 _Scope lifetimes compared — request-scoped variables are cheapest; application-scoped variables persist for the life of the process._
 ::
 
-**Activity:** Still in the **Terminal** tab, copy and paste the script below to create `scopes.cfm` and demonstrate the `variables` scope explicitly:
+**Activity:** Create `scopes.cfm` to demonstrate the `variables` scope.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/scopes.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/scopes.cfm << 'EOF'
 <cfscript>
   // variables scope — explicit prefix
   variables.name    = "Alex";
@@ -135,10 +175,32 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/scopes.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `scopes.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  // variables scope — explicit prefix
+  variables.name    = "Alex";
+  variables.course  = "ColdFusion 2025";
+
+  writeOutput("<strong>variables.name:</strong> "   & variables.name   & "<br>");
+  writeOutput("<strong>variables.course:</strong> " & variables.course & "<br>");
+
+  // url scope — reads ?name= from the query string
+  urlName = url.name ?: "no name passed";
+  writeOutput("<strong>url.name:</strong> " & urlName & "<br>");
+</cfscript>
+```
+::
+
 Open `/scopes.cfm` in the browser to confirm the `variables` scope output:
 
 ```bash
-curl -s http://localhost:8500/scopes.cfm
+curl -s http://localhost:8500/student/scopes.cfm
 ```
 
 ::image-box
@@ -185,7 +247,7 @@ The `variables` scope is explicitly prefixed. ✓
 Pass a query-string parameter and read it back with `url.name`:
 
 ```bash
-curl -s "http://localhost:8500/scopes.cfm?name=TestUser"
+curl -s "http://localhost:8500/student/scopes.cfm?name=TestUser"
 # Expected: url.name: TestUser
 ```
 
@@ -265,7 +327,7 @@ Add those lines temporarily to any `.cfm` file, reload in the browser, and you g
 If you need to tweak `scopes.cfm` without rewriting it from scratch:
 
 ```bash
-vi /opt/coldfusion2025/cfusion/wwwroot/scopes.cfm
+vi /opt/coldfusion2025/cfusion/wwwroot/student/scopes.cfm
 ```
 
 | Key | What it does |

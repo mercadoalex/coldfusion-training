@@ -36,10 +36,12 @@ _Anatomy of a CFC — one file defines the class, its properties, and all its me
 
 ## Activity 1 — Create your first CFC
 
-**Activity:** Click the **Terminal** tab in your lab. Copy and paste the script below to create `GreetingService.cfc` — a simple CFC with a constructor, a public method, and a private helper:
+**Activity:** Create `GreetingService.cfc` — a simple CFC with a constructor, a public method, and a private helper.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc << 'EOF'
 component displayname="GreetingService" hint="Returns greetings" {
 
   // Constructor
@@ -62,10 +64,39 @@ component displayname="GreetingService" hint="Returns greetings" {
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `GreetingService.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component displayname="GreetingService" hint="Returns greetings" {
+
+  // Constructor
+  public GreetingService function init() {
+    variables.createdAt = now();
+    return this;
+  }
+
+  // Public method
+  public string function greet(required string name) {
+    return _format("Hello, " & arguments.name & "!");
+  }
+
+  // Private helper — not callable from outside
+  private string function _format(required string msg) {
+    return "[" & timeFormat(now(), "HH:mm:ss") & "] " & arguments.msg;
+  }
+
+}
+```
+::
+
 Verify the file was created:
 
 ```bash
-ls -lh /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc
+ls -lh /opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc
 ```
 
 ::image-box
@@ -83,7 +114,7 @@ _Terminal confirming `GreetingService.cfc` was created in the web root._
 :name: verify_cfc_exists
 ---
 #active
-Click the **Terminal** tab and run the `sudo tee` command above to create `GreetingService.cfc` in the web root.
+Create `GreetingService.cfc` in the web root — use the **Terminal tab** command or the **IDE tab** above.
 
 #completed
 CFC file found in the web root. ✓
@@ -171,10 +202,12 @@ The `remote` modifier is unique to ColdFusion — it turns any method into an au
 
 ## Activity 2 — Instantiate the CFC and call a method
 
-**Activity:** Still in the **Terminal** tab, copy and paste the script below to create `test_cfc.cfm` — a page that instantiates `GreetingService` and calls its `greet()` method:
+**Activity:** Create `test_cfc.cfm` — a page that instantiates `GreetingService` and calls its `greet()` method.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_cfc.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/test_cfc.cfm << 'EOF'
 <cfscript>
   svc     = new GreetingService();
   message = svc.greet("ColdFusion Student");
@@ -184,10 +217,26 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_cfc.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `test_cfc.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  svc     = new GreetingService();
+  message = svc.greet("ColdFusion Student");
+  writeOutput("<strong>Result:</strong> " & message & "<br>");
+  writeOutput("<strong>CFC type:</strong> " & getMetaData(svc).name & "<br>");
+</cfscript>
+```
+::
+
 Open `/test_cfc.cfm` in the **ColdFusion 2025** browser tab (right-click → Open Link in New Tab, change path). Or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/test_cfc.cfm
+curl -s http://localhost:8500/student/test_cfc.cfm
 # Expected: Result: [HH:mm:ss] Hello, ColdFusion Student!
 ```
 
@@ -270,10 +319,12 @@ Use `super.methodName()` to call the parent's version of an overridden method.
 
 ## Activity 3 — Add a method and verify with cfdump
 
-**Activity:** Update `GreetingService.cfc` to add a `getInfo()` method that returns a struct with instance information, then verify it with `cfdump`:
+**Activity:** Update `GreetingService.cfc` to add a `getInfo()` method, then update `test_cfc.cfm` to verify it with `cfdump`.
+
+**Terminal tab** — update `GreetingService.cfc`:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc << 'EOF'
 component displayname="GreetingService" hint="Returns greetings" {
 
   public GreetingService function init() {
@@ -301,10 +352,44 @@ component displayname="GreetingService" hint="Returns greetings" {
 EOF
 ```
 
-Now update `test_cfc.cfm` to dump the info struct:
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `GreetingService.cfc`, **select all**, replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+component displayname="GreetingService" hint="Returns greetings" {
+
+  public GreetingService function init() {
+    variables.createdAt = now();
+    return this;
+  }
+
+  public string function greet(required string name) {
+    return _format("Hello, " & arguments.name & "!");
+  }
+
+  public struct function getInfo() {
+    return {
+      name:      "GreetingService",
+      createdAt: variables.createdAt,
+      age:       dateDiff("s", variables.createdAt, now()) & " seconds"
+    };
+  }
+
+  private string function _format(required string msg) {
+    return "[" & timeFormat(now(), "HH:mm:ss") & "] " & arguments.msg;
+  }
+
+}
+```
+::
+
+**Terminal tab** — update `test_cfc.cfm`:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_cfc.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/test_cfc.cfm << 'EOF'
 <cfscript>
   svc = new GreetingService();
   writeOutput("<strong>Greeting:</strong> " & svc.greet("ColdFusion Student") & "<br><br>");
@@ -312,6 +397,21 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_cfc.cfm << 'EOF'
 <cfdump var="#new GreetingService().getInfo()#" label="GreetingService.getInfo()">
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `test_cfc.cfm`, **select all**, replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  svc = new GreetingService();
+  writeOutput("<strong>Greeting:</strong> " & svc.greet("ColdFusion Student") & "<br><br>");
+</cfscript>
+<cfdump var="#new GreetingService().getInfo()#" label="GreetingService.getInfo()">
+```
+::
 
 Reload `/test_cfc.cfm` in the browser — you should see the greeting and a `cfdump` table showing the struct with `name`, `createdAt`, and `age`.
 
@@ -424,10 +524,12 @@ If you need logic shared between a JSP and a CFC, extract it into a plain Java c
 
 ## Activity 4 — Call Java from inside a CFC
 
-**Activity:** In the **Terminal** tab, create `JavaUtilService.cfc` — a CFC whose methods each call a different Java class from the standard library:
+**Activity:** Create `JavaUtilService.cfc` — a CFC whose methods each call a different Java class from the standard library.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/JavaUtilService.cfc << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/JavaUtilService.cfc << 'EOF'
 component displayname="JavaUtilService" hint="Demonstrates calling Java from CFML" {
 
   public JavaUtilService function init() {
@@ -474,10 +576,63 @@ component displayname="JavaUtilService" hint="Demonstrates calling Java from CFM
 EOF
 ```
 
-Now create `test_java_cfc.cfm` to call all four methods:
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `JavaUtilService.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component displayname="JavaUtilService" hint="Demonstrates calling Java from CFML" {
+
+  public JavaUtilService function init() {
+    return this;
+  }
+
+  // 1. java.util.UUID — generate a random unique identifier
+  public string function generateUUID() {
+    return createObject("java", "java.util.UUID")
+           .randomUUID()
+           .toString();
+  }
+
+  // 2. java.lang.StringBuilder — efficient string building
+  public string function buildMessage(required array parts) {
+    var sb = createObject("java", "java.lang.StringBuilder").init();
+    for (var part in arguments.parts) {
+      sb.append(part);
+    }
+    return sb.toString();
+  }
+
+  // 3. java.lang.System — read a JVM system property
+  public string function getJavaVersion() {
+    return createObject("java", "java.lang.System")
+           .getProperty("java.version");
+  }
+
+  // 4. java.util.Collections — sort an array using Java's sort algorithm
+  public array function sortList(required array items) {
+    var javaList = createObject("java", "java.util.ArrayList").init();
+    for (var item in arguments.items) {
+      javaList.add(item);
+    }
+    createObject("java", "java.util.Collections").sort(javaList);
+    var result = [];
+    for (var item in javaList) {
+      arrayAppend(result, item);
+    }
+    return result;
+  }
+
+}
+```
+::
+
+**Terminal tab** — create `test_java_cfc.cfm`:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_java_cfc.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/test_java_cfc.cfm << 'EOF'
 <cfscript>
   svc = new JavaUtilService();
 
@@ -491,10 +646,30 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/test_java_cfc.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `test_java_cfc.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  svc = new JavaUtilService();
+
+  writeOutput("<strong>1. UUID:</strong> "          & svc.generateUUID() & "<br>");
+  writeOutput("<strong>2. StringBuilder:</strong> " & svc.buildMessage(["Hello", ", ", "Java", " from ", "CFML!"]) & "<br>");
+  writeOutput("<strong>3. Java version:</strong> "  & svc.getJavaVersion() & "<br>");
+
+  sorted = svc.sortList(["banana", "apple", "cherry", "date"]);
+  writeOutput("<strong>4. Sorted list:</strong> "   & arrayToList(sorted) & "<br>");
+</cfscript>
+```
+::
+
 Open `/test_java_cfc.cfm` in the **ColdFusion 2025** browser tab, or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/test_java_cfc.cfm
+curl -s http://localhost:8500/student/test_java_cfc.cfm
 ```
 
 ::image-box
@@ -545,7 +720,7 @@ Java called successfully from inside a CFC. ✓
 ---
 
 ```bash
-vi /opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc
+vi /opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc
 ```
 
 | Key | What it does |

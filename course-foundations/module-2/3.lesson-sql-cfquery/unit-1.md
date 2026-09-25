@@ -110,7 +110,7 @@ Named parameters (`:status`) are the `queryExecute` equivalent of `cfqueryparam`
 **Activity:** In the **Terminal** tab, create `tickets.cfm` — a page that queries all open tickets from `hd_tickets` and renders them in an HTML table:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/tickets.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/tickets.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,7 +155,7 @@ EOF
 Verify the page loads and displays results:
 
 ```bash
-curl -s http://localhost:8500/tickets.cfm | grep -i "open tickets"
+curl -s http://localhost:8500/student/tickets.cfm | grep -i "open tickets"
 ```
 
 ::image-box
@@ -173,7 +173,7 @@ _`tickets.cfm` displaying open tickets from `hd_tickets` using `cfquery` and `cf
 :name: verify_query_page
 ---
 #active
-Run the `sudo tee` command above to create `tickets.cfm`, then open `/tickets.cfm` in the browser to confirm the ticket list renders.
+Run the `sudo tee` command above to create `tickets.cfm`, then open `/student/tickets.cfm` in the browser to confirm the ticket list renders.
 
 #completed
 `tickets.cfm` is accessible and displays query results. ✓
@@ -186,7 +186,7 @@ Run the `sudo tee` command above to create `tickets.cfm`, then open `/tickets.cf
 **Activity:** Update `tickets.cfm` to filter by priority using a URL parameter — and use `cfqueryparam` to keep it safe. Create `tickets_filter.cfm`:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/tickets_filter.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/tickets_filter.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -255,7 +255,7 @@ EOF
 Test the filter with a URL parameter:
 
 ```bash
-curl -s "http://localhost:8500/tickets_filter.cfm?priority=high" | grep -i "ticket"
+curl -s "http://localhost:8500/student/tickets_filter.cfm?priority=high" | grep -i "ticket"
 ```
 
 ::image-box
@@ -286,7 +286,7 @@ Run the `sudo tee` command above to create `tickets_filter.cfm`. Open `/tickets_
 **Activity:** Create `ticket_actions.cfm` — a page that demonstrates all four SQL operations using `queryExecute` with named parameters:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/ticket_actions.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/ticket_actions.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -359,10 +359,10 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/ticket_actions.cfm << 'EOF'
 EOF
 ```
 
-Open `/ticket_actions.cfm` in the **ColdFusion 2025** browser tab to see all four operations confirmed.
+Open `/student/ticket_actions.cfm` in the **ColdFusion 2025** browser tab to see all four operations confirmed.
 
 ```bash
-curl -s http://localhost:8500/ticket_actions.cfm | grep -i "resolved"
+curl -s http://localhost:8500/student/ticket_actions.cfm | grep -i "resolved"
 ```
 
 ::image-box
@@ -380,7 +380,7 @@ _`ticket_actions.cfm` — INSERT, SELECT, and UPDATE all confirmed using `queryE
 :name: verify_select_results
 ---
 #active
-Run the `sudo tee` command above to create `ticket_actions.cfm`, then open `/ticket_actions.cfm` in the browser to confirm all operations complete without errors.
+Run the `sudo tee` command above to create `ticket_actions.cfm`, then open `/student/ticket_actions.cfm` in the browser to confirm all operations complete without errors.
 
 #completed
 Query results displayed — INSERT, SELECT and UPDATE all working. ✓

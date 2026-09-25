@@ -26,14 +26,28 @@ Tags are case-insensitive and must be paired (or self-closed). The hash signs `#
 _Anatomy of a CFML tag: opening tag, optional attributes, hash-delimited interpolation, and closing tag._
 ::
 
-**Activity:** In your lab, click the **Terminal** tab. Create `syntax_tag.cfm` in the ColdFusion web root using `sudo tee`:
+**Activity:** Create `syntax_tag.cfm` in the ColdFusion web root.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_tag.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/syntax_tag.cfm << 'EOF'
 <cfset message = "I am using tag syntax">
 <cfoutput>#message# — tag</cfoutput>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open the folder `/opt/coldfusion2025/cfusion/wwwroot/student/`, create a new file named `syntax_tag.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfset message = "I am using tag syntax">
+<cfoutput>#message# — tag</cfoutput>
+```
+::
 
 To see the rendered page in the browser:
 
@@ -57,7 +71,7 @@ https://<your-session-id>.iximiuz.com/syntax_tag.cfm
 You can also verify from the Terminal without opening a browser at all:
 
 ```bash
-curl -s http://localhost:8500/syntax_tag.cfm
+curl -s http://localhost:8500/student/syntax_tag.cfm
 # Expected output: I am using tag syntax — tag
 ```
 
@@ -97,20 +111,35 @@ Both syntaxes compile to the same bytecode. You can mix them freely — a common
 _Both syntaxes are compiled by the same CFML engine to identical JVM bytecode._
 ::
 
-**Activity:** Still in the Terminal, create `syntax_script.cfm`:
+**Activity:** Create `syntax_script.cfm`:
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/syntax_script.cfm << 'EOF'
 <cfscript>
   writeOutput("I am using cfscript — script syntax");
 </cfscript>
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_script.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  writeOutput("I am using cfscript — script syntax");
+</cfscript>
+```
+::
+
 In the browser window you opened earlier, change the path to `/syntax_script.cfm` and reload. Or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/syntax_script.cfm
+curl -s http://localhost:8500/student/syntax_script.cfm
 # Expected output: I am using cfscript — script syntax
 ```
 
@@ -198,10 +227,12 @@ Tag equivalent:
 _Quick reference: CFML tag syntax (left) vs. cfscript syntax (right) for conditionals and loops._
 ::
 
-**Activity:** Update `syntax_script.cfm` to add a conditional. In the Terminal, overwrite the file:
+**Activity:** Update `syntax_script.cfm` to add a conditional.
+
+**Terminal tab** — overwrite the file:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/syntax_script.cfm << 'EOF'
 <cfscript>
   writeOutput("I am using cfscript — script syntax");
   score = 85;
@@ -216,10 +247,31 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_script.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `syntax_script.cfm` from the Explorer, **select all** the existing content, replace it with the code below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  writeOutput("I am using cfscript — script syntax");
+  score = 85;
+  if (score >= 90) {
+    writeOutput(" — Grade: A");
+  } else if (score >= 80) {
+    writeOutput(" — Grade: B");
+  } else {
+    writeOutput(" — Grade: C");
+  }
+</cfscript>
+```
+::
+
 Reload `/syntax_script.cfm` in the browser window to see the grade appended to the output. Or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/syntax_script.cfm
+curl -s http://localhost:8500/student/syntax_script.cfm
 # Expected: I am using cfscript — script syntax — Grade: B
 ```
 
@@ -268,10 +320,12 @@ ColdFusion also supports iterating over arrays and structs:
 </cfscript>
 ```
 
-**Activity:** In the Terminal, create `syntax_loop.cfm`:
+**Activity:** Create `syntax_loop.cfm`:
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/syntax_loop.cfm << 'EOF'
 <cfscript>
   for (i = 1; i <= 5; i++) {
     writeOutput(i & "<br>");
@@ -280,10 +334,25 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_loop.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  for (i = 1; i <= 5; i++) {
+    writeOutput(i & "<br>");
+  }
+</cfscript>
+```
+::
+
 Change the path to `/syntax_loop.cfm` in the browser window — the `<br>` tags render properly so the numbers appear on separate lines. Or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/syntax_loop.cfm
+curl -s http://localhost:8500/student/syntax_loop.cfm
 # Expected: 1<br>2<br>3<br>4<br>5<br>
 ```
 
@@ -312,10 +381,12 @@ CFML has four loop constructs you will encounter in real codebases. This exercis
 | `for (key in struct)` | Iterating every key of a struct |
 | `while (condition)` | Repeating until a condition is false |
 
-**Activity:** In the Terminal, create `syntax_loop_all.cfm`:
+**Activity:** Create `syntax_loop_all.cfm`:
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop_all.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/syntax_loop_all.cfm << 'EOF'
 <cfscript>
   // 1. Index loop — numeric counter
   writeOutput("<strong>Index loop:</strong><br>");
@@ -348,10 +419,49 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/syntax_loop_all.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_loop_all.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  // 1. Index loop — numeric counter
+  writeOutput("<strong>Index loop:</strong><br>");
+  for (i = 1; i <= 3; i++) {
+    writeOutput("  step #i#<br>");
+  }
+
+  // 2. For-in loop — array
+  writeOutput("<br><strong>Array loop:</strong><br>");
+  languages = ["CFML", "Java", "JavaScript"];
+  for (lang in languages) {
+    writeOutput("  #lang#<br>");
+  }
+
+  // 3. For-in loop — struct
+  writeOutput("<br><strong>Struct loop:</strong><br>");
+  info = {engine: "ColdFusion", version: "2025", port: "8500"};
+  for (key in info) {
+    writeOutput("  #key# = #info[key]#<br>");
+  }
+
+  // 4. While loop
+  writeOutput("<br><strong>While loop:</strong><br>");
+  count = 1;
+  while (count <= 3) {
+    writeOutput("  count is #count#<br>");
+    count++;
+  }
+</cfscript>
+```
+::
+
 Change the path to `/syntax_loop_all.cfm` in your browser window to see all four loop types rendered. Or from the Terminal:
 
 ```bash
-curl -s http://localhost:8500/syntax_loop_all.cfm
+curl -s http://localhost:8500/student/syntax_loop_all.cfm
 ```
 
 ::image-box
@@ -372,7 +482,7 @@ If a file has a typo or you want to tweak it without rewriting the whole thing, 
 
 **Open the file:**
 ```bash
-vi /opt/coldfusion2025/cfusion/wwwroot/syntax_loop_all.cfm
+vi /opt/coldfusion2025/cfusion/wwwroot/student/syntax_loop_all.cfm
 ```
 
 **Basic vi commands:**

@@ -42,12 +42,12 @@ tasks:
     needs:
       - verify_cfc_exists
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc"
       if ! grep -qi "component" "$FILE"; then
         echo "No component declaration found in GreetingService.cfc"
         exit 1
       fi
-      BODY=$(curl -s http://localhost:8500/test_cfc.cfm)
+      BODY=$(curl -s http://localhost:8500/student/test_cfc.cfm)
       if echo "$BODY" | grep -qi "error\|exception"; then
         echo "test_cfc.cfm returned an error — check GreetingService.cfc"
         exit 1
@@ -60,7 +60,7 @@ tasks:
     needs:
       - verify_cfc_component
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/GreetingService.cfc"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc"
       COUNT=$(grep -ci "function" "$FILE")
       if [ "$COUNT" -lt 2 ]; then
         echo "Expected at least 2 functions in GreetingService.cfc (got $COUNT)"
@@ -74,12 +74,12 @@ tasks:
     needs:
       - verify_cfc_method
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/JavaUtilService.cfc"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/JavaUtilService.cfc"
       if [ ! -f "${FILE}" ]; then
         echo "JavaUtilService.cfc not found"
         exit 1
       fi
-      BODY=$(curl -s http://localhost:8500/test_java_cfc.cfm)
+      BODY=$(curl -s http://localhost:8500/student/test_java_cfc.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "test_java_cfc.cfm returned an error"
         exit 1

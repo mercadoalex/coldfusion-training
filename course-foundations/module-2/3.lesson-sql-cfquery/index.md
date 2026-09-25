@@ -32,12 +32,12 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/tickets.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/tickets.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "tickets.cfm not found (got ${STATUS})"
         exit 1
       fi
-      BODY=$(curl -s http://localhost:8500/tickets.cfm)
+      BODY=$(curl -s http://localhost:8500/student/tickets.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "tickets.cfm returned an error"
         exit 1
@@ -50,7 +50,7 @@ tasks:
     needs:
       - verify_query_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/tickets_filter.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/tickets_filter.cfm"
       if [ ! -f "${FILE}" ]; then
         echo "tickets_filter.cfm not found"
         exit 1
@@ -67,12 +67,12 @@ tasks:
     needs:
       - verify_queryparam_used
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/ticket_actions.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/ticket_actions.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "ticket_actions.cfm not found (got ${STATUS})"
         exit 1
       fi
-      BODY=$(curl -s http://localhost:8500/ticket_actions.cfm)
+      BODY=$(curl -s http://localhost:8500/student/ticket_actions.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "ticket_actions.cfm returned an error"
         exit 1

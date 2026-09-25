@@ -166,6 +166,14 @@ EOF
 echo "[CF] Writing neo-datasource.xml..."
 cp /tmp/neo-datasource.xml "${CF_LIB}/neo-datasource.xml"
 
+# ─── WebSocket config ─────────────────────────────────────────────────────────
+# enableWebsocketOverProxyPort=true — required for the iximiuz reverse proxy.
+# startListenerOnNormalPort=true    — accept WS upgrades on port 8500 (HTTP port).
+# Without these, the browser WebSocket connection is rejected by CF before
+# WSHandler.cfc is ever reached.
+echo "[CF] Writing neo-websocket.xml..."
+cp /tmp/neo-websocket.xml "${CF_LIB}/neo-websocket.xml"
+
 # ─── Patch JVM heap in jvm.config ─────────────────────────────────────────────
 # The ZIP ships with -Xms256m -Xmx1024m — keep Xms, lower Xmx for microVM
 if [ -f "${CF_BIN}/jvm.config" ]; then

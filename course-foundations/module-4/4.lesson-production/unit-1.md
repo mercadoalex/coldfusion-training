@@ -192,7 +192,7 @@ grep -E "<var name='NAME'>|<var name='url'>|<var name='CLASS'>" \
 **Test live datasource connectivity:**
 ```bash
 # health.cfm already runs SELECT 1 — use it as your connectivity probe
-curl -s http://localhost:8500/health.cfm
+curl -s http://localhost:8500/student/health.cfm
 ```
 
 > **Note:** `box cfconfig datasourceList` launches a second JVM and will be killed by the OS on this lab VM (only ~512 MB RAM). Read `neo-datasource.xml` directly instead — it is the source of truth CF reads at startup.
@@ -354,12 +354,12 @@ If you browse to the **ColdFusion** tab or hit `https://<your-lab-url>/health.cf
 Complete Activity 1 first, then open the browser tab. The file will be there.
 ::
 
-**What you are building:** `/opt/coldfusion2025/cfusion/wwwroot/health.cfm` — a JSON endpoint that tests the database connection and returns the correct HTTP status code.
+**What you are building:** `/opt/coldfusion2025/cfusion/wwwroot/student/health.cfm` — a JSON endpoint that tests the database connection and returns the correct HTTP status code.
 
 In the **Terminal** tab, run:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/health.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/health.cfm << 'EOF'
 <cfscript>
   status   = "ok";
   httpCode = 200;
@@ -386,7 +386,7 @@ EOF
 Verify it returns valid JSON:
 
 ```bash
-curl -s -w "\nHTTP: %{http_code}\n" http://localhost:8500/health.cfm
+curl -s -w "\nHTTP: %{http_code}\n" http://localhost:8500/student/health.cfm
 ```
 
 ::simple-task
@@ -395,7 +395,7 @@ curl -s -w "\nHTTP: %{http_code}\n" http://localhost:8500/health.cfm
 :name: verify_health_endpoint
 ---
 #active
-Create `/opt/coldfusion2025/cfusion/wwwroot/health.cfm` — must return valid JSON.
+Create `/opt/coldfusion2025/cfusion/wwwroot/student/health.cfm` — must return valid JSON.
 
 #completed
 `health.cfm` returns valid JSON. ✓
@@ -408,7 +408,7 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/health.cfm` — must return valid JS
 The response JSON must contain a `status` field set to `"ok"` (DB reachable) or `"degraded"` (DB unreachable).
 
 ```bash
-curl -s http://localhost:8500/health.cfm \
+curl -s http://localhost:8500/student/health.cfm \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])"
 ```
 
@@ -431,7 +431,7 @@ Health status is `ok` or `degraded`. ✓
 A healthy endpoint must return **HTTP 200**. If the DB is unreachable it must return **HTTP 503**. Any other code means the endpoint is not production-ready.
 
 ```bash
-curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/health.cfm
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8500/student/health.cfm
 ```
 
 ::simple-task

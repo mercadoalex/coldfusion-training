@@ -71,10 +71,12 @@ _`cffile action="upload"` handles the entire multipart pipeline — parsing, val
 
 ## Activity 1 — Create a media demo page
 
-**Activity:** In the **Terminal** tab, create `media_demo.cfm` — an HTML5 page with both a `<video>` and an `<audio>` element. Because the lab does not have real media files, both elements use placeholder `src` paths but still demonstrate the correct markup and ColdFusion dynamic output:
+**Activity:** Create `media_demo.cfm` — an HTML5 page with `<video>` and `<audio>` elements and a CFML-rendered timestamp.
+
+**Terminal tab:**
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/media_demo.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,10 +114,17 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `media_demo.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+::
+
 Verify the page is served:
 
 ```bash
-curl -s http://localhost:8500/media_demo.cfm | head -20
+curl -s http://localhost:8500/student/media_demo.cfm | head -20
 ```
 
 ::image-box
@@ -133,7 +142,7 @@ _`media_demo.cfm` with both HTML5 `<video>` and `<audio>` elements and a CFML-re
 :name: verify_media_page
 ---
 #active
-Run the `sudo tee` command above to create `media_demo.cfm`, then open `/media_demo.cfm` in the browser tab to confirm it loads.
+Create `media_demo.cfm` — use the **Terminal tab** command or the **IDE tab** above — then open `/media_demo.cfm` in the browser tab to confirm it loads.
 
 #completed
 `media_demo.cfm` is accessible and returns HTTP 200. ✓
@@ -166,7 +175,7 @@ The `controls` attribute renders the browser's native playback UI. Additional at
 Confirm `media_demo.cfm` contains a `<video>` or `<audio>` element — run the check below:
 
 ```bash
-grep -i "<video\|<audio" /opt/coldfusion2025/cfusion/wwwroot/media_demo.cfm
+grep -i "<video\|<audio" /opt/coldfusion2025/cfusion/wwwroot/student/media_demo.cfm
 ```
 
 #completed
@@ -236,12 +245,14 @@ if (!arrayFind(allowedExts, ext)) {
 
 ## Activity 2 — Create a file upload handler
 
-**Activity:** Create `upload_media.cfm` — a page with a `cffile` upload handler and a form that accepts video and audio files:
+**Activity:** Create `upload_media.cfm` — a page with a `cffile` upload handler and a form that accepts video and audio files.
+
+**Terminal tab:**
 
 ```bash
 sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/uploads/media
 
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/upload_media.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -306,10 +317,23 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/upload_media.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, first create the uploads directory from the **Terminal tab**:
+
+```bash
+sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/uploads/media
+```
+
+Then in the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `upload_media.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+::
+
 Verify the upload handler is accessible:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/upload_media.cfm
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/upload_media.cfm
 ```
 
 You should see `200`.
@@ -329,7 +353,7 @@ _`upload_media.cfm` — the upload form before and after a successful file submi
 :name: verify_upload_handler
 ---
 #active
-Run the `sudo tee` commands above to create the uploads directory and `upload_media.cfm`, then open `/upload_media.cfm` in the browser to confirm it loads.
+Create the uploads directory and `upload_media.cfm` — use the **Terminal tab** commands or the **IDE tab** above — then open `/upload_media.cfm` in the browser to confirm it loads.
 
 #completed
 `upload_media.cfm` exists and is accessible. ✓
@@ -382,11 +406,13 @@ All `cfimage` actions:
 
 ## Activity 3 — Generate a thumbnail with cfimage
 
-**Activity:** Create `image_thumb.cfm` — a page that uses `cfimage` to generate a thumbnail from a small test image and display both the original and the resized result:
+**Activity:** Create `image_thumb.cfm` — a page that uses `cfimage` to generate a thumbnail and display both original and resized result.
+
+**Terminal tab:**
 
 ```bash
 # Create a minimal test image using ColdFusion itself
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/image_thumb.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/image_thumb.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -449,10 +475,19 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/image_thumb.cfm << 'EOF'
 EOF
 ```
 
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `image_thumb.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+::
+
+
 Open `/image_thumb.cfm` in the **ColdFusion 2025** browser tab. ColdFusion will generate the test image programmatically and display both original and thumbnail side by side.
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/image_thumb.cfm
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/image_thumb.cfm
 ```
 
 ::image-box
@@ -470,7 +505,7 @@ _`cfimage` resizing a programmatically generated test image — original at 400�
 :name: verify_image_thumb
 ---
 #active
-Run the `sudo tee` command above to create `image_thumb.cfm`, then open `/image_thumb.cfm` in the browser — ColdFusion will generate the test image and display both original and thumbnail.
+Create `image_thumb.cfm` — use the **Terminal tab** command or the **IDE tab** above — then open `/image_thumb.cfm` in the browser. ColdFusion will generate the test image and display both original and thumbnail.
 
 #completed
 `image_thumb.cfm` is accessible and cfimage thumbnail generation works. ✓

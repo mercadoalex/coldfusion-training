@@ -114,7 +114,7 @@ This is expected — **ColdFusion does not create the log file until the first e
 **Step 1 — add a cflog call to a page** (skip if you already have one):
 
 ```bash
-sudo tee -a /opt/coldfusion2025/cfusion/wwwroot/debug-demo.cfm << 'EOF'
+sudo tee -a /opt/coldfusion2025/cfusion/wwwroot/student/debug-demo.cfm << 'EOF'
 <cflog file="training" text="test entry from debug-demo.cfm" type="information">
 EOF
 ```
@@ -122,7 +122,7 @@ EOF
 **Step 2 — trigger the first write:**
 
 ```bash
-curl -s http://localhost:8500/debug-demo.cfm > /dev/null
+curl -s http://localhost:8500/student/debug-demo.cfm > /dev/null
 ```
 
 **Step 3 — now tail the file:**
@@ -423,7 +423,7 @@ Debugging output appears at the bottom of every CF page response. It is automati
 Create a page that dumps a struct and array so you can see cfdump in action:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/debug-demo.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/debug-demo.cfm << 'EOF'
 <cfscript>
   ticket = {
     id:       1,
@@ -438,7 +438,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/debug-demo.cfm << 'EOF'
 EOF
 ```
 
-Open the **ColdFusion** browser tab and navigate to `/debug-demo.cfm`. You should see the colour-coded dump table with the nested `tags` array expanded inline.
+Open the **ColdFusion** browser tab and navigate to `/student/debug-demo.cfm`. You should see the colour-coded dump table with the nested `tags` array expanded inline.
 
 ::simple-task
 ---
@@ -459,7 +459,7 @@ Create `debug-demo.cfm` in the CF wwwroot — it must exist and return HTTP 200.
 Add a `cflog` call to your debug page and tail the log file:
 
 ```bash
-sudo tee -a /opt/coldfusion2025/cfusion/wwwroot/debug-demo.cfm << 'EOF'
+sudo tee -a /opt/coldfusion2025/cfusion/wwwroot/student/debug-demo.cfm << 'EOF'
 <cflog file="training" text="debug-demo.cfm loaded by #cgi.REMOTE_ADDR#" type="information">
 EOF
 ```

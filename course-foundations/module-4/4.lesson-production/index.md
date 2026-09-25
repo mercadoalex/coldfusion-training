@@ -32,7 +32,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      BODY=$(curl -s --max-time 2 http://localhost:8500/health.cfm)
+      BODY=$(curl -s --max-time 2 http://localhost:8500/student/health.cfm)
       if ! echo "${BODY}" | python3 -m json.tool > /dev/null 2>&1; then
         echo "health.cfm does not return valid JSON"
         exit 1
@@ -45,7 +45,7 @@ tasks:
     needs:
       - verify_health_endpoint
     run: |
-      BODY=$(curl -s --max-time 2 http://localhost:8500/health.cfm)
+      BODY=$(curl -s --max-time 2 http://localhost:8500/student/health.cfm)
       STATUS=$(echo "${BODY}" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))")
       if [ "${STATUS}" != "ok" ] && [ "${STATUS}" != "degraded" ]; then
         echo "health.cfm status must be 'ok' or 'degraded', got '${STATUS}'"
@@ -59,7 +59,7 @@ tasks:
     needs:
       - verify_health_status
     run: |
-      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 2 http://localhost:8500/health.cfm)
+      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 2 http://localhost:8500/student/health.cfm)
       if [ "${HTTP_CODE}" != "200" ] && [ "${HTTP_CODE}" != "503" ]; then
         echo "health.cfm must return 200 or 503, got ${HTTP_CODE}"
         exit 1

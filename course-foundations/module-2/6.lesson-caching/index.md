@@ -31,7 +31,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm"
       if [ ! -f "${FILE}" ]; then
         echo "cache_demo.cfm not found"
         exit 1
@@ -48,7 +48,7 @@ tasks:
     needs:
       - verify_query_cache
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm"
       if ! grep -qi "cacheput\|cacheget" "${FILE}" 2>/dev/null; then
         echo "No cacheGet/cachePut application caching found in cache_demo.cfm"
         exit 1
@@ -61,12 +61,12 @@ tasks:
     needs:
       - verify_app_cache
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/cache_demo.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/cache_demo.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "cache_demo.cfm not accessible (got ${STATUS})"
         exit 1
       fi
-      BODY=$(curl -s http://localhost:8500/cache_demo.cfm)
+      BODY=$(curl -s http://localhost:8500/student/cache_demo.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "cache_demo.cfm is throwing an error"
         exit 1
@@ -79,7 +79,7 @@ tasks:
     needs:
       - verify_cache_page
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/cache_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm"
       if ! grep -qi "cacheremove\|cacheremoveall" "${FILE}" 2>/dev/null; then
         echo "No cacheRemove or cacheRemoveAll found in cache_demo.cfm"
         exit 1

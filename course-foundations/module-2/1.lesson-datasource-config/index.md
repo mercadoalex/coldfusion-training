@@ -31,7 +31,7 @@ tasks:
     machine: dev-machine
     user: laborant
     run: |
-      BODY=$(curl -s http://localhost:8500/verify_ds.cfm)
+      BODY=$(curl -s http://localhost:8500/student/verify_ds.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "verify_ds.cfm is throwing an error"
         exit 1
@@ -48,7 +48,7 @@ tasks:
     needs:
       - verify_no_error
     run: |
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/verify_ds.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/verify_ds.cfm"
       if ! grep -q "training_db" "${FILE}" 2>/dev/null; then
         echo "verify_ds.cfm does not reference the training_db datasource"
         exit 1
@@ -78,17 +78,17 @@ tasks:
     needs:
       - verify_app_cfc
     run: |
-      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/qoq_demo.cfm)
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/student/qoq_demo.cfm)
       if [ "${STATUS}" != "200" ]; then
         echo "qoq_demo.cfm not found (got ${STATUS})"
         exit 1
       fi
-      BODY=$(curl -s http://localhost:8500/qoq_demo.cfm)
+      BODY=$(curl -s http://localhost:8500/student/qoq_demo.cfm)
       if echo "${BODY}" | grep -qi "error\|exception"; then
         echo "qoq_demo.cfm returned an error"
         exit 1
       fi
-      FILE="/opt/coldfusion2025/cfusion/wwwroot/qoq_demo.cfm"
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/student/qoq_demo.cfm"
       if ! grep -q "dbtype.*query\|dbtype: .query" "${FILE}" 2>/dev/null; then
         echo "qoq_demo.cfm does not use dbtype=query (Query of Queries)"
         exit 1

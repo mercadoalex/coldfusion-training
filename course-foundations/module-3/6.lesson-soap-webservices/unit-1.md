@@ -317,7 +317,7 @@ All files in this lesson go into `/opt/coldfusion2025/cfusion/wwwroot/` and are 
 
 **What you are building:** `soap_consumer.cfm` — a page that calls a public SOAP web service and displays the result. We use a **local** SOAP call (CF calling itself via `TicketService.cfc`) so the exercise works without internet access.
 
-**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm`
+**File to create:** `/opt/coldfusion2025/cfusion/wwwroot/student/soap_consumer.cfm`
 
 ::hint-box
 ---
@@ -382,7 +382,7 @@ EOF
 Now create the consumer page:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/soap_consumer.cfm << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -441,10 +441,10 @@ EOF
 Verify both files exist:
 
 ```bash
-grep -i "cfinvoke\|createObject" /opt/coldfusion2025/cfusion/wwwroot/soap_consumer.cfm
+grep -i "cfinvoke\|createObject" /opt/coldfusion2025/cfusion/wwwroot/student/soap_consumer.cfm
 ```
 
-Open `/soap_consumer.cfm` in the **ColdFusion 2025** browser tab — you should see the ticket loaded via SOAP and the full ticket list.
+Open `/student/soap_consumer.cfm` in the **ColdFusion 2025** browser tab — you should see the ticket loaded via SOAP and the full ticket list.
 
 ::image-box
 ---
@@ -461,7 +461,7 @@ _`soap_consumer.cfm` — tickets loaded via SOAP proxy calls to `TicketService.c
 :name: verify_ws_consumer
 ---
 #active
-Run the `sudo tee` commands above to create `TicketService.cfc` and `soap_consumer.cfm`. Open `/soap_consumer.cfm` in the browser to confirm the SOAP calls return ticket data.
+Run the `sudo tee` commands above to create `TicketService.cfc` and `soap_consumer.cfm`. Open `/student/soap_consumer.cfm` in the browser to confirm the SOAP calls return ticket data.
 
 #completed
 `soap_consumer.cfm` exists with web service invocation. ✓

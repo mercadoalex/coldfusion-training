@@ -2,13 +2,12 @@ component extends="testbox.system.BaseSpec" {
 
   function run() {
 
-    beforeAll(function() {
-      // Seed the in-memory H2 database that Application.cfc declares for Lucee.
-      // This must run before any test — the in-memory DB is empty on first request.
-      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
-    });
-
     describe("TicketService", function() {
+
+      // Seed the database once before the tests are defined.
+      // This TestBox version only has beforeEach/afterEach — no beforeAll.
+      // Calling cfhttp here runs once when the describe closure is executed.
+      cfhttp(url="http://localhost:8888/seed-db.cfm", method="GET");
 
       var svc = new TicketService();
 
