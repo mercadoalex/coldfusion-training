@@ -100,6 +100,15 @@ In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025
 ```
 ::
 
+::image-box
+---
+:src: __static__/data-types-v1.png
+:alt: VS Code editor in the IDE tab showing data_types.cfm open with the six cfscript blocks for String, Numeric, Boolean, Date, Array, and Struct — no unsaved-changes dot on the editor tab, confirming the file has been saved to disk
+:max-width: 860px
+---
+_`data_types.cfm` saved in the `student/` folder — ready to run._
+::
+
 Open `/data_types.cfm` in the **ColdFusion 2025** browser tab (right-click → Open Link in New Tab, then change the path). Or from the Terminal:
 
 ```bash
