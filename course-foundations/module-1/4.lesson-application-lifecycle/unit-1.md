@@ -10,7 +10,7 @@ name: application-cfc-lifecycle-unit-1
 
 `Application.cfc` is the framework entry point for every ColdFusion web application. Drop it in the web root and ColdFusion automatically invokes its lifecycle methods at the right moment — no configuration file, no XML, no registration step.
 
-> **Important:** `Application.cfc` is a reserved filename — ColdFusion intercepts it before any request reaches it. If you try to open `http://localhost:8500/Application.cfc` in a browser you will always get an "Invalid request" error. This is by design. You verify it indirectly — by making a normal request and observing that the lifecycle hooks fired.
+> **Important:** `Application.cfc` is a reserved filename — not just because it is a CFC, but because ColdFusion has a hardcoded block on this specific name. Normally you *can* request any `.cfc` file directly in the browser and CF will show an introspection page listing its public methods. `Application.cfc` is the exception: CF intercepts it at the request dispatcher level before it ever executes, for security reasons (it sets session timeouts, datasources, and app-wide settings — allowing direct requests could expose your configuration or let someone trigger `onApplicationStart()` on demand). If you try to open `http://localhost:8500/Application.cfc` you will always get an "Invalid request" error. Verify it indirectly instead — by making a normal request and observing that the lifecycle hooks fired.
 
 It replaces the older `Application.cfm` approach and gives you a clean OO structure: one component, one place to configure your entire application.
 
