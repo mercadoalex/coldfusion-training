@@ -397,10 +397,12 @@ Create `cfdump_demo.cfm` — the response must contain the word **greeting** (du
 
 ::hint-box
 ---
-:summary: Need to edit a file? Use vi
+:summary: 💡 Need to edit a file? The IDE is the easiest option
 ---
 
-If you need to tweak `scopes.cfm` without rewriting it from scratch:
+The simplest way to edit any file is to open the **IDE tab** — the file is already visible in the Explorer panel, just click it, make your changes, and save with **Ctrl+S**.
+
+If you prefer to stay in the **Terminal**, you can also use `vi` — but be aware it has a steep learning curve if you haven't used it before. It is completely optional:
 
 ```bash
 vi /opt/coldfusion2025/cfusion/wwwroot/student/scopes.cfm
@@ -412,6 +414,8 @@ vi /opt/coldfusion2025/cfusion/wwwroot/student/scopes.cfm
 | `Esc` | Back to normal mode |
 | `:wq` + Enter | Save and quit |
 | `:q!` + Enter | Quit without saving |
+
+If `vi` feels unfamiliar, stick with the IDE tab — it is always the safer choice.
 
 ::
 
