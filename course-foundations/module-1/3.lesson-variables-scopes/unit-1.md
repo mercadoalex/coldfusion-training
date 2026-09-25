@@ -320,12 +320,9 @@ When you write just `name` without a prefix, ColdFusion checks scopes in this or
 
 **Always prefix to be explicit and avoid scope-bleed bugs.** In a large application, an unqualified variable that accidentally resolves from `url` instead of `variables` can cause hard-to-trace security issues.
 
-::hint-box
----
-:summary: Need to inspect all scope values at once?
----
+## Inspecting scopes with cfdump
 
-ColdFusion has a built-in debugging tool — `cfdump`. It renders any variable, struct, array, or scope as a formatted HTML table, perfect for exploring what's actually in scope at runtime.
+ColdFusion has a built-in debugging tool — `<cfdump>`. It renders any variable, struct, array, query, or entire scope as a colour-coded HTML table directly in the browser. It is the fastest way to see exactly what is in scope at runtime.
 
 ```cfml
 <cfdump var="#variables#" label="variables scope">
@@ -333,9 +330,61 @@ ColdFusion has a built-in debugging tool — `cfdump`. It renders any variable, 
 <cfdump var="#session#"   label="session scope">
 ```
 
-Add those lines temporarily to any `.cfm` file, reload in the browser, and you get a complete view of every variable in each scope. Remove them before going to production.
+> **Rule of thumb:** add `<cfdump>` while you develop, remove it before going to production. Leaving it in exposes internal variable names and values to anyone who can reach the page.
 
+**Activity:** Create `cfdump_demo.cfm` to dump the `variables` and `url` scopes side by side.
+
+**Terminal tab:**
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cfdump_demo.cfm << 'EOF'
+<cfscript>
+  variables.greeting = "Hello from cfdump";
+  variables.counter  = 42;
+</cfscript>
+
+<cfdump var="#variables#" label="variables scope">
+<cfdump var="#url#"       label="url scope">
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `cfdump_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  variables.greeting = "Hello from cfdump";
+  variables.counter  = 42;
+</cfscript>
+
+<cfdump var="#variables#" label="variables scope">
+<cfdump var="#url#"       label="url scope">
+```
 ::
+
+Open `/cfdump_demo.cfm` in the **ColdFusion 2025** browser tab to see the rendered dump tables. Or confirm from the Terminal that the response contains the expected variable names:
+
+```bash
+curl -s http://localhost:8500/student/cfdump_demo.cfm | grep -i "greeting"
+# Expected: a line containing "greeting"
+```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_cfdump
+---
+#active
+Create `cfdump_demo.cfm` — the response must contain the word **greeting** (dumped from the `variables` scope).
+
+#completed
+`cfdump_demo.cfm` dumps the variables scope correctly. ✓
+::
+
+---
 
 ::hint-box
 ---

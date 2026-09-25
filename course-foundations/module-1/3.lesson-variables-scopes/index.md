@@ -76,11 +76,24 @@ tasks:
       fi
       echo "URL scope is working correctly"
 
-  verify_lesson_complete:
+  verify_cfdump:
     machine: dev-machine
     user: laborant
     needs:
       - verify_url_scope
+    run: |
+      BODY=$(curl -s http://localhost:8500/student/cfdump_demo.cfm)
+      if ! echo "${BODY}" | grep -qi "greeting"; then
+        echo "cfdump_demo.cfm does not contain expected variable 'greeting'"
+        exit 1
+      fi
+      echo "cfdump_demo.cfm dumps the variables scope correctly"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_cfdump
     run: |
       echo "Lesson complete — well done!"
 
