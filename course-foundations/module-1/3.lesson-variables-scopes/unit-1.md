@@ -206,6 +206,15 @@ In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025
 ```
 ::
 
+::image-box
+---
+:src: __static__/scopes-v1.png
+:alt: VS Code editor in the IDE tab showing scopes.cfm open with the cfscript block for variables and url scopes — no unsaved-changes dot on the editor tab, confirming the file has been saved to disk
+:max-width: 860px
+---
+_`scopes.cfm` saved in the `student/` folder — ready to run._
+::
+
 Open `/scopes.cfm` in the browser to confirm the `variables` scope output:
 
 ```bash
