@@ -295,15 +295,6 @@ Log in with password `admin`. Now verify your `Application.cfc` is active in two
 - **JVM memory** — live heap usage
 - **Session management** — confirms sessions are enabled
 
-::image-box
----
-:src: __static__/browser-cf-pmt-dashboard-v1.png
-:alt: Browser window showing the status.cfm page — a dark-themed status dashboard with three sections: Engine (product name, version, Java version, server time), JVM Memory (used/total/max in MB), and Application Scope showing this.name as CFTraining and onApplicationStart as fired with a timestamp
-:max-width: 960px
----
-_`/status.cfm` — a zero-dependency live view of your running CF engine and `Application.cfc` state._
-::
-
 **2 — CF Admin → Debugging & Logging → Log Files**
 
 In CF Admin, go to **Debugging & Logging → Log Files** in the left navigation. Open `application.log` — you should see the line written by `writeLog()` in `onApplicationStart()`, timestamped to when the application first started.
