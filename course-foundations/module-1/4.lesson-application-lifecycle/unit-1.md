@@ -53,7 +53,7 @@ _Key `this.*` settings in Application.cfc — configure once, effective for ever
 > **Why `wwwroot/` and not `student/`?**
 > `Application.cfc` must live in the **web root** (`/opt/coldfusion2025/cfusion/wwwroot/`) — not in `student/`. ColdFusion walks up the directory tree from the requested page to find `Application.cfc`, so placing it in `wwwroot/` means it governs every request to the engine, including your `student/` pages. If you put it inside `student/` it would only apply to files in that subfolder. This is the one file in this course that intentionally lives outside `student/`.
 
-**Activity:** Create `Application.cfc` in the web root.
+**Activity:** Replace `Application.cfc` in the web root with the version below.
 
 **Terminal tab:**
 
@@ -90,9 +90,9 @@ EOF
 
 ::details-box
 ---
-:summary: ✏️ Using the IDE tab instead? Create the file here
+:summary: ✏️ Using the IDE tab instead? Edit the file here
 ---
-In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. The folder already exists — VS Code will open it immediately. Then right-click in the Explorer panel → **New File** → name it `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. `Application.cfc` already exists in the Explorer panel — click it to open it, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
 
 ```cfml
 component {
