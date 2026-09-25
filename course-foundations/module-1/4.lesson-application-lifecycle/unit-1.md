@@ -10,7 +10,12 @@ name: application-cfc-lifecycle-unit-1
 
 `Application.cfc` is the framework entry point for every ColdFusion web application. Drop it in the web root and ColdFusion automatically invokes its lifecycle methods at the right moment — no configuration file, no XML, no registration step.
 
-> **Important:** `Application.cfc` is a reserved filename — not just because it is a CFC, but because ColdFusion has a hardcoded block on this specific name. Normally you *can* request any `.cfc` file directly in the browser and CF will show an introspection page listing its public methods. `Application.cfc` is the exception: CF intercepts it at the request dispatcher level before it ever executes, for security reasons (it sets session timeouts, datasources, and app-wide settings — allowing direct requests could expose your configuration or let someone trigger `onApplicationStart()` on demand). If you try to open `http://localhost:8500/Application.cfc` you will always get an "Invalid request" error. Verify it indirectly instead — by making a normal request and observing that the lifecycle hooks fired.
+::remark-box
+---
+kind: warning
+---
+`Application.cfc` is a reserved filename — not just because it is a CFC, but because ColdFusion has a hardcoded block on this specific name. Normally you _can_ request any `.cfc` file directly in the browser and CF will show an introspection page listing its public methods. `Application.cfc` is the exception: CF intercepts it at the request dispatcher level before it ever executes, for security reasons (it sets session timeouts, datasources, and app-wide settings — allowing direct requests could expose your configuration or let someone trigger `onApplicationStart()` on demand). If you try to open `http://localhost:8500/Application.cfc` you will always get an "Invalid request" error. Verify it indirectly instead — by making a normal request and observing that the lifecycle hooks fired.
+::
 
 It replaces the older `Application.cfm` approach and gives you a clean OO structure: one component, one place to configure your entire application.
 
@@ -342,6 +347,129 @@ public boolean function onRequestStart(string targetPage) {
 ```
 
 Returning `false` from `onRequestStart` stops the request entirely — the target page never runs. This is how CF apps enforce login gates without touching every individual page.
+
+---
+
+## Activity 4 — Add the gatekeeper to Application.cfc
+
+You will update `Application.cfc` with the gatekeeper `onRequestStart` and create a simple `login.cfm` stub so the redirect has somewhere to land.
+
+**Step 1 — Update `Application.cfc`**
+
+The `onRequestStart` method already exists in your file — replace it with the gatekeeper version. **Terminal tab:**
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
+component {
+
+  this.name              = "CFTraining";
+  this.sessionManagement = true;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);  // 30 minutes
+
+  // WebSocket channels — required by the WebSockets lesson (module 3)
+  this.wschannels = [
+    { name="chat", cfclistener="WSHandler" }
+  ];
+
+  public boolean function onApplicationStart() {
+    application.startTime = now();
+    writeLog(text="Application started at #now()#", file="application");
+    return true;
+  }
+
+  public boolean function onSessionStart() {
+    session.userId = 0;
+    return true;
+  }
+
+  public boolean function onRequestStart(string targetPage) {
+    var publicPages = ["/login.cfm", "/register.cfm"];
+    if (!session.userId && !arrayFind(publicPages, arguments.targetPage)) {
+      location(url="/login.cfm", addtoken=false);
+      return false;  // abort the request — page will not execute
+    }
+    return true;
+  }
+
+  public void function onError(any exception, string eventName) {
+    writeOutput("An error occurred: #exception.message#");
+  }
+
+}
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. Click `Application.cfc`, **select all** (`Ctrl+A`), replace with the content above, and save with **Ctrl+S**.
+::
+
+**Step 2 — Create `login.cfm`**
+
+The gatekeeper redirects unauthenticated users to `/login.cfm`. Create a stub so CF has a page to land on:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/login.cfm << 'EOF'
+<cfoutput>
+<h2>Login page</h2>
+<p>You have been redirected here because you are not logged in.</p>
+<p>session.userId = #session.userId#</p>
+</cfoutput>
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `login.cfm`, paste the content above, and save with **Ctrl+S**.
+::
+
+**Step 3 — Test the gatekeeper**
+
+First confirm `hello.cfm` (a protected page) now redirects to login:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/student/hello.cfm
+# Expected: 302  (redirect to /login.cfm)
+```
+
+Then follow the redirect and confirm you land on the login page:
+
+```bash
+curl -sL http://localhost:8500/student/hello.cfm
+# Expected: output contains "Login page" or "not logged in"
+```
+
+And confirm the login page itself is accessible (a public page — no redirect):
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/student/login.cfm
+# Expected: 200
+```
+
+::remark-box
+---
+kind: info
+---
+`session.userId` is set to `0` by `onSessionStart()`. The gatekeeper checks `!session.userId` — since `0` is falsy in CFML, any page that is not in `publicPages` will redirect to `/login.cfm`. This simulates a real app where a logged-in user would have a non-zero userId.
+::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_onrequeststart
+---
+#active
+Update `Application.cfc` with the gatekeeper `onRequestStart` — the file must contain `publicPages` and `arrayFind`.
+
+#completed
+`onRequestStart` gatekeeper is in place. ✓
+::
+
+---
 
 ::hint-box
 ---

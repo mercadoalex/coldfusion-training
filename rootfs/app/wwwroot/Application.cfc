@@ -21,6 +21,11 @@ component {
     }
 
     public boolean function onRequestStart(string targetPage) {
+        var publicPages = ["/login.cfm", "/register.cfm"];
+        if (!session.userId && !arrayFind(publicPages, arguments.targetPage)) {
+            location(url="/login.cfm", addtoken=false);
+            return false;  // abort the request — page will not execute
+        }
         return true;
     }
 

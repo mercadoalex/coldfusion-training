@@ -78,11 +78,28 @@ tasks:
       fi
       echo "this.sessionManagement and this.sessionTimeout are configured"
 
-  verify_lesson_complete:
+  verify_onrequeststart:
     machine: dev-machine
     user: laborant
     needs:
       - verify_this_settings
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/Application.cfc"
+      if ! grep -q "publicPages" "${FILE}"; then
+        echo "onRequestStart gatekeeper not found — publicPages missing from Application.cfc"
+        exit 1
+      fi
+      if ! grep -q "arrayFind" "${FILE}"; then
+        echo "onRequestStart gatekeeper not found — arrayFind missing from Application.cfc"
+        exit 1
+      fi
+      echo "onRequestStart gatekeeper is in place"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_onrequeststart
     run: |
       echo "Lesson complete — well done!"
 
