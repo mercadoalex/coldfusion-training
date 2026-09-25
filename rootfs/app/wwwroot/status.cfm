@@ -45,11 +45,7 @@
   startTime  = isDefined("application.startTime") ? dateTimeFormat(application.startTime, "yyyy-mm-dd HH:nn:ss") : "not set";
 
   // ── Session scope ──────────────────────────────────────────────────────────
-  try {
-    sessionEnabled = isSessionEnabled() ? "enabled" : "disabled";
-  } catch (any e) {
-    sessionEnabled = isDefined("this.sessionManagement") && this.sessionManagement ? "enabled" : "disabled";
-  }
+  sessionEnabled = (isDefined("application.sessionManagement") && application.sessionManagement) ? "enabled" : "disabled";
   sessionUserId  = isDefined("session.userId") ? session.userId : "—";
 
   // ── Server info ────────────────────────────────────────────────────────────
