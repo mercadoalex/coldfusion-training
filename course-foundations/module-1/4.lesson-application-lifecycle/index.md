@@ -61,11 +61,28 @@ tasks:
       fi
       echo "Application name is configured"
 
-  verify_lesson_complete:
+  verify_this_settings:
     machine: dev-machine
     user: laborant
     needs:
       - verify_app_name
+    run: |
+      FILE="/opt/coldfusion2025/cfusion/wwwroot/Application.cfc"
+      if ! grep -q "this.sessionManagement" "${FILE}"; then
+        echo "this.sessionManagement is not set in Application.cfc"
+        exit 1
+      fi
+      if ! grep -q "this.sessionTimeout" "${FILE}"; then
+        echo "this.sessionTimeout is not set in Application.cfc"
+        exit 1
+      fi
+      echo "this.sessionManagement and this.sessionTimeout are configured"
+
+  verify_lesson_complete:
+    machine: dev-machine
+    user: laborant
+    needs:
+      - verify_this_settings
     run: |
       echo "Lesson complete — well done!"
 

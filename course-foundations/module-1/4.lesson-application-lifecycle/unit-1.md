@@ -226,16 +226,24 @@ component {
 | `this.datasource` | Default datasource — pages can omit `datasource` in `<cfquery>` |
 | `this.ormenabled` | Enables Hibernate ORM (covered later) |
 
-## Activity 3 — Verify this.name is set
+## Activity 3 — Verify `this.*` settings
 
-Your `Application.cfc` already has `this.name = "CFTraining"`. Confirm it:
+Your `Application.cfc` already has `this.name`, `this.sessionManagement`, and `this.sessionTimeout` set from Activity 1. Confirm all three are present and correctly valued:
 
 ```bash
-grep "this.name" /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
-# Expected: this.name = "CFTraining";
+grep -E "this\.(name|sessionManagement|sessionTimeout)" \
+  /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
 ```
 
-Then make a request and confirm the app responds without errors:
+Expected output:
+
+```
+  this.name              = "CFTraining";
+  this.sessionManagement = true;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);
+```
+
+Then confirm the engine responds without errors after loading the updated file:
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/index.cfm
@@ -248,8 +256,22 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8500/index.cfm
 :alt: Terminal window showing the output of grep "this.name" on Application.cfc — a single matching line reads: this.name = "CFTraining"; confirming the application name is set correctly
 :max-width: 860px
 ---
-_`grep` confirms `this.name = "CFTraining"` is set in `Application.cfc`._
+_`grep` confirms `this.name`, `this.sessionManagement`, and `this.sessionTimeout` are all set in `Application.cfc`._
 ::
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_this_settings
+---
+#active
+Confirm `Application.cfc` has `this.sessionManagement` and `this.sessionTimeout` set — both must be present in the file.
+
+#completed
+`this.sessionManagement` and `this.sessionTimeout` are configured. ✓
+::
+
+---
 
 Open the **ColdFusion 2025** tab (right-click → Open in New Tab) and browse to your lab root — CF Admin login page appearing means the engine is running with your `Application.cfc` active.
 
