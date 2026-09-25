@@ -434,3 +434,12 @@ All done? Hit **Check** to mark this lesson complete and unlock the next one.
 #completed
 Lesson complete. On to the next one!
 ::
+
+::image-box
+---
+:src: __static__/cfdump-response-v1.png
+:alt: Terminal window showing the curl response from cfdump_demo.cfm — raw HTML output containing the cfdump table markup with the greeting variable value visible in the response body
+:max-width: 860px
+---
+_The raw `curl` response from `cfdump_demo.cfm` — the `greeting` variable is visible in the output, confirming the dump ran correctly._
+::
