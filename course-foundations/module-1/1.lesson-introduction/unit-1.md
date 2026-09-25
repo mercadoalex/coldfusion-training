@@ -248,9 +248,9 @@ _Your lab microVM boots with CF 2025 (8500), Lucee 7 (8888), and VS Code all rea
 |---|---|---|
 | Adobe ColdFusion 2025 | `8500` | `/opt/coldfusion2025/cfusion/wwwroot/` |
 | CommandBox + Lucee 7.0 | `8888` | `/home/laborant/app/` |
-| VS Code (code-server) | IDE tab | Opens the webroot of ColdFusion 2025 |
+| VS Code (code-server) | IDE tab | Opens `/opt/coldfusion2025/cfusion/wwwroot/student/` |
 
-> **Tip:** Files you create in VS Code land directly in the CF 2025 webroot. Open a Terminal inside VS Code to also write to the Lucee webroot.
+> **Tip:** Files you create in VS Code land directly in your `student/` working folder, immediately accessible at `http://localhost:8500/student/<filename>.cfm`.
 
 ::image-box
 ---
@@ -326,23 +326,23 @@ Lucee is running on port 8888. ✓
 You are going to write a real `.cfm` file, have ColdFusion compile and execute it, and verify the output. Choose the option that feels more comfortable — both produce exactly the same result.
 
 > **Where does the file need to live?**
-> ColdFusion 2025 serves files from its **webroot** folder:
-> `/opt/coldfusion2025/cfusion/wwwroot/`
-> Any `.cfm` file saved there is immediately accessible at `http://localhost:8500/<filename>.cfm` — no restart needed.
+> Your working folder for all lesson exercises is:
+> `/opt/coldfusion2025/cfusion/wwwroot/student/`
+> Any `.cfm` file saved there is immediately accessible at `http://localhost:8500/student/<filename>.cfm` — no restart needed. This folder is kept separate from the pre-built lab files in the webroot root so there is no risk of overwriting them.
 
 ---
 
 #### Option A — Using the IDE tab (VS Code in the browser)
 
-You have full read/write access to the webroot as the `laborant` user — no `sudo` required in the IDE.
+The **IDE tab** opens directly to your `student/` working folder. If it shows a welcome screen or a different folder, navigate there in one step:
 
 1. Click the **IDE** tab in your lab environment.
-2. If you see a welcome screen or an empty Explorer panel, you need to open the webroot folder manually:
-   - Click **File → Open Folder…** in the top menu bar
+2. If the Explorer panel does not already show the `student/` folder, click **File → Open Folder…** in the top menu bar.
    - A path input box appears at the top of the screen — clear it and type exactly:
-     `/opt/coldfusion2025/cfusion/wwwroot`
-   - Press **Enter** or click **OK**
-   - The Explorer panel on the left now shows the files inside the webroot — `index.cfm`, `status.cfm`, and others
+     `/opt/coldfusion2025/cfusion/wwwroot/student`
+   - Press **Enter** or click **OK**.
+   - VS Code may ask _"The folder does not exist. Would you like to create it?"_ — click **Yes** to create it.
+   - The Explorer panel now shows your working directory — `student/` is empty until you create your first file.
 3. Right-click anywhere in the **empty space** of the Explorer panel → **New File** → type `hello.cfm` → press **Enter**.
 4. The new file opens in the editor. Paste this content:
 
@@ -354,11 +354,20 @@ You have full read/write access to the webroot as the `laborant` user — no `su
 5. Save the file: **`Ctrl+S`** (Windows/Linux) or **`Cmd+S`** (Mac).
    The dot on the editor tab disappears when the file is saved to disk.
 
+::image-box
+---
+:src: __static__/hello-cfm-v1.png
+:alt: VS Code editor in the IDE tab showing hello.cfm open with the two-line CFML greeting code — cfset and cfoutput tags — and no unsaved-changes dot on the editor tab, confirming the file has been saved to disk
+:max-width: 860px
+---
+_`hello.cfm` saved in the `student/` folder — the tab shows no dot, meaning the file is written to disk._
+::
+
 ::hint-box
 ---
 :summary: 💡 Tip — the IDE will remember this folder next time
 ---
-Once you open `/opt/coldfusion2025/cfusion/wwwroot` in the IDE, VS Code saves it as your workspace. The next time you click the IDE tab it will reopen the same folder automatically — you only need to do this navigation once per session.
+Once you open `/opt/coldfusion2025/cfusion/wwwroot/student` in the IDE, VS Code saves it as your workspace. The next time you click the IDE tab it will reopen the same folder automatically — you only need to do this navigation once per session.
 ::
 
 ---
@@ -369,7 +378,7 @@ Once you open `/opt/coldfusion2025/cfusion/wwwroot` in the IDE, VS Code saves it
 2. Run this single command — it creates the file and writes the content in one step:
 
 ```bash
-sudo tee /opt/coldfusion2025/cfusion/wwwroot/hello.cfm << 'EOF'
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/hello.cfm << 'EOF'
 <cfset greeting = "Hello from ColdFusion 2025!">
 <cfoutput>#greeting#</cfoutput>
 EOF
@@ -384,7 +393,7 @@ EOF
 Whichever option you used, confirm ColdFusion compiled and executed the file:
 
 ```bash
-curl -s http://localhost:8500/hello.cfm
+curl -s http://localhost:8500/student/hello.cfm
 # Expected output: Hello from ColdFusion 2025!
 ```
 
@@ -396,7 +405,7 @@ If you see the greeting text — not the raw `<cfset>` source — the engine pic
 :name: verify_hello_cfm
 ---
 #active
-Create `/opt/coldfusion2025/cfusion/wwwroot/hello.cfm` that outputs a greeting containing the word **hello**.
+Create `/opt/coldfusion2025/cfusion/wwwroot/student/hello.cfm` that outputs a greeting containing the word **hello**.
 
 #completed
 `hello.cfm` exists and returns a greeting. ✓
