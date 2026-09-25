@@ -41,7 +41,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open the folder `/opt/coldfusion2025/cfusion/wwwroot/student/`, create a new file named `syntax_tag.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_tag.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfset message = "I am using tag syntax">
@@ -127,7 +127,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_script.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_script.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>
@@ -338,7 +338,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_loop.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_loop.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>
@@ -423,7 +423,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_loop_all.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `syntax_loop_all.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>

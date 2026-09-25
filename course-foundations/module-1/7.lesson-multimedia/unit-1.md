@@ -118,7 +118,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `media_demo.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `media_demo.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**.
 ::
 
 Verify the page is served:
@@ -480,7 +480,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `image_thumb.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `image_thumb.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**.
 ::
 
 

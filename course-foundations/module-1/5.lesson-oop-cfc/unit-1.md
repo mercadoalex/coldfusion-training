@@ -68,7 +68,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `GreetingService.cfc`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `GreetingService.cfc`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 component displayname="GreetingService" hint="Returns greetings" {
@@ -221,7 +221,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `test_cfc.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `test_cfc.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>
@@ -580,7 +580,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `JavaUtilService.cfc`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `JavaUtilService.cfc`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 component displayname="JavaUtilService" hint="Demonstrates calling Java from CFML" {
@@ -650,7 +650,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `test_java_cfc.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `test_java_cfc.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>

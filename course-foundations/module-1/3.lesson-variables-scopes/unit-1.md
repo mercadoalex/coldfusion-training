@@ -68,7 +68,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `data_types.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `data_types.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>
@@ -179,7 +179,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `scopes.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `scopes.cfm`, paste the content below, and save with **Ctrl+S**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**:
 
 ```cfml
 <cfscript>
