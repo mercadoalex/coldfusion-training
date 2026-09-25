@@ -188,7 +188,7 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `scopes.cfm`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `scopes.cfm`, paste the content below, and save with **Ctrl+S**:
 
 ```cfml
 <cfscript>
