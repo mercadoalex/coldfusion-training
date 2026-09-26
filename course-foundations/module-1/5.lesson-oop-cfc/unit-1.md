@@ -344,6 +344,15 @@ svc.getTimestamp();       // inherited from BaseService
 
 Use `super.methodName()` to call the parent's version of an overridden method.
 
+::image-box
+---
+:src: __static__/inheritance-v1.png
+:alt: Diagram showing two UML boxes connected by an inheritance arrow — BaseService at the top with getTimestamp() and getClassName() methods, and GreetingService below it with init(), greet(), and _format() methods — an open-headed arrow points from GreetingService up to BaseService labelled "extends"
+:max-width: 660px
+---
+_`GreetingService` extends `BaseService` — methods defined in the parent are callable on the child instance._
+::
+
 ---
 
 ## Activity 3 — Inherit from a base component
