@@ -129,55 +129,262 @@ You have completed all seven lessons of Unit 1. Now bring it all together.
 
 ### Your mission
 
-Build a small self-contained ColdFusion application inside the directory `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/`. It must include all of the following:
+Build a self-contained ColdFusion application in `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/` that combines the lifecycle, OOP, scopes, HTML5, and Java interop you have practised across all seven lessons.
 
 ---
 
-### 0. Set up the working directory
+### Step 1 — Create the directory
 
-Before creating any files, run this once from the **Terminal tab** to create the challenge directory:
+Run this first. All files go inside this folder.
 
 ```bash
 sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
 ```
 
-To open it in the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge` and press **Enter**.
+---
+
+### Step 2 — Create `Application.cfc`
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/Application.cfc << 'EOF'
+component {
+  this.name              = "Unit1Challenge";
+  this.sessionManagement = true;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);
+
+  public void function onApplicationStart() {
+    application.launchTime = now();
+  }
+
+  public void function onSessionStart() {
+    session.visitCount = 0;
+  }
+}
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+  this.name              = "Unit1Challenge";
+  this.sessionManagement = true;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);
+
+  public void function onApplicationStart() {
+    application.launchTime = now();
+  }
+
+  public void function onSessionStart() {
+    session.visitCount = 0;
+  }
+}
+```
+::
 
 ---
 
-### 1. Application lifecycle — `Application.cfc`
+### Step 3 — Create `PortfolioService.cfc`
 
-Create `Application.cfc` that:
-- Sets `this.name` to `"Unit1Challenge"`
-- Uses `onApplicationStart()` to store a launch timestamp in the `application` scope
-- Uses `onSessionStart()` to initialise a visit counter in the `session` scope
+A CFC with a constructor, a `getProjects()` method returning an array of structs, and a `getSummary()` method that uses Java's `StringBuilder`.
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/PortfolioService.cfc << 'EOF'
+component {
+
+  public PortfolioService function init(required string authorName) {
+    variables.authorName = arguments.authorName;
+    return this;
+  }
+
+  public array function getProjects() {
+    return [
+      { title: "Help Desk App",   description: "Ticket management system in CFML", type: "web"  },
+      { title: "REST API",        description: "JSON REST API with cfhttp",         type: "api"  },
+      { title: "ORM Entity Demo", description: "Hibernate ORM with Ticket.cfc",     type: "data" }
+    ];
+  }
+
+  public string function getSummary() {
+    var sb = createObject("java", "java.lang.StringBuilder").init("");
+    sb.append("Portfolio by ");
+    sb.append(variables.authorName);
+    sb.append(" — ");
+    sb.append(arrayLen(getProjects()));
+    sb.append(" projects");
+    return sb.toString();
+  }
+
+}
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `PortfolioService.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+
+  public PortfolioService function init(required string authorName) {
+    variables.authorName = arguments.authorName;
+    return this;
+  }
+
+  public array function getProjects() {
+    return [
+      { title: "Help Desk App",   description: "Ticket management system in CFML", type: "web"  },
+      { title: "REST API",        description: "JSON REST API with cfhttp",         type: "api"  },
+      { title: "ORM Entity Demo", description: "Hibernate ORM with Ticket.cfc",     type: "data" }
+    ];
+  }
+
+  public string function getSummary() {
+    var sb = createObject("java", "java.lang.StringBuilder").init("");
+    sb.append("Portfolio by ");
+    sb.append(variables.authorName);
+    sb.append(" — ");
+    sb.append(arrayLen(getProjects()));
+    sb.append(" projects");
+    return sb.toString();
+  }
+
+}
+```
+::
 
 ---
 
-### 2. OOP — `PortfolioService.cfc`
+### Step 4 — Create `index.cfm`
 
-Create a CFC with at least:
-- A constructor `init()` that stores your name in `variables` scope
-- A `getProjects()` method that returns an array of structs, each with `title`, `description`, and `type` keys (use hardcoded data — no database needed)
-- A `getSummary()` method that returns a one-line string using Java's `StringBuilder` via `createObject("java", "java.lang.StringBuilder")`
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/index.cfm << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Unit 1 Challenge — Portfolio</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 760px; margin: 2rem auto; background: #f8fafc; }
+    h1    { color: #1d4ed8; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; margin: .75rem 0; }
+    .meta { color: #64748b; font-size: .85rem; margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+<cfscript>
+  session.visitCount = (structKeyExists(session, "visitCount") ? session.visitCount : 0) + 1;
+  svc      = new PortfolioService("ColdFusion Student");
+  projects = svc.getProjects();
+  summary  = svc.getSummary();
+</cfscript>
 
+<h1>ColdFusion Portfolio</h1>
+<p class="meta">
+  <cfoutput>
+    Summary: #encodeForHTML(summary)# &nbsp;·&nbsp;
+    Launched: #dateTimeFormat(application.launchTime, "dd-mmm-yyyy HH:nn")# &nbsp;·&nbsp;
+    Visits this session: #session.visitCount#
+  </cfoutput>
+</p>
+
+<cfoutput>
+  <cfloop array="#projects#" index="p">
+    <div class="card">
+      <strong>#encodeForHTML(p.title)#</strong> — #encodeForHTML(p.description)#
+      <span style="color:#64748b;font-size:.8rem">[#encodeForHTML(p.type)#]</span>
+    </div>
+  </cfloop>
+</cfoutput>
+
+<script>
+  var projects = <cfoutput>#serializeJSON(projects)#</cfoutput>;
+  console.log("Projects loaded:", projects);
+</script>
+
+<audio controls style="margin-top:1.5rem">
+  <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+</body>
+</html>
+EOF
+```
+
+::details-box
 ---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `index.cfm`, paste the content below, and save with **Ctrl+S**:
 
-### 3. Main page — `index.cfm`
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Unit 1 Challenge — Portfolio</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 760px; margin: 2rem auto; background: #f8fafc; }
+    h1    { color: #1d4ed8; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; margin: .75rem 0; }
+    .meta { color: #64748b; font-size: .85rem; margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+<cfscript>
+  session.visitCount = (structKeyExists(session, "visitCount") ? session.visitCount : 0) + 1;
+  svc      = new PortfolioService("ColdFusion Student");
+  projects = svc.getProjects();
+  summary  = svc.getSummary();
+</cfscript>
 
-Create an HTML5 page (`<!DOCTYPE html>`) that:
-- Instantiates `PortfolioService` and calls both methods
-- Renders the projects list dynamically with `<cfoutput>` and `encodeForHTML()`
-- Embeds the projects array as JSON into a JavaScript variable using `serializeJSON()`
-- Includes at least one HTML5 element — either a `<video>` or `<audio>` player, or a form with `type="email"` or `type="date"` inputs
-- Displays the application launch time and session visit count from their respective scopes
+<h1>ColdFusion Portfolio</h1>
+<p class="meta">
+  <cfoutput>
+    Summary: #encodeForHTML(summary)# &nbsp;·&nbsp;
+    Launched: #dateTimeFormat(application.launchTime, "dd-mmm-yyyy HH:nn")# &nbsp;·&nbsp;
+    Visits this session: #session.visitCount#
+  </cfoutput>
+</p>
+
+<cfoutput>
+  <cfloop array="#projects#" index="p">
+    <div class="card">
+      <strong>#encodeForHTML(p.title)#</strong> — #encodeForHTML(p.description)#
+      <span style="color:#64748b;font-size:.8rem">[#encodeForHTML(p.type)#]</span>
+    </div>
+  </cfloop>
+</cfoutput>
+
+<script>
+  var projects = <cfoutput>#serializeJSON(projects)#</cfoutput>;
+  console.log("Projects loaded:", projects);
+</script>
+
+<audio controls style="margin-top:1.5rem">
+  <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+</body>
+</html>
+```
+::
 
 ---
 
 ### Verify your work
 
 ```bash
-curl -s http://localhost:8500/unit1challenge/index.cfm | head -30
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/unit1challenge/index.cfm
+# Expected: 200
 ```
 
 ::simple-task
