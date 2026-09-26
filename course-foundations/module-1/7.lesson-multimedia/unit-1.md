@@ -118,7 +118,44 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `media_demo.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `media_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColdFusion Media Demo</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 700px; margin: 2rem auto; }
+    video, audio { display: block; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion Media Demo</h1>
+
+  <cfoutput>
+    <p>Page generated at: <strong>#timeFormat(now(), "HH:mm:ss")#</strong></p>
+  </cfoutput>
+
+  <h2>Video</h2>
+  <video controls width="640" preload="metadata">
+    <source src="/media/sample.mp4"  type="video/mp4">
+    <source src="/media/sample.webm" type="video/webm">
+    <p>Your browser does not support HTML5 video.</p>
+  </video>
+
+  <h2>Audio</h2>
+  <audio controls preload="metadata">
+    <source src="/media/sample.mp3" type="audio/mpeg">
+    <source src="/media/sample.ogg" type="audio/ogg">
+    <p>Your browser does not support HTML5 audio.</p>
+  </audio>
+
+</body>
+</html>
+```
 ::
 
 Verify the page is served:
@@ -327,7 +364,71 @@ In the **IDE tab**, first create the uploads directory from the **Terminal tab**
 sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/uploads/media
 ```
 
-Then in the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, create `upload_media.cfm`, paste the content from the Terminal command above, and save with **Ctrl+S**.
+Then in the **IDE tab**, open `/opt/coldfusion2025/cfusion/wwwroot/student/`, right-click in the Explorer panel → **New File** → name it `upload_media.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Media</title>
+  <style>
+    body { font-family: sans-serif; max-width: 520px; margin: 2rem auto; }
+    .result { margin-top: 1rem; padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; }
+    .error  { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>Upload Media File</h1>
+
+<cfif cgi.REQUEST_METHOD eq "POST" and structKeyExists(form, "mediaFile") and len(form.mediaFile)>
+  <cfscript>
+    allowedTypes = "video/mp4,video/webm,audio/mpeg,audio/ogg";
+    allowedExts  = ["mp4", "webm", "mp3", "ogg"];
+    uploadDir    = expandPath("/uploads/media/");
+
+    try {
+      cffile(
+        action       = "upload",
+        filefield    = "mediaFile",
+        destination  = uploadDir,
+        accept       = allowedTypes,
+        nameconflict = "makeunique"
+      );
+      ext = lCase(listLast(cffile.serverFile, "."));
+      if (!arrayFind(allowedExts, ext)) {
+        fileDelete(cffile.serverDirectory & "/" & cffile.serverFile);
+        throw(message="Disallowed file extension: #ext#");
+      }
+    } catch (any e) {
+      uploadError = e.message;
+    }
+  </cfscript>
+
+  <cfif isDefined("uploadError")>
+    <div class="result"><span class="error">Upload failed: <cfoutput>#encodeForHTML(uploadError)#</cfoutput></span></div>
+  <cfelse>
+    <div class="result">
+      <strong>Upload successful!</strong><br>
+      <cfoutput>
+        File: <strong>#encodeForHTML(cffile.serverFile)#</strong><br>
+        Size: <strong>#cffile.fileSize# bytes</strong><br>
+        Type: <strong>#encodeForHTML(cffile.contentType)#</strong>
+      </cfoutput>
+    </div>
+  </cfif>
+</cfif>
+
+  <form method="post" enctype="multipart/form-data">
+    <label for="mediaFile">Choose a video or audio file:</label><br><br>
+    <input type="file" id="mediaFile" name="mediaFile" accept="video/*,audio/*" required>
+    <br><br>
+    <button type="submit">Upload</button>
+  </form>
+</body>
+</html>
+```
 ::
 
 Verify the upload handler is accessible:
