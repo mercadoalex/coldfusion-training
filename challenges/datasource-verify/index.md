@@ -41,15 +41,64 @@ tasks:
 
 Create `/opt/coldfusion2025/cfusion/wwwroot/db-check.cfm` that:
 
-- Runs `SELECT 1` against `training_db`
-- Returns `{ "db": "ok" }` on success
-- Returns `{ "db": "error", "message": "..." }` on failure
+- Queries `training_db` with `SELECT 1` (or any valid query)
+- Returns `Content-Type: application/json`
+- Returns `{"db":"ok"}` on success
+- Returns `{"db":"error","message":"..."}` on failure, wrapping the error in a `try/catch`
+
+Try it on your own first — then use the hints below if you need them.
+
+---
+
+::details-box
+---
+:summary: 👉 Hint — not sure where to start?
+---
+Revisit **Module 2 Lesson 1 — Datasource Configuration** and **Lesson 3 — cfquery**.
+
+Key things you need:
+- Set the `Content-Type` header with `cfheader` before any output: `<cfheader name="Content-Type" value="application/json">`
+- Use `cfquery` or `queryExecute()` with `datasource="training_db"`
+- Wrap the query in `<cftry>` / `<cfcatch>` so connection failures return the error JSON instead of a CF error page
+- Use `serializeJSON({ db: "ok" })` or write the JSON string directly with `writeOutput()`
+- The checker looks for `"db"` and `"ok"` in the response body — your JSON key must be exactly `db`
+::
+
+::details-box
+---
+:summary: 👉 Skeleton — need the structure?
+---
+Fill in the blanks:
+
+```cfml
+<cfheader name="______" value="______">
+<cftry>
+  <cfquery name="test" datasource="______">
+    SELECT ______
+  </cfquery>
+  <cfoutput>{"db":"______"}</cfoutput>
+  <cfcatch type="any">
+    <cfoutput>{"db":"______","message":"#encodeForJSON(cfcatch.message)#"}</cfoutput>
+  </cfcatch>
+</cftry>
+```
+::
+
+::remark-box
+---
+kind: info
+---
+No full solution is provided — use the hint and the skeleton. The productive struggle of figuring out the last piece is exactly what makes this stick.
+::
+
+---
+
+### Verify your work
 
 ```bash
 curl -s http://localhost:8500/db-check.cfm
+# Expected: {"db":"ok"}
 ```
-
-Expected output: `{"db":"ok"}`
 
 ::simple-task
 ---
