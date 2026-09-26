@@ -139,7 +139,9 @@ You have completed all seven lessons of Unit 1. Now bring it all together.
 
 ### Your mission
 
-Build a self-contained ColdFusion application in `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/` that combines the lifecycle, OOP, scopes, HTML5, and Java interop you have practised across all seven lessons.
+Build a self-contained ColdFusion application in `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/` that combines the lifecycle, OOP, scopes, HTML5, and Java interop you have practised across all seven lessons. You need three files: `Application.cfc`, `PortfolioService.cfc`, and `index.cfm`.
+
+Try each step on your own first. Each step has three levels of help — open them only if you need them.
 
 ---
 
@@ -159,6 +161,55 @@ ls -ld /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
 
 ### Step 2 — Create `Application.cfc`
 
+`Application.cfc` is the lifecycle controller for your app. It must set the application name, enable sessions, and define two lifecycle hooks.
+
+Requirements:
+- `this.name` set to any non-empty string
+- `this.sessionManagement = true`
+- `onApplicationStart()` — store the current timestamp in the `application` scope
+- `onSessionStart()` — initialise a visit counter in the `session` scope
+
+::details-box
+---
+:summary: 👉 Hint — not sure where to start?
+---
+Revisit **Lesson 4 — Application Lifecycle**. The key things you need:
+
+- `this.name`, `this.sessionManagement`, `this.sessionTimeout` go inside the `component { }` block directly (not inside a function)
+- `onApplicationStart()` fires once when the app boots — use `now()` to capture the time
+- `onSessionStart()` fires once per new visitor session — initialise `session.visitCount = 0`
+- Return type for lifecycle hooks is `void`
+::
+
+::details-box
+---
+:summary: 👉 Skeleton — need the structure?
+---
+Fill in the blanks:
+
+```cfml
+component {
+  this.name              = "______";
+  this.sessionManagement = ______;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);
+
+  public void function onApplicationStart() {
+    application.______ = ______();   // store current timestamp
+  }
+
+  public void function onSessionStart() {
+    session.______ = ______;         // initialise counter to zero
+  }
+}
+```
+::
+
+::details-box
+---
+:summary: 👉 Full solution — only open if truly stuck
+---
+**Terminal tab:**
+
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/Application.cfc << 'EOF'
 component {
@@ -177,11 +228,7 @@ component {
 EOF
 ```
 
-::details-box
----
-:summary: ✏️ Using the IDE tab instead? Create the file here
----
-In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+**IDE tab** — right-click → **New File** → `Application.cfc`:
 
 ```cfml
 component {
@@ -204,7 +251,65 @@ component {
 
 ### Step 3 — Create `PortfolioService.cfc`
 
-A CFC with a constructor, a `getProjects()` method returning an array of structs, and a `getSummary()` method that uses Java's `StringBuilder`.
+A CFC that encapsulates your portfolio data and summary logic.
+
+Requirements:
+- Constructor `init(required string authorName)` — stores the author name in `variables` scope
+- `getProjects()` — returns an array of at least 2 structs, each with `title`, `description`, and `type` keys (hardcoded data, no database)
+- `getSummary()` — returns a string built using Java's `StringBuilder` via `createObject("java", "java.lang.StringBuilder")`
+
+::details-box
+---
+:summary: 👉 Hint — not sure where to start?
+---
+Revisit **Lesson 5 — OOP with CFCs** and **the Java interop section**.
+
+- The constructor is always named `init()` in ColdFusion — it must `return this`
+- Store constructor arguments in `variables.*` so all methods can access them
+- `getProjects()` returns a CFML array literal: `[ {title: "...", ...}, {title: "...", ...} ]`
+- For `getSummary()`, call `createObject("java", "java.lang.StringBuilder").init("")` then use `.append()` and `.toString()`
+::
+
+::details-box
+---
+:summary: 👉 Skeleton — need the structure?
+---
+Fill in the blanks:
+
+```cfml
+component {
+
+  public PortfolioService function init(required string authorName) {
+    variables.______ = arguments.______;
+    return this;
+  }
+
+  public array function getProjects() {
+    return [
+      { title: "______", description: "______", type: "______" },
+      { title: "______", description: "______", type: "______" }
+    ];
+  }
+
+  public string function getSummary() {
+    var sb = createObject("java", "______").init("");
+    sb.append("Portfolio by ");
+    sb.append(variables.______);
+    sb.append(" — ");
+    sb.append(arrayLen(______()));
+    sb.append(" projects");
+    return sb.______();
+  }
+
+}
+```
+::
+
+::details-box
+---
+:summary: 👉 Full solution — only open if truly stuck
+---
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/PortfolioService.cfc << 'EOF'
@@ -237,11 +342,7 @@ component {
 EOF
 ```
 
-::details-box
----
-:summary: ✏️ Using the IDE tab instead? Create the file here
----
-In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `PortfolioService.cfc`, paste the content below, and save with **Ctrl+S**:
+**IDE tab** — right-click → **New File** → `PortfolioService.cfc`:
 
 ```cfml
 component {
@@ -276,6 +377,86 @@ component {
 ---
 
 ### Step 4 — Create `index.cfm`
+
+The main HTML5 page that wires everything together.
+
+Requirements:
+- `<!DOCTYPE html>` declaration
+- Instantiate `PortfolioService` and call both `getProjects()` and `getSummary()`
+- Render the projects list dynamically using `<cfoutput>` and `encodeForHTML()`
+- Embed the projects array as JSON into a JavaScript variable using `serializeJSON()`
+- Display `application.launchTime` and `session.visitCount` from their scopes
+- Include at least one HTML5 element — a `<video>`, `<audio>`, or a form with `type="email"` or `type="date"`
+
+::details-box
+---
+:summary: 👉 Hint — not sure where to start?
+---
+Revisit **Lesson 6 — HTML5** and **Lesson 3 — Variables & Scopes**.
+
+- Start with `<!DOCTYPE html>` — the check verifies this exact string
+- Instantiate with `new PortfolioService("Your Name")` — pass the author name to the constructor
+- Loop over the array with `<cfloop array="#projects#" index="p">` inside a `<cfoutput>` block
+- Always wrap dynamic output in `encodeForHTML()` to prevent XSS
+- `serializeJSON(projects)` converts the CF array to a JSON string for JavaScript
+- Access session/application scopes directly: `session.visitCount`, `application.launchTime`
+::
+
+::details-box
+---
+:summary: 👉 Skeleton — need the structure?
+---
+Fill in the blanks:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>______</title>
+</head>
+<body>
+<cfscript>
+  session.visitCount = (structKeyExists(session, "visitCount") ? session.visitCount : 0) + 1;
+  svc      = new ______("ColdFusion Student");
+  projects = svc.______();
+  summary  = svc.______();
+</cfscript>
+
+<h1>ColdFusion Portfolio</h1>
+<p>
+  <cfoutput>
+    Summary: #encodeForHTML(______)# &nbsp;·&nbsp;
+    Launched: #dateTimeFormat(application.______, "dd-mmm-yyyy HH:nn")# &nbsp;·&nbsp;
+    Visits: #session.______#
+  </cfoutput>
+</p>
+
+<cfoutput>
+  <cfloop array="#______#" index="p">
+    <div>
+      <strong>#encodeForHTML(p.______)#</strong> — #encodeForHTML(p.______)#
+    </div>
+  </cfloop>
+</cfoutput>
+
+<script>
+  var projects = <cfoutput>#serializeJSON(______)#</cfoutput>;
+</script>
+
+<!-- HTML5 element: <audio>, <video>, or a form with type="email" or type="date" -->
+______
+
+</body>
+</html>
+```
+::
+
+::details-box
+---
+:summary: 👉 Full solution — only open if truly stuck
+---
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/index.cfm << 'EOF'
@@ -332,11 +513,7 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/unit1challenge/index.cfm << 'EOF'
 EOF
 ```
 
-::details-box
----
-:summary: ✏️ Using the IDE tab instead? Create the file here
----
-In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `index.cfm`, paste the content below, and save with **Ctrl+S**:
+**IDE tab** — right-click → **New File** → `index.cfm`:
 
 ```cfml
 <!DOCTYPE html>
