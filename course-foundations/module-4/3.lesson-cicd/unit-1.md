@@ -96,6 +96,17 @@ The right pattern is to inject credentials at **runtime** via environment variab
 
 ## Activity 1 — Create box.json
 
+::remark-box
+---
+kind: info
+---
+**Why `/home/laborant/app/` and not `wwwroot/student/`?**
+
+`box.json` and `Dockerfile` are **source code artefacts**, not served files. They belong in a project directory — the kind you would commit to Git and hand to a CI runner. Putting them inside the CF web root (`wwwroot/`) would expose them over HTTP, which is a security risk.
+
+`/home/laborant/app/` is the student's project home — it already exists in the lab environment (it was seeded with the CommandBox `server.json` scaffold when the image was built). In a real project this would be your Git repository root.
+::
+
 Create `/home/laborant/app/box.json`:
 
 ```bash
