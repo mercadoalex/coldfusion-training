@@ -355,6 +355,20 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/verify_ds.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `verify_ds.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfquery name="test" datasource="training_db">
+  SELECT COUNT(*) AS total FROM hd_tickets
+</cfquery>
+<cfoutput>Connection OK — #test.total# tickets found</cfoutput>
+```
+::
+
 Verify the page responds correctly:
 
 ```bash
@@ -454,6 +468,22 @@ component {
 }
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+
+}
+```
+::
 
 Verify the file was written correctly:
 
@@ -583,6 +613,106 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/qoq_demo.cfm << 'EOF'
 </html>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `qoq_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Query of Queries Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 820px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .badge-high     { color: #c0392b; font-weight: bold; }
+    .badge-medium   { color: #d97706; font-weight: bold; }
+    .badge-low      { color: #16a34a; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Query of Queries — Help Desk Demo</h1>
+
+  <cfscript>
+    // ── Step 1: ONE database query — fetch everything ──────────────────────
+    allTickets = queryExecute(
+      "SELECT t.id, t.title, t.status, t.priority, t.category,
+              (SELECT full_name FROM hd_users WHERE id = t.requester_id) AS requester,
+              (SELECT full_name FROM hd_users WHERE id = t.assignee_id)  AS assignee
+       FROM   hd_tickets t
+       ORDER  BY t.id DESC",
+      {},
+      { datasource: "training_db" }
+    );
+
+    // ── Step 2: QoQ — filter open + high priority (NO database hit) ────────
+    openHighPriority = queryExecute(
+      "SELECT id, title, priority, category, assignee
+       FROM   allTickets
+       WHERE  status   = 'open'
+       AND    priority = 'high'
+       ORDER  BY id DESC",
+      {},
+      { dbtype: "query" }
+    );
+
+    // ── Step 3: QoQ — group count by status (NO database hit) ──────────────
+    statusSummary = queryExecute(
+      "SELECT status, COUNT(id) AS total
+       FROM   allTickets
+       GROUP  BY status
+       ORDER  BY total DESC",
+      {},
+      { dbtype: "query" }
+    );
+  </cfscript>
+
+  <h2>All Tickets — <cfoutput>#allTickets.recordCount#</cfoutput> rows (from DB)</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Status</th><th>Priority</th><th>Assignee</th></tr>
+    <cfoutput query="allTickets">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(status)#</td>
+        <td class="badge-#encodeForHTMLAttribute(priority)#">#encodeForHTML(priority)#</td>
+        <td>#encodeForHTML(assignee)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+  <h2>Open + High Priority — <cfoutput>#openHighPriority.recordCount#</cfoutput> rows (QoQ — no DB hit)</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Category</th><th>Assignee</th></tr>
+    <cfoutput query="openHighPriority">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(category)#</td>
+        <td>#encodeForHTML(assignee)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+  <h2>Tickets by Status — (QoQ — no DB hit)</h2>
+  <table>
+    <tr><th>Status</th><th>Count</th></tr>
+    <cfoutput query="statusSummary">
+      <tr><td>#encodeForHTML(status)#</td><td>#total#</td></tr>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+```
+::
 
 Open `/student/qoq_demo.cfm` in the **ColdFusion 2025** browser tab. You should see:
 - All 10 tickets from the database
