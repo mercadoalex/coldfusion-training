@@ -133,6 +133,18 @@ Build a small self-contained ColdFusion application inside the directory `/opt/c
 
 ---
 
+### 0. Set up the working directory
+
+Before creating any files, run this once from the **Terminal tab** to create the challenge directory:
+
+```bash
+sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
+```
+
+To open it in the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge` and press **Enter**.
+
+---
+
 ### 1. Application lifecycle — `Application.cfc`
 
 Create `Application.cfc` that:
