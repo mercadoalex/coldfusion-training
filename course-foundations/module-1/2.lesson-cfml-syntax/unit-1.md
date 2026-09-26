@@ -43,6 +43,15 @@ EOF
 ---
 In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `syntax_tag.cfm`, paste the content below, and save with **Ctrl+S**:
 
+::image-box
+---
+:src: __static__/folder-student-does-not-exist-v1.png
+:alt: VS Code dialog asking "The folder /opt/coldfusion2025/cfusion/wwwroot/student does not exist. Would you like to create it?" with a Yes button highlighted
+:max-width: 560px
+---
+_VS Code will offer to create the `student` folder — click **Yes**._
+::
+
 ```cfml
 <cfset message = "I am using tag syntax">
 <cfoutput>#message# — tag</cfoutput>

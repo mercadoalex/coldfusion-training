@@ -403,7 +403,44 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Edit the file here
 ---
-In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. Click `Application.cfc`, **select all** (`Ctrl+A`), replace with the content above, and save with **Ctrl+S**.
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. Click `Application.cfc`, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**.
+```cfml
+  component {
+
+  this.name              = "CFTraining";
+  this.sessionManagement = true;
+  this.sessionTimeout    = createTimeSpan(0, 0, 30, 0);  // 30 minutes
+
+  // WebSocket channels — required by the WebSockets lesson (module 3)
+  this.wschannels = [
+    { name="chat", cfclistener="WSHandler" }
+  ];
+
+  public boolean function onApplicationStart() {
+    application.startTime = now();
+    writeLog(text="Application started at #now()#", file="application");
+    return true;
+  }
+
+  public boolean function onSessionStart() {
+    session.userId = 0;
+    return true;
+  }
+
+  public boolean function onRequestStart(string targetPage) {
+    var publicPages = ["/login.cfm", "/register.cfm"];
+    if (!session.userId && !arrayFind(publicPages, arguments.targetPage)) {
+      location(url="/login.cfm", addtoken=false);
+      return false;  // abort the request — page will not execute
+    }
+    return true;
+  }
+
+  public void function onError(any exception, string eventName) {
+    writeOutput("An error occurred: #exception.message#");
+  }
+}
+```
 ::
 
 **Step 2 — Create `login.cfm`**
@@ -424,7 +461,14 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `login.cfm`, paste the content above, and save with **Ctrl+S**.
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `login.cfm`, paste the content below, and save with **Ctrl+S**.
+```cfml
+  <cfoutput>
+  <h2>Login page</h2>
+  <p>You have been redirected here because you are not logged in.</p>
+  <p>session.userId = #session.userId#</p>
+  </cfoutput>
+```
 ::
 
 **Step 3 — Test the gatekeeper**

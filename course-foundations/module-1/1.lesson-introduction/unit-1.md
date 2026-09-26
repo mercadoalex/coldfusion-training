@@ -342,6 +342,16 @@ The **IDE tab** opens directly to your `student/` working folder. If it shows a 
      `/opt/coldfusion2025/cfusion/wwwroot/student`
    - Press **Enter** or click **OK**.
    - VS Code may ask _"The folder does not exist. Would you like to create it?"_ — click **Yes** to create it.
+
+::image-box
+---
+:src: __static__/folder-student-does-not-exist-v1.png
+:alt: VS Code dialog asking "The folder /opt/coldfusion2025/cfusion/wwwroot/student does not exist. Would you like to create it?" with a Yes button highlighted
+:max-width: 560px
+---
+_VS Code will offer to create the `student` folder — click **Yes**._
+::
+
    - The Explorer panel now shows your working directory — `student/` is empty until you create your first file.
 3. Right-click anywhere in the **empty space** of the Explorer panel → **New File** → type `hello.cfm` → press **Enter**.
 4. The new file opens in the editor. Paste this content:

@@ -70,6 +70,15 @@ EOF
 ---
 In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `GreetingService.cfc`, paste the content below, and save with **Ctrl+S**:
 
+::image-box
+---
+:src: __static__/folder-student-does-not-exist-v1.png
+:alt: VS Code dialog asking "The folder /opt/coldfusion2025/cfusion/wwwroot/student does not exist. Would you like to create it?" with a Yes button highlighted
+:max-width: 560px
+---
+_VS Code will offer to create the `student` folder — click **Yes**._
+::
+
 ```cfml
 component displayname="GreetingService" hint="Returns greetings" {
 
@@ -91,6 +100,15 @@ component displayname="GreetingService" hint="Returns greetings" {
 
 }
 ```
+::
+
+::image-box
+---
+:src: __static__/greeting-service-v1.png
+:alt: UML class diagram of the GreetingService component — shows the class name at the top, a variables scope section listing createdAt, and two method sections: public greet(name: string): string and private _format(msg: string): string
+:max-width: 560px
+---
+_UML representation of `GreetingService` — constructor, public method, and private helper._
 ::
 
 Verify the file was created:
@@ -124,8 +142,10 @@ CFC file found in the web root. ✓
 
 ## CFC anatomy
 
+The example below is a **reference CFC** used throughout this lesson to label and explain each part of a component. You do not need to create it — the hands-on activities use `GreetingService.cfc` (Activity 1) and `JavaUtilService.cfc` (Activity 4).
+
 ```cfml
-// TicketService.cfc
+// TicketService.cfc — reference example (read only, no activity)
 component displayname="TicketService" hint="Manages help desk tickets" {
 
   // Properties (optional — document the object's state)
@@ -164,6 +184,15 @@ component displayname="TicketService" hint="Manages help desk tickets" {
 
 }
 ```
+
+::image-box
+---
+:src: __static__/TicketService-Component-v1.png
+:alt: UML class diagram of TicketService — shows the class name at the top, one instance property: datasource (string, default "training_db"), and three method sections: public init(datasource: string) returning TicketService, public getAll() returning array, public getById(id: numeric) returning struct, and private isValidPriority(priority: string) returning boolean
+:max-width: 560px
+---
+_UML representation of `TicketService` — property, constructor, two public methods, and a private helper._
+::
 
 ::hint-box
 ---
@@ -386,6 +415,15 @@ component displayname="GreetingService" hint="Returns greetings" {
 ```
 ::
 
+::image-box
+---
+:src: __static__/Greeting-service-2-v2.png
+:alt: UML class diagram of the updated GreetingService component — variables scope section lists createdAt, and four method sections: public init() returning GreetingService, public greet(name: string) returning string, public getInfo() returning struct (new), and private _format(msg: string) returning string
+:max-width: 560px
+---
+_Updated `GreetingService` after Activity 3 — `getInfo()` added as a second public method._
+::
+
 **Terminal tab** — update `test_cfc.cfm`:
 
 ```bash
@@ -525,6 +563,17 @@ If you need logic shared between a JSP and a CFC, extract it into a plain Java c
 ## Activity 4 — Call Java from inside a CFC
 
 **Activity:** Create `JavaUtilService.cfc` — a CFC whose methods each call a different Java class from the standard library.
+
+`JavaUtilService` is a pure bridge component — it has no business logic of its own. Its sole responsibility is to expose four methods that each delegate to a different class from the Java standard library: `java.util.UUID` for generating unique identifiers, `java.lang.StringBuilder` for efficient string concatenation, `java.lang.System` for reading JVM system properties, and `java.util.Collections` for sorting a list using Java's native sort algorithm. It exists to demonstrate that the full JVM class library is directly reachable from CFML with nothing more than `createObject("java", "...")`.
+
+::image-box
+---
+:src: __static__/JavaUtilService-Component-v1.png
+:alt: UML class diagram of JavaUtilService — shows the class name at the top, no instance properties, and four public methods: generateUUID() returning string, buildMessage(parts: array) returning string, getJavaVersion() returning string, and sortList(items: array) returning array, each annotated with the Java class it delegates to
+:max-width: 560px
+---
+_UML representation of `JavaUtilService` — four public methods, each bridging to a different Java standard-library class._
+::
 
 **Terminal tab:**
 

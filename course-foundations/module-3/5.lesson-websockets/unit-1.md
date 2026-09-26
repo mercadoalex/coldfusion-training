@@ -780,7 +780,12 @@ _The chat demo page — once the WebSocket handshake completes the status line c
 ---
 The most common cause is a syntax error in `Application.cfc`. Check that the `this.wschannels` line is inside the `component { }` block and that all curly braces are balanced.
 
-> **Note:** You cannot open `Application.cfc` directly in the browser — ColdFusion will always block it with an "Invalid request" error because it is a reserved framework file. To check for syntax errors, trigger any normal request (e.g. `curl http://localhost:8500/index.cfm`) and CF will surface the parse error in the response, or check the CF error log:
+::remark-box
+---
+kind: info
+---
+You cannot open `Application.cfc` directly in the browser — ColdFusion will always block it with an "Invalid request" error because it is a reserved framework file. To check for syntax errors, trigger any normal request (e.g. `curl http://localhost:8500/index.cfm`) and CF will surface the parse error in the response, or check the CF error log:
+::
 
 ```bash
 tail -20 /opt/coldfusion2025/cfusion/logs/exception.log
