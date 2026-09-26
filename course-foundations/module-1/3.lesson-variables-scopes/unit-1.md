@@ -547,7 +547,7 @@ Para uso básico sin framework, las funciones `ls*` y `setLocale()` de CFML son 
 
 ::hint-box
 ---
-:summary: 💡 Need to edit a file? The IDE is the easiest option
+:summary: 💡 Need to edit a file? The IDE is the easiest option but you can also use VI.
 ---
 
 The simplest way to edit any file is to open the **IDE tab** — the file is already visible in the Explorer panel, just click it, make your changes, and save with **Ctrl+S**.
