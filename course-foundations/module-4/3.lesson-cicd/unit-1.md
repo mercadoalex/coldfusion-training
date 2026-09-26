@@ -53,6 +53,26 @@ The full pipeline — Git server, registry, automated tests, and deployments usi
 
 ## 2. Dockerfile — containerise your app
 
+::hint-box
+---
+:summary: What is a Dockerfile and why does CFML need one?
+---
+
+A **Dockerfile** is a plain-text recipe that tells Docker how to build a container image — a self-contained, portable package that includes your application code, its runtime, and all dependencies. Once built, the image runs identically on any machine that has Docker installed: a developer laptop, a CI server, or a cloud VM.
+
+**Why containerise a ColdFusion application?**
+
+| Without a container | With a container |
+|---|---|
+| "Works on my machine" — CF version, JVM flags, and file paths differ per server | One image runs the same everywhere |
+| Manual server setup — install CF, configure datasources, set JVM heap | `docker run` does it all in one command |
+| Deploying means copying files and restarting CF | Deploying means swapping one image tag for another |
+
+**How it relates to ColdFusion:** your CFML files are just files — they need a running CF or Lucee engine to execute. The `FROM ortussolutions/commandbox:latest` base image provides that engine, so you only need to copy your code on top of it and install your dependencies.
+
+A Dockerfile is always a text file named exactly `Dockerfile` (no extension). Docker reads it top to bottom, executes each instruction as a layer, and produces a tagged image you can push to a registry and pull anywhere.
+::
+
 ::image-box
 ---
 :src: __static__/commandbox-dockerfile-anatomy-v1.png
