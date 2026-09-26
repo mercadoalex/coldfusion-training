@@ -534,6 +534,15 @@ Create `locale_demo.cfm` — the response must contain **German (Standard)** and
 `locale_demo.cfm` renders locale-aware output correctly. ✓
 ::
 
+::remark-box
+---
+kind: info
+---
+Para uso básico sin framework, las funciones `ls*` y `setLocale()` de CFML son suficientes. Para aplicaciones multi-idioma más completas, **cbi18n** es la opción más robusta y mantenida.
+
+**cbi18n** (ColdBox i18n) es un módulo de ColdBox que ofrece soporte profesional de internacionalización con _resource bundles_, gestión de locales y almacenamiento de preferencias del usuario.
+::
+
 ---
 
 ::hint-box
