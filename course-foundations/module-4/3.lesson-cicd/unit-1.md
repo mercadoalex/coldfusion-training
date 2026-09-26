@@ -122,6 +122,23 @@ tee /home/laborant/app/box.json << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/home/laborant/app` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `box.json`, paste the content below, and save with **Ctrl+S**:
+
+```json
+{
+  "name": "helpdesk-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "testbox": "^5.0.0"
+  }
+}
+```
+::
+
 Verify:
 
 ```bash
@@ -159,6 +176,25 @@ EXPOSE 8888
 CMD ["box", "server", "start", "--console"]
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/home/laborant/app` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `Dockerfile`, paste the content below, and save with **Ctrl+S**:
+
+```dockerfile
+FROM ortussolutions/commandbox:latest
+
+COPY . /app
+WORKDIR /app
+
+RUN box install --production
+
+EXPOSE 8888
+CMD ["box", "server", "start", "--console"]
+```
+::
 
 Verify:
 
