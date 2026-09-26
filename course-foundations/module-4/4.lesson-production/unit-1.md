@@ -17,7 +17,7 @@ name: production-readiness-monitoring-unit-1
 _health.cfm tests the DB on every request and returns 200/503 — used by load balancers and container probes._
 ::
 
-Every production ColdFusion application should expose a `/health.cfm` endpoint that:
+Every production ColdFusion application should expose a `/health.cfm` endpoint that (you will create it in Activity 1 later in this lesson):
 1. Tests the database connection
 2. Returns JSON with a `status` field (`"ok"` or `"degraded"`)
 3. Returns HTTP 200 when healthy, 503 when degraded
