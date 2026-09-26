@@ -27,9 +27,19 @@ playground:
   name: cf-alex-edcdf975
 
 tasks:
+  setup_directory:
+    machine: dev-machine
+    user: laborant
+    run: |
+      sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
+      sudo chmod 755 /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
+      echo "unit1challenge directory ready"
+
   verify_app_cfc:
     machine: dev-machine
     user: laborant
+    needs:
+      - setup_directory
     run: |
       FILE="/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/Application.cfc"
       if [ ! -f "${FILE}" ]; then
@@ -133,13 +143,17 @@ Build a self-contained ColdFusion application in `/opt/coldfusion2025/cfusion/ww
 
 ---
 
-### Step 1 — Create the directory
+### Step 1 — Open the working directory
 
-Run this first. All files go inside this folder.
+The folder `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge/` is created automatically when the challenge loads.
+
+**Terminal tab** — confirm it exists:
 
 ```bash
-sudo mkdir -p /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
+ls -ld /opt/coldfusion2025/cfusion/wwwroot/unit1challenge
 ```
+
+**IDE tab** — click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/unit1challenge` and press **Enter**.
 
 ---
 
