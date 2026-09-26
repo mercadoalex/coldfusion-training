@@ -192,6 +192,7 @@ grep -E "<var name='NAME'>|<var name='url'>|<var name='CLASS'>" \
 **Test live datasource connectivity:**
 ```bash
 # health.cfm already runs SELECT 1 — use it as your connectivity probe
+# (complete Activity 1 first to create this file)
 curl -s http://localhost:8500/student/health.cfm
 ```
 
@@ -382,6 +383,36 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/health.cfm << 'EOF'
 </cfscript>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `health.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  status   = "ok";
+  httpCode = 200;
+
+  try {
+    queryExecute("SELECT 1", {}, {datasource: "training_db"});
+  } catch (any e) {
+    status   = "degraded";
+    httpCode = 503;
+  }
+
+  cfheader(statuscode=httpCode);
+  cfheader(name="Content-Type", value="application/json");
+
+  writeOutput(serializeJSON({
+    "status":    status,
+    "timestamp": dateTimeFormat(now(), "yyyy-mm-dd'T'HH:nn:ssXXX"),
+    "version":   "1.0.0"
+  }));
+</cfscript>
+```
+::
 
 Verify it returns valid JSON:
 
