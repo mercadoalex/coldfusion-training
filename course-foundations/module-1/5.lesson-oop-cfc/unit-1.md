@@ -346,7 +346,148 @@ Use `super.methodName()` to call the parent's version of an overridden method.
 
 ---
 
-## Activity 3 — Add a method and verify with cfdump
+## Activity 3 — Inherit from a base component
+
+**Activity:** Create `BaseService.cfc` with a shared `getTimestamp()` method, then update `GreetingService.cfc` to extend it. Verify that the inherited method is accessible on the child instance.
+
+**Terminal tab** — create `BaseService.cfc`:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/BaseService.cfc << 'EOF'
+component displayname="BaseService" hint="Shared base for all services" {
+
+  public string function getTimestamp() {
+    return dateTimeFormat(now(), "iso8601");
+  }
+
+  public string function getClassName() {
+    return getMetaData(this).name;
+  }
+
+}
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `BaseService.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component displayname="BaseService" hint="Shared base for all services" {
+
+  public string function getTimestamp() {
+    return dateTimeFormat(now(), "iso8601");
+  }
+
+  public string function getClassName() {
+    return getMetaData(this).name;
+  }
+
+}
+```
+::
+
+**Terminal tab** — update `GreetingService.cfc` to extend `BaseService`:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/GreetingService.cfc << 'EOF'
+component displayname="GreetingService" hint="Returns greetings" extends="BaseService" {
+
+  public GreetingService function init() {
+    variables.createdAt = now();
+    return this;
+  }
+
+  public string function greet(required string name) {
+    return _format("Hello, " & arguments.name & "!");
+  }
+
+  private string function _format(required string msg) {
+    return "[" & timeFormat(now(), "HH:mm:ss") & "] " & arguments.msg;
+  }
+
+}
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `GreetingService.cfc`, **select all**, replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+component displayname="GreetingService" hint="Returns greetings" extends="BaseService" {
+
+  public GreetingService function init() {
+    variables.createdAt = now();
+    return this;
+  }
+
+  public string function greet(required string name) {
+    return _format("Hello, " & arguments.name & "!");
+  }
+
+  private string function _format(required string msg) {
+    return "[" & timeFormat(now(), "HH:mm:ss") & "] " & arguments.msg;
+  }
+
+}
+```
+::
+
+**Terminal tab** — update `test_cfc.cfm` to verify inheritance:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/test_cfc.cfm << 'EOF'
+<cfscript>
+  svc = new GreetingService();
+  writeOutput("<strong>greet():</strong> "        & svc.greet("ColdFusion Student") & "<br>");
+  writeOutput("<strong>getTimestamp():</strong> " & svc.getTimestamp() & "<br>");
+  writeOutput("<strong>getClassName():</strong> " & svc.getClassName() & "<br>");
+</cfscript>
+<cfdump var="#getMetaData(new GreetingService())#" label="GreetingService metadata">
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `test_cfc.cfm`, **select all**, replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  svc = new GreetingService();
+  writeOutput("<strong>greet():</strong> "        & svc.greet("ColdFusion Student") & "<br>");
+  writeOutput("<strong>getTimestamp():</strong> " & svc.getTimestamp() & "<br>");
+  writeOutput("<strong>getClassName():</strong> " & svc.getClassName() & "<br>");
+</cfscript>
+<cfdump var="#getMetaData(new GreetingService())#" label="GreetingService metadata">
+```
+::
+
+Reload `/test_cfc.cfm` in the browser — you should see the greeting, an ISO timestamp, the class name, and a `cfdump` of the full component metadata showing `extends="BaseService"` in the hierarchy.
+
+> **Key observation:** `getTimestamp()` and `getClassName()` are defined in `BaseService.cfc` but callable directly on the `GreetingService` instance — this is inheritance in action. The `cfdump` of `getMetaData()` shows the full inheritance chain.
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_inheritance
+---
+#active
+Create `BaseService.cfc` and update `GreetingService.cfc` to extend it — the CFC must contain `extends="BaseService"`.
+
+#completed
+`GreetingService` extends `BaseService`. ✓
+::
+
+---
+
+## Activity 4 — Add a method and verify with cfdump
 
 **Activity:** Update `GreetingService.cfc` to add a `getInfo()` method, then update `test_cfc.cfm` to verify it with `cfdump`.
 
@@ -560,7 +701,7 @@ If you need logic shared between a JSP and a CFC, extract it into a plain Java c
 
 ---
 
-## Activity 4 — Call Java from inside a CFC
+## Activity 5 — Call Java from inside a CFC
 
 **Activity:** Create `JavaUtilService.cfc` — a CFC whose methods each call a different Java class from the standard library.
 
