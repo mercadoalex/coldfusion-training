@@ -404,6 +404,138 @@ Create `cfdump_demo.cfm` — the response must contain the word **greeting** (du
 
 ---
 
+## Regionalization & locale-aware output
+
+ColdFusion has two sets of formatting functions:
+
+| Function | Behaviour |
+|---|---|
+| `dateFormat()`, `numberFormat()`, `dollarFormat()` | Fixed US English output — always the same regardless of server locale |
+| `lsDateFormat()`, `lsNumberFormat()`, `lsCurrencyFormat()` | **Locale-sensitive** — output adapts to the active locale |
+
+The `ls` prefix stands for **locale-specific**. Switch the locale for a request with `setLocale()` and read it back with `getLocale()`. The locale only applies for the duration of the current request — it does not persist to the next one.
+
+```cfml
+// Set the locale for this request
+setLocale("German (Standard)");
+
+price  = 1234567.89;
+today  = now();
+
+writeOutput(lsNumberFormat(price)   & "<br>"); // 1.234.567,89
+writeOutput(lsCurrencyFormat(price) & "<br>"); // 1.234.567,89 €
+writeOutput(lsDateFormat(today, "long") & "<br>"); // e.g. 3. September 2026
+```
+
+Common locale strings accepted by `setLocale()`:
+
+| Locale string | Region |
+|---|---|
+| `English (US)` | United States |
+| `English (UK)` | United Kingdom |
+| `German (Standard)` | Germany |
+| `French (Standard)` | France |
+| `Spanish (Standard)` | Spain |
+| `Portuguese (Brazilian)` | Brazil |
+| `Japanese` | Japan |
+| `Chinese (China)` | Simplified Chinese |
+
+> **Gotcha:** `setLocale()` accepts the locale display name as a string, not an IETF tag like `en-US`. Use `getLocaleInfo()` to inspect the full list of locales available on the running JVM.
+
+**Activity:** Create `locale_demo.cfm` to compare the same number and date formatted in three different locales side by side.
+
+**Terminal tab:**
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/locale_demo.cfm << 'EOF'
+<cfscript>
+  price = 1234567.89;
+  today = now();
+
+  locales = [
+    "English (US)",
+    "German (Standard)",
+    "French (Standard)"
+  ];
+
+  for (loc in locales) {
+    setLocale(loc);
+    writeOutput("<strong>" & loc & "</strong><br>");
+    writeOutput("&nbsp;&nbsp;Number:   " & lsNumberFormat(price)          & "<br>");
+    writeOutput("&nbsp;&nbsp;Currency: " & lsCurrencyFormat(price)        & "<br>");
+    writeOutput("&nbsp;&nbsp;Date:     " & lsDateFormat(today, "long")    & "<br><br>");
+  }
+</cfscript>
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `locale_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  price = 1234567.89;
+  today = now();
+
+  locales = [
+    "English (US)",
+    "German (Standard)",
+    "French (Standard)"
+  ];
+
+  for (loc in locales) {
+    setLocale(loc);
+    writeOutput("<strong>" & loc & "</strong><br>");
+    writeOutput("&nbsp;&nbsp;Number:   " & lsNumberFormat(price)          & "<br>");
+    writeOutput("&nbsp;&nbsp;Currency: " & lsCurrencyFormat(price)        & "<br>");
+    writeOutput("&nbsp;&nbsp;Date:     " & lsDateFormat(today, "long")    & "<br><br>");
+  }
+</cfscript>
+```
+::
+
+Open `/locale_demo.cfm` in the **ColdFusion 2025** browser tab, or from the Terminal:
+
+```bash
+curl -s http://localhost:8500/student/locale_demo.cfm
+```
+
+You should see three blocks — each showing the same number and date formatted differently:
+
+```
+English (US)
+  Number:   1,234,567.89
+  Currency: $1,234,567.89
+  Date:     September 3, 2026
+
+German (Standard)
+  Number:   1.234.567,89
+  Currency: 1.234.567,89 €
+  Date:     3. September 2026
+
+French (Standard)
+  Number:   1 234 567,89
+  Currency: 1 234 567,89 €
+  Date:     3 septembre 2026
+```
+
+::simple-task
+---
+:tasks: tasks
+:name: verify_locale_demo
+---
+#active
+Create `locale_demo.cfm` — the response must contain **German (Standard)** and a comma-formatted number.
+
+#completed
+`locale_demo.cfm` renders locale-aware output correctly. ✓
+::
+
+---
+
 ::hint-box
 ---
 :summary: 💡 Need to edit a file? The IDE is the easiest option
