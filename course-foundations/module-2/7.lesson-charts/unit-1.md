@@ -250,6 +250,51 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `chart_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ColdFusion Chart Demo</title>
+  <style>
+    body    { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    h2      { margin-top: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: .4rem; }
+    .charts { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion cfchart Demo</h1>
+
+  <h2>Bar Chart — Open Tickets by Priority</h2>
+
+  <cfquery name="byPriority" datasource="training_db">
+    SELECT priority, COUNT(*) AS total
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    GROUP  BY priority
+    ORDER  BY total DESC
+  </cfquery>
+
+  <cfchart format="png" chartwidth="600" chartheight="380"
+           title="Open Tickets by Priority" show3d="false"
+           backgroundColor="##ffffff">
+    <cfchartseries type="bar" query="byPriority"
+                   itemcolumn="priority" valuecolumn="total"
+                   seriescolor="##3b82d4" serieslabel="Open tickets">
+    </cfchartseries>
+  </cfchart>
+
+</body>
+</html>
+```
+::
+
 Verify the file exists and contains `cfchart`:
 
 ```bash
@@ -363,6 +408,68 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/chart_demo.cfm << 'EOF'
 </html>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `chart_demo.cfm`, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ColdFusion Chart Demo</title>
+  <style>
+    body    { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    h2      { margin-top: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: .4rem; }
+    .charts { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion cfchart Demo</h1>
+
+  <h2>Bar Chart — Open Tickets by Priority</h2>
+
+  <cfquery name="byPriority" datasource="training_db">
+    SELECT priority, COUNT(*) AS total
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    GROUP  BY priority
+    ORDER  BY total DESC
+  </cfquery>
+
+  <cfchart format="png" chartwidth="600" chartheight="380"
+           title="Open Tickets by Priority" show3d="false"
+           backgroundColor="##ffffff">
+    <cfchartseries type="bar" query="byPriority"
+                   itemcolumn="priority" valuecolumn="total"
+                   seriescolor="##3b82d4" serieslabel="Open tickets">
+    </cfchartseries>
+  </cfchart>
+
+  <h2>Pie Chart — All Tickets by Status</h2>
+
+  <cfquery name="byStatus" datasource="training_db">
+    SELECT status, COUNT(*) AS total
+    FROM   hd_tickets
+    GROUP  BY status
+    ORDER  BY total DESC
+  </cfquery>
+
+  <cfchart format="png" chartwidth="500" chartheight="400"
+           title="All Tickets by Status" show3d="false"
+           backgroundColor="##ffffff">
+    <cfchartseries type="pie" query="byStatus"
+                   itemcolumn="status" valuecolumn="total">
+    </cfchartseries>
+  </cfchart>
+
+</body>
+</html>
+```
+::
 
 Reload `/student/chart_demo.cfm` in the browser — you should now see both charts: the bar chart above and the pie chart below it.
 
