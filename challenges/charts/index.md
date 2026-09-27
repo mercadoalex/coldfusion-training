@@ -68,9 +68,66 @@ Create `/opt/coldfusion2025/cfusion/wwwroot/chart_demo.cfm` that:
 
 1. Runs a `cfquery` or `queryExecute` against `hd_tickets`
 2. Renders the result as a `<cfchart>` (bar, pie, or line — your choice)
+3. Returns HTTP 200 with no errors
+
+Try it on your own first — then use the hints below if you need them.
+
+---
+
+::details-box
+---
+:summary: 👉 Hint — not sure where to start?
+---
+Revisit **Module 2 Lesson 7 — Chart Generation and Management**.
+
+Key things you need:
+- The file goes in `/opt/coldfusion2025/cfusion/wwwroot/` (the web root, **not** `student/`) so the checker finds it at `http://localhost:8500/chart_demo.cfm`
+- Query `hd_tickets` first with `cfquery` or `queryExecute` — group by any column (priority, status, category)
+- Use `<cfchart>` to wrap the chart and `<cfchartseries>` inside it with `type="bar"`, `type="pie"`, or `type="line"`
+- Point `cfchartseries` at your query: `query="yourQueryName"`, `itemcolumn="priority"`, `valuecolumn="total"`
+- Colour values need `##` not `#` — e.g. `seriescolor="##3b82d4"`
+- If you see "chart package not installed": run `sudo /opt/coldfusion2025/cfusion/bin/cfpm.sh install chart && sudo /opt/coldfusion2025/cfusion/bin/coldfusion restart`
+::
+
+::details-box
+---
+:summary: 👉 Skeleton — need the structure?
+---
+Fill in the blanks:
+
+```cfml
+<cfquery name="______" datasource="training_db">
+  SELECT ______, COUNT(*) AS total
+  FROM   hd_tickets
+  GROUP  BY ______
+  ORDER  BY total DESC
+</cfquery>
+
+<cfchart format="png" chartwidth="600" chartheight="380"
+         title="______" show3d="false">
+  <cfchartseries type="______"
+                 query="______"
+                 itemcolumn="______"
+                 valuecolumn="total">
+  </cfchartseries>
+</cfchart>
+```
+::
+
+::remark-box
+---
+kind: info
+---
+No full solution is provided here — use the hint and the skeleton. Once you pass all the checks, a **post-challenge review lesson** unlocks with the full annotated solution.
+::
+
+---
+
+### Verify your work
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8500/chart_demo.cfm
+# Expected: 200
 ```
 
 Open the **ColdFusion** browser tab to see the rendered chart.
