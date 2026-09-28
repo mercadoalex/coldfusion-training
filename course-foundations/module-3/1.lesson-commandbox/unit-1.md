@@ -21,6 +21,21 @@ _CommandBox is package manager + embedded server + CLI in one tool — the `npm`
 
 In this lab environment, `box` is already on the PATH and a Lucee 7 server is running on port **8888** via a systemd service. You do not need to install or start anything — CommandBox is ready to use.
 
+::hint-box
+---
+:summary: Is CommandBox widely used in the ColdFusion world?
+---
+
+**Yes — but mainly for development tooling, not production servers.**
+
+If you are doing **modern CFML development** — new projects, frameworks, testing, open source — CommandBox is effectively **mandatory**. The Ortus ecosystem (CommandBox + ColdBox + TestBox + ForgeBox) has become the standard developer toolchain for the language.
+
+If you are maintaining a **legacy Adobe ColdFusion enterprise application** from 10+ years ago, you might never touch CommandBox at all — those shops typically use Adobe's own installer and admin tools directly.
+
+**This course teaches it because it represents where the language is going — not just where it has been.**
+
+::
+
 ---
 
 ## The `box` command
