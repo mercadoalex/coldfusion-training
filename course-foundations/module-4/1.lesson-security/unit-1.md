@@ -175,6 +175,15 @@ Add these headers in `Application.cfc` `onRequestStart` — they tell browsers t
 | `X-Content-Type-Options: nosniff` | Stops browsers guessing the content type (MIME confusion attacks) |
 | `Referrer-Policy: no-referrer` | Prevents leaking your URL to third-party sites |
 
+::image-box
+---
+:src: __static__/security-headers-v1.png
+:alt: Browser diagram showing four security headers and their effect — Content-Security-Policy blocks an external script load with a red X; X-Frame-Options DENY shows an iframe embed attempt rejected with a blocked overlay; X-Content-Type-Options nosniff prevents a response labelled text/plain from being executed as JavaScript; Referrer-Policy no-referrer shows the Referer header stripped before leaving the browser — each header has a green shield icon and a one-line plain-English label
+:max-width: 860px
+---
+_Each security header activates a different browser protection — none are on by default, all must be explicitly sent by your application._
+::
+
 Run this now — you will get **empty output** because the default CF installation sends no security headers:
 
 ```bash
