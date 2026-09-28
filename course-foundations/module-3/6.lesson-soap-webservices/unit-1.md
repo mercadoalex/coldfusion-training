@@ -336,7 +336,9 @@ You should see a success message confirming the tables and sample data were crea
 
 ::
 
-In the **Terminal** tab, first create the `TicketService.cfc` that will be consumed:
+First, create `TicketService.cfc` — the CFC that will be exposed as a SOAP service.
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/TicketService.cfc << 'EOF'
@@ -379,7 +381,55 @@ component displayname="TicketService" style="document" {
 EOF
 ```
 
-Now create the consumer page:
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `TicketService.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component displayname="TicketService" style="document" {
+
+  remote struct function getTicketById(required numeric id) output="false" {
+    var q = queryExecute(
+      "SELECT id, title, status, priority FROM hd_tickets WHERE id = :id",
+      { id: { value: arguments.id, cfsqltype: "cf_sql_integer" } },
+      { datasource: "training_db" }
+    );
+    if (q.recordCount == 0) { return { error: "not found" }; }
+    return {
+      id       : q.id,
+      title    : q.title,
+      status   : q.status,
+      priority : q.priority
+    };
+  }
+
+  remote array function getAllTickets() output="false" {
+    var q = queryExecute(
+      "SELECT id, title, status, priority FROM hd_tickets ORDER BY id",
+      {},
+      { datasource: "training_db" }
+    );
+    var result = [];
+    for (var row in q) {
+      arrayAppend(result, {
+        id       : row.id,
+        title    : row.title,
+        status   : row.status,
+        priority : row.priority
+      });
+    }
+    return result;
+  }
+
+}
+```
+::
+
+Now create the consumer page.
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/soap_consumer.cfm << 'EOF'
@@ -437,6 +487,68 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/soap_consumer.cfm << 'EOF'
 </html>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open the folder `/opt/coldfusion2025/cfusion/wwwroot/student` (click **File → Open Folder…** if needed — create the folder if VS Code asks). Right-click in the Explorer panel → **New File** → name it `soap_consumer.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SOAP Consumer Demo</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    .box  { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>SOAP Web Service Consumer</h1>
+
+  <cfscript>
+    // Create proxy from the local TicketService WSDL
+    ws = createObject("webservice", "http://localhost:8500/TicketService.cfc?wsdl");
+
+    // Call getTicketById — SOAP request/response handled by ColdFusion
+    ticket = ws.getTicketById(1);
+
+    // Call getAllTickets
+    allTickets = ws.getAllTickets();
+  </cfscript>
+
+  <div class="box">
+    <strong>SOAP call — getTicketById(1):</strong><br>
+    <cfoutput>
+      ID: #ticket.id# | Title: #encodeForHTML(ticket.title)# |
+      Status: #encodeForHTML(ticket.status)# | Priority: #encodeForHTML(ticket.priority)#
+    </cfoutput>
+  </div>
+
+  <h2>getAllTickets() — full ticket list via SOAP</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Status</th><th>Priority</th></tr>
+    <cfoutput>
+      <cfloop array="#allTickets#" index="t">
+        <tr>
+          <td>#t.id#</td>
+          <td>#encodeForHTML(t.title)#</td>
+          <td>#encodeForHTML(t.status)#</td>
+          <td>#encodeForHTML(t.priority)#</td>
+        </tr>
+      </cfloop>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+```
+::
 
 Verify both files exist:
 
