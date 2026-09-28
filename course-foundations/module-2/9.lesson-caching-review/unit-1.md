@@ -1,3 +1,8 @@
+---
+kind: lesson
+---
+
+
 # Caching Challenge — Review & Annotated Solution
 
 This lesson unlocks after you pass the **Cache That Query** challenge. It walks through a complete, annotated solution and explains every design choice so you can apply these patterns confidently in your own code.
