@@ -615,9 +615,31 @@ component {
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `Application.cfc` at `/opt/coldfusion2025/cfusion/wwwroot`, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.ormenabled = true;
+  this.ormsettings = {
+    datasource : "training_db",
+    dbcreate   : "update",
+    logsql     : false
+  };
+}
+```
+::
+
 ::
 
 **Activity:** Create `Category.cfc` and update `Ticket.cfc` so that each category has many tickets and each ticket belongs to one category.
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/Category.cfc << 'EOF'
@@ -632,6 +654,27 @@ component persistent="true" table="hd_categories" {
 }
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `Category.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component persistent="true" table="hd_categories" {
+
+  property name="id"      fieldtype="id"       generator="native";
+  property name="name"    ormtype="string";
+  property name="tickets" fieldtype="one-to-many" cfc="Ticket"
+                          fkcolumn="category_id" type="array"
+                          cascade="all-delete-orphan" inverse="true";
+
+}
+```
+::
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/Ticket.cfc << 'EOF'
@@ -649,6 +692,28 @@ component persistent="true" table="hd_tickets" {
 }
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `Ticket.cfc` (already in `/opt/coldfusion2025/cfusion/wwwroot`), **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+component persistent="true" table="hd_tickets" {
+
+  property name="id"          fieldtype="id"         generator="native";
+  property name="title"       ormtype="string";
+  property name="description" ormtype="string";
+  property name="status"      ormtype="string"       default="open";
+  property name="priority"    ormtype="string"       default="medium";
+  property name="userId"      column="USER_ID"       ormtype="integer"  notnull="false";
+  property name="category"    fieldtype="many-to-one" cfc="Category"
+                              fkcolumn="category_id";
+
+}
+```
+::
 
 Verify the relationship fieldtype is present:
 
@@ -683,6 +748,8 @@ ORM relationship CFCs are in place. ✓
 ## Activity 2 — Test the relationship with a CFM page
 
 **Activity:** Create `orm_rel_test.cfm` to reload ORM, create a category, add a ticket to it, and read the relationship back:
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/orm_rel_test.cfm << 'EOF'
@@ -759,6 +826,86 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/orm_rel_test.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open the folder `/opt/coldfusion2025/cfusion/wwwroot`, right-click in the Explorer panel → **New File** → name it `orm_rel_test.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ORM Relationship Test</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 820px; margin: 2rem auto; }
+    .box  { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <h1>ORM Relationship Test</h1>
+
+  <cfscript>
+    ORMReload();
+
+    // Create a Category and a Ticket linked to it
+    cat = EntityNew("Category");
+    cat.setName("Hardware");
+    EntitySave(cat);
+
+    t = EntityNew("Ticket");
+    t.setTitle("Monitor flickering");
+    t.setStatus("open");
+    t.setPriority("high");
+    t.setUserId(1);
+    t.setCategory(cat);
+    EntitySave(t);
+
+    ORMFlush();
+
+    // Navigate the many-to-one: ticket → category
+    loaded = EntityLoadByPK("Ticket", t.getId());
+    catName = loaded.getCategory().getName();
+
+    // Navigate the one-to-many: category → tickets
+    tickets = EntityLoad("Ticket");
+  </cfscript>
+
+  <div class="box">
+    <strong>Ticket category (many-to-one):</strong>
+    <cfoutput>#encodeForHTML(catName)#</cfoutput>
+  </div>
+
+  <h2>All Tickets</h2>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Priority</th><th>Category</th></tr>
+    <cfoutput>
+      <cfloop array="#tickets#" index="tk">
+        <tr>
+          <td>#tk.getId()#</td>
+          <td>#encodeForHTML(tk.getTitle())#</td>
+          <td>#encodeForHTML(tk.getPriority())#</td>
+          <td>
+            <cfif isObject(tk.getCategory())>
+              #encodeForHTML(tk.getCategory().getName())#
+            <cfelse>
+              —
+            </cfif>
+          </td>
+        </tr>
+      </cfloop>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+```
+::
+
 Open `/orm_rel_test.cfm` in the **ColdFusion 2025** browser tab. You should see the ticket's category name loaded via the many-to-one association, and the full ticket list with their categories.
 
 ```bash
@@ -801,6 +948,26 @@ component {
 }
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `Application.cfc` at `/opt/coldfusion2025/cfusion/wwwroot`, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+  this.name       = "HelpdeskApp";
+  this.datasource = "training_db";
+  this.ormenabled = true;
+  this.ormsettings = {
+    datasource : "training_db",
+    dbcreate   : "update",
+    logsql     : false
+  };
+}
+```
+::
 
 Then reload the page. The `ORMReload()` call at the top of `orm_rel_test.cfm` will reinitialise Hibernate automatically.
 
