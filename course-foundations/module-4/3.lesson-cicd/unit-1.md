@@ -129,6 +129,8 @@ kind: info
 
 Create `/home/laborant/app/box.json`:
 
+**Terminal tab** (no `sudo` needed — `/home/laborant/app/` is your home directory):
+
 ```bash
 mkdir -p /home/laborant/app
 tee /home/laborant/app/box.json << 'EOF'
@@ -165,6 +167,64 @@ Verify:
 cat /home/laborant/app/box.json
 ```
 
+Now create a `.gitignore` so `modules/` is never committed to Git:
+
+```bash
+tee /home/laborant/app/.gitignore << 'EOF'
+# CommandBox — never commit installed packages
+modules/
+
+# CommandBox server state
+.server/
+server.json.bak
+
+# OS and editor noise
+.DS_Store
+.vscode/
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `.gitignore`, paste the content below, and save with **Ctrl+S**:
+
+```
+# CommandBox — never commit installed packages
+modules/
+
+# CommandBox server state
+.server/
+server.json.bak
+
+# OS and editor noise
+.DS_Store
+.vscode/
+```
+::
+
+::hint-box
+---
+:summary: Why must modules/ be in .gitignore?
+---
+`box install` downloads ForgeBox packages into a `modules/` directory — the CFML equivalent of `node_modules/` in Node.js. This directory can easily reach **hundreds of MB** and contains third-party code that is already versioned on ForgeBox.
+
+Committing it to Git:
+- Bloats your repository permanently
+- Creates merge conflicts when teammates run `box install` on different platforms
+- Makes `git clone` painfully slow for new team members
+
+The correct workflow — identical to npm:
+
+```
+git clone <repo>        # no modules/ — just source code
+box install             # recreates modules/ from box.json in seconds
+```
+
+Any CI runner does the same: `git clone` → `box install` → run tests → build image. The `box.json` file is the single source of truth.
+::
+
 ::simple-task
 ---
 :tasks: tasks
@@ -183,9 +243,11 @@ Create `box.json` in `/home/laborant/app/`.
 
 Create `/home/laborant/app/Dockerfile`:
 
+**Terminal tab:**
+
 ```bash
 tee /home/laborant/app/Dockerfile << 'EOF'
-FROM ortussolutions/commandbox:latest
+FROM ortussolutions/commandbox:6.3.4
 
 COPY . /app
 WORKDIR /app
@@ -201,10 +263,10 @@ EOF
 ---
 :summary: ✏️ Using the IDE tab instead? Create the file here
 ---
-In the **IDE tab**, click **File → Open Folder…**, type `/home/laborant/app` and press **Enter**. Right-click in the Explorer panel → **New File** → name it `Dockerfile`, paste the content below, and save with **Ctrl+S**:
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `Dockerfile`, paste the content below, and save with **Ctrl+S**:
 
 ```dockerfile
-FROM ortussolutions/commandbox:latest
+FROM ortussolutions/commandbox:6.3.4
 
 COPY . /app
 WORKDIR /app
@@ -216,10 +278,90 @@ CMD ["box", "server", "start", "--console"]
 ```
 ::
 
+::hint-box
+---
+:summary: 💡 Why pin the version tag — and not use :latest?
+---
+`FROM ortussolutions/commandbox:latest` always pulls whichever version Ortus last published. That means:
+
+- Two developers building on different days can get **different images**
+- A pipeline that worked yesterday can silently fail today after an upstream update
+- You cannot reproduce a past build reliably
+
+Pin to a specific version tag instead:
+
+```dockerfile
+FROM ortussolutions/commandbox:6.3.4
+```
+
+Now every build — locally, on CI, in production — uses the exact same base. If you need to upgrade, you change the tag deliberately and test the result. `latest` is convenient for demos; pinned tags are mandatory for production.
+::
+
+Now create a `.dockerignore` so `COPY . /app` doesn't bloat the image:
+
+```bash
+tee /home/laborant/app/.dockerignore << 'EOF'
+# Never copy installed packages into the image — box install runs inside the build
+modules/
+
+# Git history has no place in a production image
+.git/
+.gitignore
+
+# Local server state — not needed in the image
+.server/
+server.json.bak
+
+# Editor files
+.vscode/
+.DS_Store
+EOF
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, right-click in the Explorer panel → **New File** → name it `.dockerignore`, paste the content below, and save with **Ctrl+S**:
+
+```
+# Never copy installed packages into the image — box install runs inside the build
+modules/
+
+# Git history has no place in a production image
+.git/
+.gitignore
+
+# Local server state — not needed in the image
+.server/
+server.json.bak
+
+# Editor files
+.vscode/
+.DS_Store
+```
+::
+
+::hint-box
+---
+:summary: Why does .dockerignore matter — what happens without it?
+---
+`COPY . /app` copies **everything** in the build context to the image. Without a `.dockerignore`:
+
+| What gets copied | Problem |
+|---|---|
+| `modules/` | Hundreds of MB of packages — then `RUN box install` adds them again. Double the size. |
+| `.git/` | Full Git history baked into the image — leaks commit messages, author names, and potentially secrets from past commits |
+| `.vscode/`, `.DS_Store` | Noise — no effect but adds unnecessary bytes |
+
+A `.dockerignore` works exactly like `.gitignore` — patterns listed there are excluded from the build context before Docker even starts processing the `Dockerfile`. The result is a smaller, cleaner, faster-to-push image.
+::
+
 Verify:
 
 ```bash
 cat /home/laborant/app/Dockerfile
+cat /home/laborant/app/.dockerignore
 ```
 
 ::simple-task
@@ -244,7 +386,26 @@ Build the image tagged `cfml-app`:
 docker build -t cfml-app /home/laborant/app/
 ```
 
-Confirm it exists:
+You will see Docker work through the Dockerfile line by line — each instruction becomes a **layer**:
+
+```
+Step 1/5 : FROM ortussolutions/commandbox:6.3.4
+ ---> pulling base image ...
+Step 2/5 : COPY . /app
+ ---> copied project files
+Step 3/5 : WORKDIR /app
+ ---> set working directory
+Step 4/5 : RUN box install --production
+ ---> installing ForgeBox dependencies ...
+Step 5/5 : CMD ["box", "server", "start", "--console"]
+ ---> set default start command
+Successfully built a1b2c3d4e5f6
+Successfully tagged cfml-app:latest
+```
+
+Run the build a second time immediately — every step shows `---> Using cache`. Docker detected that nothing changed and reused all five layers. This is why CI builds after the first are fast.
+
+Confirm the image exists:
 
 ```bash
 docker images | grep cfml
@@ -252,10 +413,20 @@ docker images | grep cfml
 
 ::hint-box
 ---
-:summary: 🐢 First build is slow — here is why.
+:summary: 🐢 First build is slow — here is why and what each layer caches.
 ---
 
-Docker pulls the `ortussolutions/commandbox:latest` base image on the first build — roughly 500 MB. Subsequent builds reuse cached layers and complete in seconds. The `RUN box install --production` step is also cached after the first run as long as `box.json` has not changed.
+Docker pulls the `ortussolutions/commandbox:6.3.4` base image on the first build — roughly 500 MB. After that it is cached locally and never downloaded again unless you change the `FROM` tag.
+
+Each subsequent instruction is also cached **independently**:
+
+| Layer | Invalidated when... |
+|---|---|
+| `FROM` | You change the base image tag |
+| `COPY . /app` | Any file in the build context changes |
+| `RUN box install --production` | `box.json` changes (because `COPY` runs first) |
+
+This is why `COPY` comes **before** `RUN box install` — if the order were reversed, a single `.cfm` file change would invalidate the `box install` cache and re-download all packages on every build.
 ::
 
 ::simple-task
