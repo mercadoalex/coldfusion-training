@@ -143,6 +143,15 @@ WHERE id = #url.id#
 WHERE id = <cfqueryparam value="#url.id#" cfsqltype="cf_sql_integer">
 ```
 
+::image-box
+---
+:src: __static__/sql-injection-v1.png
+:alt: Split diagram comparing two query execution paths — left side labelled "UNSAFE: string interpolation" shows user input 1 OR 1=1 merging directly into the SQL string, producing WHERE id = 1 OR 1=1 which the database parses as a modified query structure, with a red banner saying "attacker controls the query"; right side labelled "SAFE: bind parameter (cfqueryparam)" shows the SQL template and the user value travelling as two separate channels to the database driver, with a green banner saying "value is always just data — never SQL"
+:max-width: 860px
+---
+_String interpolation lets attacker input change the query structure. A bind parameter keeps value and SQL in separate channels — the database driver never parses the value as SQL._
+::
+
 `cfqueryparam` sends the value as a **bind parameter** — the database driver keeps the value and the SQL structure completely separate. Even if an attacker passes `1 OR 1=1` as the value, it is treated as a literal string, not as SQL syntax.
 
 ---
