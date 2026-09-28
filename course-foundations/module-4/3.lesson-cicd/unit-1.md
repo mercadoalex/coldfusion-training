@@ -412,6 +412,15 @@ Successfully built a1b2c3d4e5f6
 Successfully tagged cfml-app:latest
 ```
 
+::image-box
+---
+:src: __static__/what-docker-is-doing-v1.png
+:alt: Diagram showing the docker build process — on the left a Dockerfile with five instructions (FROM, COPY, WORKDIR, RUN, CMD); each instruction has an arrow pointing right to a stacked layer in the centre labelled "Image layers (read-only)"; the final stack is sealed with a tag label "cfml-app:latest" on the right — a clock icon on the FROM layer is labelled "~500 MB, downloaded once then cached", and a lightning bolt on layers 2-5 is labelled "cache hit on rebuild if unchanged"
+:max-width: 860px
+---
+_Each Dockerfile instruction creates one immutable layer — unchanged layers are reused from cache on every subsequent build._
+::
+
 Run the build a second time immediately — every step shows `---> Using cache`. Docker detected that nothing changed and reused all five layers. This is why CI builds after the first are fast.
 
 Confirm the image exists:
