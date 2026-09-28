@@ -319,6 +319,97 @@ _`new GreetingService()` and `createObject("component","GreetingService").init()
 
 ---
 
+## CFC packages — CFCs in subfolders
+
+Java organises classes into packages (`com.example.services`). ColdFusion does the same thing using **dot-notation paths that mirror the folder structure** relative to the web root.
+
+```
+wwwroot/
+├── index.cfm
+└── services/
+    └── greeting/
+        └── GreetingService.cfc   ← package: services.greeting
+```
+
+To instantiate a CFC that lives in a subfolder, replace the slashes with dots:
+
+```cfml
+// CFC is at wwwroot/services/greeting/GreetingService.cfc
+svc = new services.greeting.GreetingService();
+
+// Equivalent createObject form
+svc = createObject("component", "services.greeting.GreetingService").init();
+```
+
+The dot-path is always **relative to the web root** (or a mapped path — see below). There is no `import` statement needed — ColdFusion resolves the path at runtime.
+
+**The `extends` attribute uses the same dot-notation:**
+
+```cfml
+// services/greeting/GreetingService.cfc extends services/BaseService.cfc
+component extends="services.BaseService" {
+  ...
+}
+```
+
+### CF mappings — using paths outside the web root
+
+If your CFCs live outside the web root (e.g. `/opt/app/components/`) you need a **ColdFusion mapping** — an alias that tells CF where to look. Define it in `Application.cfc`:
+
+```cfml
+component {
+  this.name = "MyApp";
+
+  // Map the alias "components" to an absolute filesystem path
+  this.mappings["/components"] = "/opt/app/components";
+}
+```
+
+Now instantiate using the mapping alias:
+
+```cfml
+// Resolves to /opt/app/components/services/GreetingService.cfc
+svc = new components.services.GreetingService();
+```
+
+::hint-box
+---
+:summary: CF mappings vs web root paths — when to use each
+---
+
+| Approach | When to use | Example path |
+|---|---|---|
+| **Dot-path from web root** | CFCs are inside `wwwroot/` | `new services.greeting.GreetingService()` |
+| **`this.mappings` in Application.cfc** | CFCs are outside `wwwroot/` — libraries, shared components | `new components.services.GreetingService()` |
+| **Absolute path in `createObject`** | One-off, no mapping needed | `createObject("component", "/opt/app/Util.cfc")` |
+
+Most training and small projects keep everything under `wwwroot/` and use dot-paths. Real applications typically move CFCs outside `wwwroot/` (so they cannot be requested directly by a browser) and use mappings.
+
+::
+
+### Quick reference — folder structure → instantiation path
+
+```
+wwwroot/
+├── Application.cfc
+├── index.cfm
+├── services/
+│   ├── GreetingService.cfc      → new services.GreetingService()
+│   └── tickets/
+│       └── TicketService.cfc    → new services.tickets.TicketService()
+└── models/
+    └── User.cfc                 → new models.User()
+```
+
+::remark-box
+---
+kind: info
+---
+**The dot separator is mandatory** — `new services/GreetingService()` is a syntax error. Always use dots, never slashes, when referencing a CFC by path in CFML code.
+::
+
+---
+
 ## Inheritance
 
 ```cfml
