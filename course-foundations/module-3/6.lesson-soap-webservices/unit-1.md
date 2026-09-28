@@ -698,6 +698,15 @@ Here is what the output means — the five sections CF wrote for you, trimmed an
 
 **Why two bindings and two ports?** ColdFusion auto-generates both so any client — old or new — can connect without you having to pick a version. The same `TicketService.cfc` URL serves both. When you call `createObject("webservice", "http://localhost:8500/TicketService.cfc?wsdl")`, ColdFusion reads the WSDL and negotiates the version automatically based on the client's `Content-Type` header — you never write any version-handling code.
 
+::image-box
+---
+:src: __static__/two-bindins-two-ports-v1.png
+:alt: Diagram showing the single TicketService.cfc URL on the left splitting into two paths — SOAP 1.1 (Content-Type text/xml) connecting to TicketServiceHttpSoap11Endpoint, and SOAP 1.2 (Content-Type application/soap+xml) connecting to TicketServiceHttpSoap12Endpoint — both paths converge back to the same CFC on the right, with a label showing createObject picks automatically
+:max-width: 760px
+---
+_ColdFusion generates one binding and one port per SOAP version — the same CFC URL serves both. `createObject("webservice", ...)` negotiates the version automatically._
+::
+
 **Reading a WSDL at a glance — the one-line version of each section:**
 
 | Section | XML element | Plain-English meaning |
