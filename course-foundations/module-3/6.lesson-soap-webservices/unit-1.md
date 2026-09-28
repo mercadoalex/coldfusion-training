@@ -599,6 +599,95 @@ curl -s "http://localhost:8500/TicketService.cfc?wsdl" | head -20
 
 You should see an XML document starting with `<?xml` and containing `<wsdl:definitions` — ColdFusion generated this automatically from your CFC's `remote` function signatures.
 
+Here is what the output means — the five sections CF wrote for you, trimmed and annotated:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ① Root element — names the service and declares XML namespaces.
+     targetNamespace is the unique identifier for THIS service contract. -->
+<wsdl:definitions name="TicketService"
+  targetNamespace="http://localhost:8500/TicketService.cfc"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!-- ② Types — XSD schema for every input and output data structure.
+       CF mapped your CFML types: numeric → xsd:int, struct → xsd:anyType.
+       Any SOAP client reads this to know what to send and what to expect back. -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://localhost:8500/TicketService.cfc">
+      <xsd:element name="getTicketById">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:int"/>   <!-- your "numeric id" arg -->
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <!-- getAllTickets takes no arguments — no input element needed -->
+    </xsd:schema>
+  </wsdl:types>
+
+  <!-- ③ Messages — named parameter bundles, one per operation input/output.
+       Think of these as the typed method signatures in a Java interface. -->
+  <wsdl:message name="getTicketByIdRequest">
+    <wsdl:part name="parameters" element="tns:getTicketById"/>
+  </wsdl:message>
+  <wsdl:message name="getTicketByIdResponse">
+    <wsdl:part name="return" type="xsd:anyType"/>     <!-- CF struct → anyType -->
+  </wsdl:message>
+
+  <!-- ④ PortType — the interface: every available operation listed by name.
+       This is the section to read first when you get a third-party WSDL —
+       it tells you exactly what operations you can call. -->
+  <wsdl:portType name="TicketServicePortType">
+    <wsdl:operation name="getTicketById">
+      <wsdl:input  message="tns:getTicketByIdRequest"/>
+      <wsdl:output message="tns:getTicketByIdResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTickets">
+      <wsdl:input  message="tns:getAllTicketsRequest"/>
+      <wsdl:output message="tns:getAllTicketsResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <!-- ⑤ Binding — transport details: SOAP 1.1 over HTTP, document style.
+       "document" matches the style="document" you set on the component. -->
+  <wsdl:binding name="TicketServiceSoapBinding" type="tns:TicketServicePortType">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getTicketById">
+      <soap:operation soapAction="getTicketById"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTickets">
+      <soap:operation soapAction="getAllTickets"/>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <!-- ⑥ Service — the live endpoint URL.
+       This is the string you pass to createObject("webservice", "...").
+       CF fills it in automatically from the request URL. -->
+  <wsdl:service name="TicketService">
+    <wsdl:port name="TicketServicePort" binding="tns:TicketServiceSoapBinding">
+      <soap:address location="http://localhost:8500/TicketService.cfc"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>
+```
+
+**Reading a WSDL at a glance — the one-line version of each section:**
+
+| Section | XML element | Plain-English meaning |
+|---------|-------------|----------------------|
+| Types | `<wsdl:types>` | "Here are the data shapes" — XSD schemas for inputs and outputs |
+| Messages | `<wsdl:message>` | "Here are the method signatures" — typed parameter bundles |
+| Port Type | `<wsdl:portType>` | "Here are the operations you can call" — start reading here |
+| Binding | `<wsdl:binding>` | "Here is how to call them" — SOAP version, HTTP transport, encoding style |
+| Service | `<wsdl:service>` | "Here is the URL to call" — the endpoint address for `createObject` |
+
+When integrating with a **third-party SOAP service**, jump straight to `<wsdl:portType>` to see available operations, then `<wsdl:types>` to understand the data structures. You never need to read the binding or service sections manually — ColdFusion's `createObject("webservice", ...)` consumes the whole document automatically.
+
 ::image-box
 ---
 :src: __static__/terminal-wsdl-accessible-v1.png
