@@ -268,7 +268,9 @@ CF Admin endpoint audited. ✓ In production this must return 403 — never 200.
 
 ## Activity 2 — Prevent XSS with encodeForHTML()
 
-Create `/opt/coldfusion2025/cfusion/wwwroot/student/input_demo.cfm` that safely encodes user input:
+Create `/opt/coldfusion2025/cfusion/wwwroot/student/input_demo.cfm` that safely encodes user input.
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/input_demo.cfm << 'EOF'
@@ -278,6 +280,20 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/input_demo.cfm << 'EOF'
 </cfscript>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `input_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<cfscript>
+  name = structKeyExists(url, "name") ? encodeForHTML(url.name) : "Guest";
+  writeOutput("Hello, " & name & "!");
+</cfscript>
+```
+::
 
 Test it — use URL-encoded characters so Tomcat accepts the request:
 
@@ -373,14 +389,46 @@ curl -s -I http://localhost:8500/index.cfm | grep -i "x-frame\|content-security\
 # Expected: empty output — no headers yet
 ```
 
-Add the security headers to your existing `Application.cfc`. If you already have an `onRequestStart` method, add the `cfheader` calls inside it. If not, add the whole method:
+Check whether `Application.cfc` already exists:
 
 ```bash
-# Check if Application.cfc already exists
 ls /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
 ```
 
-**If it exists** — open it and add inside `onRequestStart`:
+::remark-box
+---
+kind: warning
+---
+**Do not overwrite an existing `Application.cfc` with the `sudo tee` command below if you completed the ORM lessons.** That file contains `this.ormenabled = true` and `this.ormsettings` — replacing it will break ORM for the rest of the course. Use the **"It exists"** path instead and add only the `cfheader` lines.
+::
+
+---
+
+**If it exists** — add the four `cfheader` calls inside the existing `onRequestStart` method (or add the method if it is missing). Choose your preferred approach:
+
+**Terminal tab** — append headers with a targeted edit:
+
+```bash
+sudo tee /opt/coldfusion2025/cfusion/wwwroot/security_headers.cfm << 'EOF'
+<cfheader name="Content-Security-Policy"  value="default-src 'self'">
+<cfheader name="X-Frame-Options"          value="DENY">
+<cfheader name="X-Content-Type-Options"   value="nosniff">
+<cfheader name="Referrer-Policy"          value="no-referrer">
+EOF
+cat /opt/coldfusion2025/cfusion/wwwroot/security_headers.cfm
+```
+
+Then open `Application.cfc` in the terminal editor and paste those four lines inside `onRequestStart`:
+
+```bash
+sudo vi /opt/coldfusion2025/cfusion/wwwroot/Application.cfc
+```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `Application.cfc` at `/opt/coldfusion2025/cfusion/wwwroot`. Find the `onRequestStart` function (or `<cffunction name="onRequestStart">`) and add the four lines below **inside** it — do not replace the rest of the file:
 
 ```cfml
 cfheader(name="Content-Security-Policy",  value="default-src 'self'");
@@ -389,23 +437,62 @@ cfheader(name="X-Content-Type-Options",   value="nosniff");
 cfheader(name="Referrer-Policy",          value="no-referrer");
 ```
 
-**If it does not exist** — create a minimal one:
+If there is no `onRequestStart` yet, add the whole function inside the `component { }` block:
+
+```cfml
+public void function onRequestStart(required string targetPage) {
+  cfheader(name="Content-Security-Policy",  value="default-src 'self'");
+  cfheader(name="X-Frame-Options",          value="DENY");
+  cfheader(name="X-Content-Type-Options",   value="nosniff");
+  cfheader(name="Referrer-Policy",          value="no-referrer");
+}
+```
+
+Save with **Ctrl+S**.
+::
+
+---
+
+**If it does not exist** — create a minimal `Application.cfc` from scratch:
+
+**Terminal tab:**
 
 ```bash
 sudo tee /opt/coldfusion2025/cfusion/wwwroot/Application.cfc << 'EOF'
-<cfcomponent>
-  <cfset this.name = "training_app">
-  <cfset this.datasource = "training_db">
+component {
+  this.name       = "training_app";
+  this.datasource = "training_db";
 
-  <cffunction name="onRequestStart">
-    <cfheader name="Content-Security-Policy"  value="default-src 'self'">
-    <cfheader name="X-Frame-Options"          value="DENY">
-    <cfheader name="X-Content-Type-Options"   value="nosniff">
-    <cfheader name="Referrer-Policy"          value="no-referrer">
-  </cffunction>
-</cfcomponent>
+  public void function onRequestStart(required string targetPage) {
+    cfheader(name="Content-Security-Policy",  value="default-src 'self'");
+    cfheader(name="X-Frame-Options",          value="DENY");
+    cfheader(name="X-Content-Type-Options",   value="nosniff");
+    cfheader(name="Referrer-Policy",          value="no-referrer");
+  }
+}
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, open the folder `/opt/coldfusion2025/cfusion/wwwroot`, right-click in the Explorer panel → **New File** → name it `Application.cfc`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+component {
+  this.name       = "training_app";
+  this.datasource = "training_db";
+
+  public void function onRequestStart(required string targetPage) {
+    cfheader(name="Content-Security-Policy",  value="default-src 'self'");
+    cfheader(name="X-Frame-Options",          value="DENY");
+    cfheader(name="X-Content-Type-Options",   value="nosniff");
+    cfheader(name="Referrer-Policy",          value="no-referrer");
+  }
+}
+```
+::
 
 Now verify the headers appear:
 
