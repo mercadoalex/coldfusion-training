@@ -651,9 +651,12 @@ Here is what the output means — the five sections CF wrote for you, trimmed an
     </wsdl:operation>
   </wsdl:portType>
 
-  <!-- ⑤ Binding — transport details: SOAP 1.1 over HTTP, document style.
-       "document" matches the style="document" you set on the component. -->
-  <wsdl:binding name="TicketServiceSoapBinding" type="tns:TicketServicePortType">
+  <!-- ⑤ Binding — CF generates TWO bindings: one for SOAP 1.1, one for SOAP 1.2.
+       Both use document/literal style ("document" matches style="document" on the component).
+       The client's Content-Type header determines which binding is used at runtime:
+         SOAP 1.1 → Content-Type: text/xml
+         SOAP 1.2 → Content-Type: application/soap+xml                          -->
+  <wsdl:binding name="TicketServiceSoap11Binding" type="tns:TicketServicePortType">
     <soap:binding style="document"
                   transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="getTicketById">
@@ -664,17 +667,36 @@ Here is what the output means — the five sections CF wrote for you, trimmed an
     </wsdl:operation>
   </wsdl:binding>
 
-  <!-- ⑥ Service — the live endpoint URL.
-       This is the string you pass to createObject("webservice", "...").
-       CF fills it in automatically from the request URL. -->
+  <wsdl:binding name="TicketServiceSoap12Binding" type="tns:TicketServicePortType">
+    <soap12:binding style="document"
+                    transport="http://www.w3.org/2003/05/soap/bindings/HTTP/"/>
+    <wsdl:operation name="getTicketById">
+      <soap12:operation soapAction="getTicketById"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTickets">
+      <soap12:operation soapAction="getAllTickets"/>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <!-- ⑥ Service — CF generates TWO ports inside the same <wsdl:service>:
+       one for SOAP 1.1 and one for SOAP 1.2. Both point to the same CFC URL.
+       createObject("webservice", ...) reads both and negotiates automatically —
+       you never need to choose which port to use. -->
   <wsdl:service name="TicketService">
-    <wsdl:port name="TicketServicePort" binding="tns:TicketServiceSoapBinding">
+    <wsdl:port name="TicketServiceHttpSoap11Endpoint"
+               binding="tns:TicketServiceSoap11Binding">
       <soap:address location="http://localhost:8500/TicketService.cfc"/>
+    </wsdl:port>
+    <wsdl:port name="TicketServiceHttpSoap12Endpoint"
+               binding="tns:TicketServiceSoap12Binding">
+      <soap12:address location="http://localhost:8500/TicketService.cfc"/>
     </wsdl:port>
   </wsdl:service>
 
 </wsdl:definitions>
 ```
+
+**Why two bindings and two ports?** ColdFusion auto-generates both so any client — old or new — can connect without you having to pick a version. The same `TicketService.cfc` URL serves both. When you call `createObject("webservice", "http://localhost:8500/TicketService.cfc?wsdl")`, ColdFusion reads the WSDL and negotiates the version automatically based on the client's `Content-Type` header — you never write any version-handling code.
 
 **Reading a WSDL at a glance — the one-line version of each section:**
 
@@ -683,8 +705,8 @@ Here is what the output means — the five sections CF wrote for you, trimmed an
 | Types | `<wsdl:types>` | "Here are the data shapes" — XSD schemas for inputs and outputs |
 | Messages | `<wsdl:message>` | "Here are the method signatures" — typed parameter bundles |
 | Port Type | `<wsdl:portType>` | "Here are the operations you can call" — start reading here |
-| Binding | `<wsdl:binding>` | "Here is how to call them" — SOAP version, HTTP transport, encoding style |
-| Service | `<wsdl:service>` | "Here is the URL to call" — the endpoint address for `createObject` |
+| Binding | `<wsdl:binding>` | "Here is how to call them" — one binding per SOAP version (1.1 and 1.2) |
+| Service | `<wsdl:service>` | "Here are the endpoints" — two ports, same URL, CF picks the right one |
 
 When integrating with a **third-party SOAP service**, jump straight to `<wsdl:portType>` to see available operations, then `<wsdl:types>` to understand the data structures. You never need to read the binding or service sections manually — ColdFusion's `createObject("webservice", ...)` consumes the whole document automatically.
 
