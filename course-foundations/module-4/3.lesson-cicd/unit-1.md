@@ -204,6 +204,15 @@ server.json.bak
 ```
 ::
 
+::image-box
+---
+:src: __static__/gitignore-v1.png
+:alt: Project directory tree showing two columns — left column labelled "Committed to Git" contains box.json, Dockerfile, .dockerignore, .gitignore, server.json, and .cfm source files with green checkmarks; right column labelled "Ignored by Git" contains modules/ folder and .server/ folder with red X marks — an arrow from box.json points to modules/ with the label "box install recreates this"
+:max-width: 760px
+---
+_`modules/` is never committed — `box.json` is the source of truth. Any developer or CI runner recreates it with `box install`._
+::
+
 ::hint-box
 ---
 :summary: Why must modules/ be in .gitignore?
