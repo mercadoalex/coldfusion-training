@@ -290,6 +290,62 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm << 'EOF'
 EOF
 ```
 
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Create the file here
+---
+In the **IDE tab**, click **File → Open Folder…**, type `/opt/coldfusion2025/cfusion/wwwroot/student` and press **Enter**. If VS Code asks _"The folder does not exist. Would you like to create it?"_ — click **Yes**. Then right-click in the Explorer panel → **New File** → name it `cache_demo.cfm`, paste the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ColdFusion Cache Demo</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .box  { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion Caching Demo</h1>
+
+  <h2>1. Query Cache — cachedwithin</h2>
+
+  <cfquery name="openTickets" datasource="training_db"
+           cachedwithin="#createTimeSpan(0,0,5,0)#">
+    SELECT id, title, status, priority
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    ORDER  BY id DESC
+  </cfquery>
+
+  <div class="box">
+    <strong>cachedwithin query:</strong>
+    <cfoutput>#openTickets.recordCount#</cfoutput> open ticket(s) — cached for 5 minutes
+  </div>
+
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Status</th><th>Priority</th></tr>
+    <cfoutput query="openTickets">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(status)#</td>
+        <td>#encodeForHTML(priority)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+```
+::
+
 Verify `cachedwithin` is in the file:
 
 ```bash
@@ -414,6 +470,88 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm << 'EOF'
 </html>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `cache_demo.cfm`, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ColdFusion Cache Demo</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .box  { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+    .miss { border-left-color: #ef4444; background: #fff0f0; }
+    .hit  { border-left-color: #22c55e; background: #f0fff4; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion Caching Demo</h1>
+
+  <h2>1. Query Cache — cachedwithin</h2>
+
+  <cfquery name="openTickets" datasource="training_db"
+           cachedwithin="#createTimeSpan(0,0,5,0)#">
+    SELECT id, title, status, priority
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    ORDER  BY id DESC
+  </cfquery>
+
+  <div class="box">
+    <strong>cachedwithin query:</strong>
+    <cfoutput>#openTickets.recordCount#</cfoutput> open ticket(s) — cached for 5 minutes
+  </div>
+
+  <h2>2. Application Cache — cacheGet / cachePut</h2>
+
+  <cfscript>
+    cacheKey = "highPriorityTickets";
+    highTickets = cacheGet(cacheKey);
+    cacheHit = !isNull(highTickets);
+
+    if (!cacheHit) {
+      highTickets = queryExecute(
+        "SELECT id, title, priority, category FROM hd_tickets WHERE priority = 'high' ORDER BY id DESC",
+        {},
+        { datasource: "training_db" }
+      );
+      cachePut(cacheKey, highTickets, createTimeSpan(0,0,5,0));
+    }
+  </cfscript>
+
+  <cfoutput>
+  <div class="box #cacheHit ? 'hit' : 'miss'#">
+    <strong>Cache #cacheHit ? 'HIT' : 'MISS'#:</strong>
+    #highTickets.recordCount# high-priority ticket(s) from #cacheHit ? 'cache' : 'database'#
+  </div>
+  </cfoutput>
+
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Priority</th><th>Category</th></tr>
+    <cfoutput query="highTickets">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(priority)#</td>
+        <td>#encodeForHTML(category)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+</body>
+</html>
+```
+::
 
 Open `/student/cache_demo.cfm` in the **ColdFusion 2025** browser tab. The first load will show **Cache MISS** (red); refresh and it switches to **Cache HIT** (green).
 
@@ -605,6 +743,109 @@ sudo tee /opt/coldfusion2025/cfusion/wwwroot/student/cache_demo.cfm << 'EOF'
 </html>
 EOF
 ```
+
+::details-box
+---
+:summary: ✏️ Using the IDE tab instead? Edit the file here
+---
+In the **IDE tab**, open `cache_demo.cfm`, **select all** (`Ctrl+A`), replace with the content below, and save with **Ctrl+S**:
+
+```cfml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ColdFusion Cache Demo</title>
+  <style>
+    body  { font-family: sans-serif; max-width: 860px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th    { background: #3b82d4; color: #fff; padding: .5rem .75rem; text-align: left; }
+    td    { padding: .45rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    tr:hover td { background: #f7f8fa; }
+    .box  { padding: 1rem; background: #f0f4ff; border-left: 4px solid #3b82d4; margin: 1rem 0; }
+    .miss { border-left-color: #ef4444; background: #fff0f0; }
+    .hit  { border-left-color: #22c55e; background: #f0fff4; }
+    .warn { border-left-color: #f59e0b; background: #fffbeb; }
+  </style>
+</head>
+<body>
+  <h1>ColdFusion Caching Demo</h1>
+
+  <h2>1. Query Cache — cachedwithin</h2>
+
+  <cfquery name="openTickets" datasource="training_db"
+           cachedwithin="#createTimeSpan(0,0,5,0)#">
+    SELECT id, title, status, priority
+    FROM   hd_tickets
+    WHERE  status = 'open'
+    ORDER  BY id DESC
+  </cfquery>
+
+  <div class="box">
+    <strong>cachedwithin query:</strong>
+    <cfoutput>#openTickets.recordCount#</cfoutput> open ticket(s) — cached for 5 minutes
+  </div>
+
+  <h2>2. Application Cache — cacheGet / cachePut</h2>
+
+  <cfscript>
+    cacheKey = "highPriorityTickets";
+    highTickets = cacheGet(cacheKey);
+    cacheHit = !isNull(highTickets);
+
+    if (!cacheHit) {
+      highTickets = queryExecute(
+        "SELECT id, title, priority, category FROM hd_tickets WHERE priority = 'high' ORDER BY id DESC",
+        {},
+        { datasource: "training_db" }
+      );
+      cachePut(cacheKey, highTickets, createTimeSpan(0,0,5,0));
+    }
+  </cfscript>
+
+  <cfoutput>
+  <div class="box #cacheHit ? 'hit' : 'miss'#">
+    <strong>Cache #cacheHit ? 'HIT' : 'MISS'#:</strong>
+    #highTickets.recordCount# high-priority ticket(s) from #cacheHit ? 'cache' : 'database'#
+  </div>
+  </cfoutput>
+
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Priority</th><th>Category</th></tr>
+    <cfoutput query="highTickets">
+      <tr>
+        <td>#id#</td>
+        <td>#encodeForHTML(title)#</td>
+        <td>#encodeForHTML(priority)#</td>
+        <td>#encodeForHTML(category)#</td>
+      </tr>
+    </cfoutput>
+  </table>
+
+  <h2>3. Cache Invalidation — cacheRemove</h2>
+
+  <cfscript>
+    // Check if the key exists before invalidation
+    beforeRemove = !isNull(cacheGet("highPriorityTickets"));
+
+    // Invalidate the key
+    cacheRemove("highPriorityTickets");
+
+    // Check immediately after — must be null now
+    afterRemove = isNull(cacheGet("highPriorityTickets"));
+  </cfscript>
+
+  <cfoutput>
+  <div class="box warn">
+    <strong>Before cacheRemove:</strong> key was #beforeRemove ? 'PRESENT in cache' : 'already absent'#<br>
+    <strong>After cacheRemove:</strong> key is #afterRemove ? 'GONE — next request will be a cache miss' : 'still present (unexpected)'#
+  </div>
+  </cfoutput>
+
+</body>
+</html>
+```
+::
 
 Now reload `/student/cache_demo.cfm` twice in the browser:
 
